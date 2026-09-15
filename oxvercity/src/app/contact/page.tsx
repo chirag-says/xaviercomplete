@@ -28,7 +28,7 @@ export default function ContactPage() {
       footer={<Footer hashes={LAYOUT_HASHES.contact} containerClass="framer-pis4pp-container" />}
     >
       <div className="ct">
-        <ContactBanner />
+        <ContactBanner siteKey={turnstileSiteKey()} />
         <AccessRequestSection siteKey={turnstileSiteKey()} />
         <ContactFaq />
         <LocationSection />

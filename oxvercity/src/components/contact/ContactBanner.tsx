@@ -4,10 +4,21 @@
  * Contact page hero — two-column layout:
  *   Left:  heading, description
  *   Right: the contact form card
+ *
+ * Includes a Cloudflare Turnstile widget when a site key is configured.
  */
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { contactPage } from '@/data/pages/contact';
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (el: HTMLElement, options: Record<string, unknown>) => string;
+      reset: (id?: string) => void;
+    };
+  }
+}
 
 function ArrowIcon() {
   return (
@@ -20,9 +31,31 @@ function ArrowIcon() {
 
 type FormState = 'idle' | 'sending' | 'sent' | 'error';
 
-export function ContactBanner() {
+export function ContactBanner({ siteKey }: { siteKey: string | null }) {
   const [state, setState] = useState<FormState>('idle');
   const [notice, setNotice] = useState('');
+
+  const widget = useRef<HTMLDivElement>(null);
+  const widgetId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!siteKey || !widget.current) return;
+
+    const render = () => {
+      if (!window.turnstile || !widget.current || widgetId.current) return;
+      widgetId.current = window.turnstile.render(widget.current, { sitekey: siteKey, theme: 'light' });
+    };
+
+    if (window.turnstile) {
+      render();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.onload = render;
+    document.head.appendChild(script);
+  }, [siteKey]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -40,15 +73,19 @@ export function ContactBanner() {
       if (!response.ok) {
         setState('error');
         setNotice(data.message ?? 'We could not send that. Please email the Association directly.');
+        // Reset Turnstile so a retry gets a fresh token
+        window.turnstile?.reset(widgetId.current ?? undefined);
         return;
       }
 
       setState('sent');
       setNotice(data.message ?? 'Thank you — your message is with the Association.');
       form.reset();
+      window.turnstile?.reset(widgetId.current ?? undefined);
     } catch {
       setState('error');
       setNotice('We could not reach the server. Check your connection, or email the Association directly.');
+      window.turnstile?.reset(widgetId.current ?? undefined);
     }
   }
 
@@ -95,6 +132,8 @@ export function ContactBanner() {
                 <span className="ct-form__consent-text">{contactPage.form.consent}</span>
               </label>
 
+              {siteKey && <div style={{ marginBottom: 12 }} ref={widget} />}
+
               <button className="ct-form__submit" type="submit" disabled={state === 'sending'}>
                 {label}
                 <ArrowIcon />
@@ -118,3 +157,4 @@ export function ContactBanner() {
     </section>
   );
 }
+
