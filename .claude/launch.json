@@ -1,0 +1,49 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "oxversity-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "oxvercity",
+        "run",
+        "dev"
+      ],
+      "port": 3300
+    },
+    {
+      "name": "oxvercity-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "oxvercity",
+        "run",
+        "dev:preview"
+      ],
+      "autoPort": true
+    },
+    {
+      "name": "mobile-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "mobile",
+        "run",
+        "web"
+      ],
+      "port": 8081
+    },
+    {
+      "name": "admin-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "admin",
+        "run",
+        "dev:preview"
+      ],
+      "autoPort": true
+    }
+  ]
+}

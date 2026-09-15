@@ -1,0 +1,38 @@
+{
+  "name": "sxccaa-admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env node_modules/next/dist/bin/next dev -p 3400",
+    "dev:preview": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env node_modules/next/dist/bin/next dev",
+    "build": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env node_modules/next/dist/bin/next build",
+    "start": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env node_modules/next/dist/bin/next start -p 3400",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"tests/**/*.test.ts\"",
+    "admin:create": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env tools/create-admin.ts",
+    "admin:verify": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env tools/admin-verify.ts",
+    "admin:sql": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env tools/admin-sql.ts",
+    "seed:verify": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env tools/seed-sql-verify.ts",
+    "broadcast:verify": "node --env-file-if-exists=../oxvercity/.env --env-file-if-exists=.env tools/broadcast-verify.ts"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.0.2",
+    "next": "^15.5.2",
+    "postgres": "^3.4.9",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.11",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "^15.5.2",
+    "typescript": "^5.9.2"
+  },
+  "overrides": {
+    "postcss": "^8.5.28"
+  },
+  "overridesRationale": "Same reasoning as the public app: next pins postcss 8.4.31, which carries four sourceMappingURL path-traversal advisories. 8.5.x is the patched, semver-compatible line."
+}

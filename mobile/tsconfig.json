@@ -1,0 +1,23 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    // The tests run under `node --test`, which resolves TypeScript by stripping
+    // types, so they import with explicit .ts extensions. Safe to allow
+    // project-wide because noEmit is true — the same reasoning as oxvercity's
+    // tsconfig, which does this for the tools that run outside Next.
+    "allowImportingTsExtensions": true,
+    // expo/tsconfig.base sets no `types`, and TypeScript's automatic @types
+    // inclusion does not survive its `customConditions: ["react-native"]` — so
+    // node:test and node:assert in tests/ go unresolved unless named here.
+    // "react" is listed too because naming any type package disables the
+    // automatic inclusion that was supplying it.
+    "types": ["node", "react"],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["node_modules"]
+}

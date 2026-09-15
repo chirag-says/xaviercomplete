@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    // Shared modules are imported with explicit .ts extensions so plain Node can
+    // load them: the admin CLI and the verifier run outside Next. Safe because
+    // noEmit is true.
+    "allowImportingTsExtensions": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  // The public app's modules are NOT listed as roots here. They reach the
+  // compiler through the import graph from src/lib/shared.ts, which is exactly
+  // the set this app depends on. Adding `../oxvercity/src/lib/**/*.ts` as a
+  // root instead pulls in files that use that app's own `@/` alias — which
+  // resolves to *this* app's src — and produces errors about modules the admin
+  // portal never imports.
+  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next-env.d.ts"],
+  "exclude": ["node_modules", "../oxvercity/node_modules"]
+}

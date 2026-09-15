@@ -1,0 +1,121 @@
+# Continuous integration for the SXCCAA alumni platform.
+#
+# Everything here runs without a database, without secrets, and without a
+# running server. The checks that need those — `db:verify`, `gate:verify`,
+# `auth:verify`, `request:verify`, `admin:verify`, `restore:proof`,
+# `harden:verify` — are run by hand against a real environment and are
+# documented in TESTING-GUIDE.md. Wiring production credentials into CI to
+# automate them would put the key that decrypts every contact number into a
+# third party's build environment, which is a worse trade than running six
+# commands before a release.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The default token only needs to read the code.
+permissions:
+  contents: read
+
+jobs:
+  public-site:
+    name: Public site
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: oxvercity
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: oxvercity/package-lock.json
+
+      # `npm ci` and not `npm install`: the lockfile is the record of what was
+      # reviewed, and an install that silently resolves something newer defeats
+      # the point of committing it.
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint src tools tests
+
+      - name: Unit tests
+        run: npm test
+
+      # Includes the visibility matrix and the upload abuse suite, which are the
+      # two that fail loudly if the access model is reopened.
+      - name: Build
+        run: npm run build
+        env:
+          # The build must not depend on real secrets. If it ever does, this step
+          # fails and that is the signal — a build that needs the decryption key
+          # is a build that could bake it into the output.
+          NODE_ENV: production
+
+      - name: Secrets must not be in the repository
+        run: npm run scan:secrets
+
+      - name: Dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+  admin-portal:
+    name: Admin portal
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+
+      # The public app's node_modules are needed too: admin/src/lib/shared.ts
+      # imports the crypto and blind-index modules from there.
+      - name: Install the public app's dependencies
+        working-directory: oxvercity
+        run: npm ci
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint src tools tests
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Dependency audit
+        run: npm audit --omit=dev --audit-level=high
+
+  no-private-data:
+    name: No alumni data in the repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The spreadsheet must never be committed, and neither must anything
+      # derived from it. This is cheap and the failure it prevents is permanent.
+      - name: private-data/ and .env must be untracked
+        run: |
+          if git ls-files | grep -E '^(oxvercity|admin)?/?private-data/|(^|/)\.env$'; then
+            echo "::error::Alumni data or a .env file is tracked by git."
+            exit 1
+          fi
+          echo "Clean."
