@@ -15,9 +15,9 @@
 
 import { randomUUID } from 'node:crypto';
 
-import { connect, type Sql } from '../../oxvercity/src/lib/db.ts';
-import { encryptField, fieldContext } from '../../oxvercity/src/lib/core/crypto.ts';
-import { emailBlindIndex } from '../../oxvercity/src/lib/core/hmac.ts';
+import { connect, type Sql } from '../src/lib/shared-db.ts';
+import { encryptField, fieldContext } from '../src/lib/core/crypto.ts';
+import { emailBlindIndex } from '../src/lib/core/hmac.ts';
 import { newRecoveryCodes } from '../src/lib/shared.ts';
 import { buildSeedSql } from '../src/lib/seed-sql.ts';
 import { hashPassword } from '../src/lib/password.ts';

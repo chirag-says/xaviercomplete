@@ -21,7 +21,7 @@ import sharp from 'sharp';
 
 import { adminDb, closeAdminDb, type Sql } from '../src/lib/db.ts';
 import { encryptOptional, fieldContext, blindIndexOfNormalised, unsubscribeToken } from '../src/lib/shared.ts';
-import { unsubscribeTokenMatches } from '../../oxvercity/src/lib/core/hmac.ts';
+import { unsubscribeTokenMatches } from '../src/lib/core/hmac.ts';
 import {
   CHUNK_SIZE,
   countSegment,
