@@ -1,0 +1,4 @@
+{
+  "//": "Marks the test directory as ESM so Node stops re-parsing each file to work it out. The app itself is untouched; Next reads the package.json one level up.",
+  "type": "module"
+}

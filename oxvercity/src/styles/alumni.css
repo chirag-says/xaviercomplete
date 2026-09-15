@@ -1,0 +1,1006 @@
+/* ==========================================================================
+ * Alumni page — al- prefix
+ * ========================================================================== */
+
+/* ── Tokens ── */
+:root {
+  --al-ink: #111;
+  --al-muted: rgba(17, 17, 17, 0.55);
+  --al-faint: rgba(17, 17, 17, 0.08);
+  --al-cream: #f7f3ec;
+  --al-green: #133e6d;
+  --al-green-soft: rgba(19, 62, 109, 0.08);
+  --al-gold: #c5a55a;
+  --al-plate: #f5f5f5;
+  --al-white: #fff;
+  --al-radius: 14px;
+  --al-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --al-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.al-page {
+  background: var(--al-white);
+  color: var(--al-ink);
+  overflow-x: clip;
+}
+
+/* ── Shell ── */
+.al-shell {
+  width: 100%;
+  max-width: 1296px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px);
+}
+
+/* ── Eyebrow ── */
+.al-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--al-green);
+  margin: 0 0 20px;
+}
+
+/* ==========================================================================
+ * Hero — editorial text only, no image
+ * ========================================================================== */
+.al-hero {
+  padding: clamp(160px, 18vh, 260px) 0 clamp(80px, 10vh, 140px);
+  position: relative;
+  overflow: hidden;
+}
+
+.al-hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+}
+
+.al-hero__headline {
+  margin: 0;
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--al-ink);
+}
+
+.al-hero__headline span {
+  display: block;
+}
+
+.al-hero__headline .al-hero__accent {
+  color: var(--al-green);
+  font-style: italic;
+  font-weight: 700;
+}
+
+.al-hero__desc {
+  margin: clamp(24px, 3vw, 40px) 0 0;
+  font-size: clamp(16px, 1.6vw, 20px);
+  line-height: 1.6;
+  color: var(--al-muted);
+  max-width: 640px;
+}
+
+.al-hero__stats {
+  display: flex;
+  gap: clamp(32px, 5vw, 64px);
+  margin-top: clamp(40px, 5vw, 64px);
+  padding-top: clamp(32px, 4vw, 48px);
+  border-top: 1px solid var(--al-faint);
+}
+
+.al-hero__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.al-hero__stat-number {
+  font-size: clamp(32px, 4vw, 56px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--al-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.al-hero__stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--al-muted);
+}
+
+/* Entrance animation */
+.al-hero__content > * {
+  opacity: 0;
+  transform: translateY(50px);
+  animation: alReveal 0.9s var(--al-out) forwards;
+}
+.al-hero__content > *:nth-child(1) { animation-delay: 0.1s; }
+.al-hero__content > *:nth-child(2) { animation-delay: 0.25s; }
+.al-hero__content > *:nth-child(3) { animation-delay: 0.4s; }
+.al-hero__content > *:nth-child(4) { animation-delay: 0.55s; }
+
+@keyframes alReveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Decorative background text ── */
+.al-hero__watermark {
+  position: absolute;
+  top: 50%;
+  right: -5%;
+  transform: translateY(-50%);
+  font-size: clamp(200px, 28vw, 400px);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  color: rgba(17, 17, 17, 0.025);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+ * Featured Xaverians — editorial tab section
+ * ========================================================================== */
+.al-featured {
+  padding: clamp(60px, 8vw, 120px) 0;
+  background: var(--al-plate);
+}
+
+.al-featured__head {
+  margin-bottom: clamp(40px, 5vw, 64px);
+}
+
+.al-featured__title {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.al-featured__layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 4vw, 80px);
+  align-items: start;
+}
+
+/* Tab list — left column */
+.al-featured__tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.al-featured__tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--al-faint);
+  padding: clamp(16px, 2vw, 24px) 0;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.4s var(--al-out);
+  position: relative;
+}
+
+.al-featured__tab:last-child {
+  border-bottom: 1px solid var(--al-faint);
+}
+
+.al-featured__tab::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 0;
+  height: 2px;
+  background: var(--al-green);
+  transition: width 0.5s var(--al-out);
+}
+
+.al-featured__tab[data-active='true']::before {
+  width: 100%;
+}
+
+.al-featured__tab-name {
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 700;
+  color: var(--al-ink);
+  margin: 0 0 4px;
+  transition: color 0.3s;
+}
+
+.al-featured__tab[data-active='false'] .al-featured__tab-name {
+  color: var(--al-muted);
+}
+
+.al-featured__tab-meta {
+  font-size: 14px;
+  color: var(--al-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.al-featured__tab-year {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--al-green);
+  margin: 0 0 6px;
+}
+
+/* Portrait — right column */
+.al-featured__portrait {
+  position: sticky;
+  top: 120px;
+}
+
+.al-featured__portrait-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--al-radius);
+  overflow: hidden;
+  background: var(--al-faint);
+}
+
+.al-featured__portrait-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s var(--al-out), transform 0.7s var(--al-out);
+}
+
+.al-featured__portrait-info {
+  margin-top: 20px;
+}
+
+.al-featured__portrait-name {
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.al-featured__portrait-role {
+  font-size: 15px;
+  color: var(--al-muted);
+  margin: 0 0 2px;
+}
+
+.al-featured__portrait-location {
+  font-size: 13px;
+  color: var(--al-muted);
+  margin: 0;
+}
+
+.al-featured__portrait-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--al-green-soft);
+  color: var(--al-green);
+  border-radius: 100px;
+}
+
+/* ==========================================================================
+ * Discover / Directory
+ * ========================================================================== */
+.al-discover {
+  padding: clamp(60px, 8vw, 120px) 0;
+}
+
+.al-discover__head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: clamp(32px, 4vw, 48px);
+  max-width: 640px;
+}
+
+.al-discover__title {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.al-discover__subtitle {
+  margin: 0;
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.5;
+  color: var(--al-muted);
+}
+
+/* Search */
+.al-search {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.al-search__icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: var(--al-muted);
+  pointer-events: none;
+}
+
+.al-search input {
+  width: 100%;
+  padding: 18px 20px 18px 52px;
+  font-size: 16px;
+  font-family: inherit;
+  border: 1.5px solid var(--al-faint);
+  border-radius: 12px;
+  background: var(--al-white);
+  color: var(--al-ink);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+}
+
+.al-search input:focus {
+  border-color: var(--al-green);
+  box-shadow: 0 0 0 3px var(--al-green-soft);
+}
+
+.al-search input::placeholder {
+  color: rgba(17, 17, 17, 0.3);
+}
+
+/* Filters */
+.al-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.al-filters select {
+  padding: 10px 32px 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1.5px solid var(--al-faint);
+  border-radius: 10px;
+  background: var(--al-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23999' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") right 12px center / 10px no-repeat;
+  -webkit-appearance: none;
+  appearance: none;
+  color: var(--al-ink);
+  cursor: pointer;
+  transition: border-color 0.3s;
+  outline: none;
+}
+
+.al-filters select:hover,
+.al-filters select:focus-visible {
+  border-color: var(--al-green);
+}
+
+.al-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1.5px solid var(--al-faint);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--al-muted);
+  transition: all 0.3s;
+}
+
+.al-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.al-toggle[data-on='true'] {
+  background: var(--al-green);
+  border-color: var(--al-green);
+  color: var(--al-white);
+}
+
+.al-reset {
+  appearance: none;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--al-green);
+  cursor: pointer;
+  padding: 10px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.al-count {
+  font-size: 14px;
+  color: var(--al-muted);
+  margin-bottom: 24px;
+}
+
+/* ── Directory grid ── */
+.al-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(16px, 2vw, 24px);
+}
+
+/* ==========================================================================
+ * Premium Alumni Card — photo-reveal with hover overlay
+ * ========================================================================== */
+.al-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--al-radius);
+  overflow: hidden;
+  background: var(--al-white);
+  border: 1px solid var(--al-faint);
+  text-decoration: none;
+  color: var(--al-ink);
+  transition: transform 0.5s var(--al-out), box-shadow 0.5s var(--al-out);
+  position: relative;
+}
+
+.al-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Photo */
+.al-card__photo {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+}
+
+.al-card__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--al-out);
+}
+
+.al-card:hover .al-card__photo img {
+  transform: scale(1.06);
+}
+
+/* Hover overlay */
+.al-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(17, 17, 17, 0.85) 0%, rgba(17, 17, 17, 0.2) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(16px, 2vw, 24px);
+  opacity: 0;
+  transition: opacity 0.4s var(--al-out);
+}
+
+.al-card:hover .al-card__overlay {
+  opacity: 1;
+}
+
+.al-card__overlay-role {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 2px;
+}
+
+.al-card__overlay-location {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 10px;
+}
+
+.al-card__overlay-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.al-card__overlay-cta span {
+  transition: transform 0.4s var(--al-out);
+}
+
+.al-card:hover .al-card__overlay-cta span {
+  transform: translateX(4px);
+}
+
+/* Tags on photo */
+.al-card__tags {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.al-card__tag {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  color: var(--al-ink);
+}
+
+.al-card__tag--demo {
+  background: rgba(255, 200, 50, 0.9);
+  color: #222;
+}
+
+.al-card__tag--connect {
+  margin-left: auto;
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.al-card__tag--connect::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16a34a;
+}
+
+/* Body */
+.al-card__body {
+  padding: clamp(14px, 1.5vw, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.al-card__name {
+  font-size: clamp(15px, 1.4vw, 18px);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.al-card__meta {
+  font-size: 13px;
+  color: var(--al-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+ * Empty state
+ * ========================================================================== */
+.al-empty {
+  padding: clamp(60px, 8vw, 100px) 0;
+  text-align: center;
+}
+
+.al-empty h3 {
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.al-empty p {
+  color: var(--al-muted);
+  font-size: 16px;
+  margin: 0;
+}
+
+/* ==========================================================================
+ * Profile page — no hero image
+ * ========================================================================== */
+.al-profile-page {
+  padding: clamp(140px, 16vh, 200px) 0 clamp(60px, 8vw, 100px);
+}
+
+.al-profile {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: clamp(40px, 5vw, 80px);
+  align-items: start;
+}
+
+.al-profile__aside {
+  position: sticky;
+  top: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.al-profile__photo {
+  aspect-ratio: 1;
+  border-radius: var(--al-radius);
+  overflow: hidden;
+  background: var(--al-plate);
+}
+
+.al-profile__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.al-profile__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.al-profile__pill {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: 100px;
+  background: var(--al-plate);
+  color: var(--al-ink);
+}
+
+.al-profile__pill--demo {
+  background: rgba(255, 200, 50, 0.2);
+  color: #92700a;
+}
+
+.al-profile__pill--green {
+  background: var(--al-green-soft);
+  color: var(--al-green);
+}
+
+.al-profile__connect-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  background: var(--al-green);
+  color: var(--al-white);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.al-profile__connect-btn:hover {
+  background: #0f3058;
+  transform: translateY(-1px);
+}
+
+.al-profile__links {
+  display: flex;
+  gap: 8px;
+}
+
+.al-profile__link {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid var(--al-faint);
+  border-radius: 8px;
+  color: var(--al-ink);
+  text-decoration: none;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.al-profile__link:hover {
+  border-color: var(--al-green);
+  background: var(--al-green-soft);
+}
+
+/* Main column */
+.al-profile__main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 4vw, 48px);
+}
+
+.al-profile__name {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+}
+
+.al-profile__role {
+  font-size: clamp(16px, 1.5vw, 20px);
+  color: var(--al-muted);
+  margin: 0;
+}
+
+.al-profile__section-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--al-green);
+  margin: 0 0 12px;
+}
+
+.al-profile__bio {
+  font-size: clamp(16px, 1.4vw, 18px);
+  line-height: 1.7;
+  color: rgba(17, 17, 17, 0.75);
+  margin: 0;
+}
+
+.al-profile__facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.al-profile__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.al-profile__fact dt {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--al-muted);
+}
+
+.al-profile__fact dd {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.al-profile__helps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.al-profile__help-tag {
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 100px;
+  background: var(--al-green-soft);
+  color: var(--al-green);
+}
+
+.al-profile__privacy {
+  font-size: 14px;
+  color: var(--al-muted);
+  margin: 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--al-faint);
+}
+
+/* ==========================================================================
+ * Responsive
+ * ========================================================================== */
+@media (max-width: 1199.98px) {
+  .al-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 809.98px) {
+  .al-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .al-featured__layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .al-featured__portrait {
+    position: relative;
+    top: auto;
+    order: -1;
+  }
+  .al-profile {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .al-profile__aside {
+    position: relative;
+    top: auto;
+    max-width: 280px;
+  }
+  .al-profile__facts {
+    grid-template-columns: 1fr;
+  }
+  .al-hero__stats {
+    flex-wrap: wrap;
+    gap: 24px 40px;
+  }
+  .al-hero__watermark {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .al-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+ * Access gating (plan §1, §5.3)
+ *
+ * A signed-out visitor gets a <div class="al-card al-card--locked"> where a
+ * signed-in one gets an <a class="al-card">. The rules below strip the
+ * affordances that would otherwise promise a click the card cannot deliver:
+ * the lift, the shadow, the photo zoom. Nothing here hides content — the
+ * private fields were never sent — it only stops the card lying about what it
+ * does.
+ * ========================================================================== */
+.al-card--locked {
+  cursor: default;
+}
+
+.al-card--locked:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.al-card--locked:hover .al-card__photo img {
+  transform: none;
+}
+
+.al-card__meta--dim {
+  font-size: 12px;
+  color: rgba(17, 17, 17, 0.4);
+}
+
+/* ── Sign-in prompt above the grid ── */
+.al-gate {
+  padding: clamp(24px, 4vw, 40px) 0 0;
+}
+
+.al-gate__card {
+  border: 1px solid var(--al-faint);
+  border-radius: var(--al-radius);
+  background: var(--al-cream);
+  padding: clamp(24px, 4vw, 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.al-gate__title {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--al-ink);
+  margin: 0;
+}
+
+.al-gate__body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--al-muted);
+  max-width: 62ch;
+  margin: 0;
+}
+
+.al-gate__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.al-gate__btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--al-green);
+  color: var(--al-white);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.3s var(--al-out), transform 0.3s var(--al-out);
+}
+
+.al-gate__btn:hover {
+  background: #0f3058;
+  transform: translateY(-1px);
+}
+
+.al-gate__link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--al-green);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.al-gate__link:hover {
+  border-bottom-color: currentColor;
+}
+
+/* ── Contact block on a full profile ── */
+.al-profile__contact {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--al-faint);
+}
+
+.al-profile__facts--stack {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+/*
+ * "Not shared" is set apart from a real value on purpose. Someone scanning a
+ * profile should be able to tell at a glance that a field was withheld rather
+ * than mistake the words for what the person wrote.
+ */
+.al-profile__unshared {
+  color: rgba(17, 17, 17, 0.38);
+  font-style: italic;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .al-hero__content > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .al-card {
+    transition: none;
+  }
+  .al-card__photo img {
+    transition: none;
+  }
+  .al-gate__btn {
+    transition: none;
+  }
+}

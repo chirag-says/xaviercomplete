@@ -1,0 +1,1727 @@
+/* =============================================================================
+ * /chapters — the Xaverian network
+ *
+ * The page is one object in two tones. It opens on night, turns to paper for
+ * the chapter and everything the chapter does, and closes on night again; the
+ * crest appears once at each end, bled off opposite edges, so the two dark
+ * screens read as the same room seen twice rather than as a header and a
+ * footer. Nothing between them is a card grid.
+ *
+ * It is set in the site's own face, Instrument Sans, and borrows the events
+ * page's ground and measure — `.ev-page`, `.ev-shell`, `--ev-ink`, `--ev-paper`
+ * and the two easings — so it reads as the same publication. The one addition
+ * is a single restrained gold, sampled from the College crest, used only for
+ * hairlines, the network's arc and four or five marks the size of a full stop.
+ * It is never a fill and never a gradient.
+ *
+ * Everything that moves is a transform, an opacity, a clip-path or a dash
+ * offset. Nothing on this page animates a width, a height, a colour stop or a
+ * blur, so no frame costs a layout.
+ *
+ * Resting states are the finished composition, not the hidden one. The two
+ * reveals that must start hidden are gated behind `[data-cx-motion='on']`,
+ * which a mounted component sets — so a visitor whose script never arrives
+ * sees the page complete rather than blank, and this page needs no `<noscript>`
+ * block to put its own content back.
+ *
+ * The reduced-motion block at the foot is the whole contract in one place:
+ * every entrance, loop, parallax and hover transition stops, and the layout is
+ * untouched by it.
+ * ========================================================================== */
+
+.cx-page {
+  --cx-night: #0b0b0c;
+  --cx-ink: #111;
+  --cx-paper: #f7f6f3;
+  --cx-cream: #f2ece1;
+  --cx-gold: #c9a24c;
+  /* Both muted inks are set at the lightest alpha that still clears WCAG AA
+   * for body text against the ground they sit on — 0.62 over the paper, 0.56
+   * over the night. The events page's `--ev-muted` is 0.56 on paper, which
+   * measures 4.05:1 and is half a step short; at this page's sizes the
+   * difference is invisible and the difference in the ratio is not. */
+  --cx-muted: rgba(17, 17, 17, 0.62);
+  --cx-faint: rgba(17, 17, 17, 0.12);
+  --cx-line: rgba(242, 236, 225, 0.14);
+  --cx-dim: rgba(242, 236, 225, 0.56);
+  /* the quietest either ground can carry and still be read at 11px */
+  --cx-quiet: rgba(242, 236, 225, 0.52);
+  --cx-ease: cubic-bezier(0.44, 0, 0.56, 1);
+  --cx-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* The shell's own gutter, for the few strips that run full-bleed but must
+   * still start on the measure. `100%` here is the page root, which is the
+   * viewport minus the scrollbar — exactly what `.ev-shell` centres against. */
+  --cx-gutter: max(20px, calc((100% - 1296px) / 2));
+
+  /* The same distance, for an element that has to reach the screen edge from
+   * inside a grid track. A percentage margin would resolve against the track
+   * rather than the measure, so this has to be viewport units; the half
+   * scrollbar it overshoots by is taken by the section's `overflow: clip`. */
+  --cx-bleed: max(20px, calc((100vw - 1296px) / 2));
+
+  background: var(--cx-night);
+}
+
+/* ---- shared type ---------------------------------------------------------- */
+
+.cx-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cx-muted);
+}
+.cx-eyebrow--dark {
+  color: rgba(242, 236, 225, 0.55);
+}
+
+/* ink is invisible on the two dark screens */
+.cx-stage :focus-visible,
+.cx-net :focus-visible,
+.cx-join__plate :focus-visible,
+.cx-close :focus-visible {
+  outline: 2px solid var(--cx-cream);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* =============================================================================
+ * 1 — The stage (the poster)
+ * ========================================================================== */
+
+.cx-stage {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  display: flex;
+  flex-flow: column;
+  min-height: 100svh;
+  background: var(--cx-night);
+  color: var(--cx-cream);
+  /* clears the fixed header before anything is set */
+  padding-top: clamp(100px, 8vw, 146px);
+}
+.cx-stage__trigger {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+}
+
+/* ---- the ground ----------------------------------------------------------- */
+
+.cx-stage__ground {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* The Association's own artwork, untouched. `screen` on a near-black ground
+ * drops everything dark in the file and keeps only its light linework, which
+ * is what makes this a watermark rather than a logo sitting on the page. */
+.cx-stage__crest {
+  position: absolute;
+  top: 50%;
+  right: -6vw;
+  width: min(82vh, 720px);
+  height: auto;
+  opacity: 0.09;
+  mix-blend-mode: screen;
+  filter: grayscale(1) contrast(1.12) brightness(1.35);
+  transform: translate3d(0, calc(-50% + var(--exit, 0) * -54px), 0);
+  will-change: transform;
+}
+
+/* sixteen arcs at 7%: a texture, not a picture */
+.cx-stage__weave {
+  position: absolute;
+  top: -4%;
+  left: -8%;
+  width: 116%;
+  height: 108%;
+  transform: translate3d(0, calc(var(--exit, 0) * -80px), 0);
+  will-change: transform;
+}
+.cx-stage__weave path {
+  fill: none;
+  stroke: var(--cx-cream);
+  stroke-width: 0.9;
+  opacity: 0.07;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: cx-draw 1.9s var(--cx-out) forwards;
+}
+
+.cx-stage__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* darkens the top so the white header has something to be white against, and
+ * closes the corners so the arcs do not simply stop at the edge */
+.cx-stage__fade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(11, 11, 12, 0.9) 0%, rgba(11, 11, 12, 0) 24%),
+    radial-gradient(120% 90% at 50% 45%, rgba(11, 11, 12, 0) 40%, rgba(11, 11, 12, 0.72) 100%);
+}
+
+/* ---- the masthead --------------------------------------------------------- */
+
+/*
+ * Everything here is small on purpose. The poster under it is the page, and
+ * type that competed with it would only make both smaller — so this is set at
+ * masthead scale: an eyebrow, one line of statement, one line of lede, none of
+ * them louder than the artwork.
+ */
+
+.cx-stage__shell {
+  flex: 1;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  gap: clamp(14px, 2vh, 26px);
+  padding-top: clamp(14px, 2.4vh, 34px);
+  padding-bottom: clamp(14px, 2.4vh, 30px);
+  transform: translate3d(0, calc(var(--exit, 0) * -34px), 0);
+}
+
+/*
+ * Two blocks pinned to the two ends of the measure: what the poster is for on
+ * the left, at a size that carries, and the statement set small against it on
+ * the right. Both are placed by the stylesheet rather than by source order, so
+ * the heading can still be the second thing in the markup.
+ */
+.cx-stage__masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: end;
+  gap: 6px clamp(24px, 4vw, 64px);
+}
+.cx-stage__eyebrow {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(242, 236, 225, 0.62);
+  opacity: 0;
+  animation: cx-fade 0.9s var(--cx-out) 0.05s forwards;
+}
+.cx-stage__pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cx-gold);
+  animation: cx-pip 2.8s var(--cx-ease) infinite;
+}
+
+.cx-stage__title {
+  grid-row: 2;
+  grid-column: 2;
+  justify-self: end;
+  margin: 4px 0 0;
+  max-width: 24ch;
+  font-size: clamp(19px, 1.9vw, 27px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-align: right;
+  color: var(--cx-cream);
+}
+.cx-stage__rise {
+  display: block;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: cx-riseIn 0.95s var(--cx-out) 0.12s forwards;
+  will-change: transform, opacity;
+}
+/*
+ * The only large type on this screen, and still a long way short of the
+ * poster, which is the point.
+ */
+.cx-stage__chapter {
+  grid-row: 2;
+  grid-column: 1;
+  justify-self: start;
+  margin: 0;
+  /* narrow enough that "West Zone Mega Meet" always breaks after "Zone",
+   * which is where it wants to break anyway */
+  max-width: 11ch;
+  /* the vh term keeps the masthead from eating the poster's room on a short
+   * screen, the same way the poster's own cap works */
+  font-size: clamp(26px, min(3.8vw, 6.4vh), 56px);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  color: var(--cx-cream);
+  opacity: 0;
+  transform: translateY(14px);
+  animation: cx-riseIn 0.95s var(--cx-out) 0.26s forwards;
+  will-change: transform, opacity;
+}
+
+/* ---- the poster ----------------------------------------------------------- */
+
+/*
+ * The frame is capped by the viewport's height as well as its width, so the
+ * whole poster lands inside the first screen rather than starting below it.
+ * The box keeps the artwork's own 16:9, so nothing is ever cropped.
+ *
+ * The height cap is what is left of the screen rather than a fixed fraction of
+ * it. Everything else on this screen — the header clearance, the masthead, the
+ * credit row, the fact rail and the gaps between them — costs a little over
+ * 360px whatever the viewport is, so subtracting 440 leaves the poster all the
+ * room there is and a little to spare. A flat `52svh` looked right on a 900px
+ * screen and pushed the rail 55px under the fold on a 660px one, because the
+ * fixed costs do not shrink with the screen.
+ */
+.cx-stage__frame {
+  position: relative;
+  display: block;
+  align-self: center;
+  width: min(100%, max(320px, calc((100svh - 440px) * 16 / 9)));
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #111;
+  font: inherit;
+  color: inherit;
+  cursor: zoom-in;
+  box-shadow: 0 50px 110px rgba(0, 0, 0, 0.55);
+  /* closed to a line at the centre; the aperture opens it, and because
+   * clip-path clips the shadow too, the frame lifts off the page as it goes */
+  clip-path: inset(50% 0 50% 0);
+  animation: cx-aperture 1.25s var(--cx-out) 0.18s forwards;
+  /* the shell above carries the words out at -34px; this brings the artwork
+   * back by 18, so the poster leaves the screen slower than the type does */
+  transform: translate3d(0, calc(var(--exit, 0) * 18px), 0);
+  will-change: transform;
+}
+.cx-stage__pan {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+/*
+ * Settles at exactly 1. The frame is 16:9 and so is the file, so at rest not a
+ * pixel of the artwork is cropped — which matters here in a way it would not
+ * for a photograph, because this poster has type printed close to its edges.
+ * The depth comes from the frame drifting against the words instead, which
+ * crops nothing.
+ */
+.cx-stage__poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.12);
+  animation: cx-settle 1.75s var(--cx-out) 0.18s forwards;
+  will-change: transform;
+}
+
+/* one raking highlight, once, and then nothing */
+.cx-stage__sheen {
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: -60%;
+  width: 60%;
+  background: linear-gradient(100deg, transparent 38%, rgba(255, 255, 255, 0.34) 50%, transparent 62%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0;
+  animation: cx-sheen 1.5s var(--cx-ease) 0.82s both;
+}
+
+/* a viewfinder closing on the artwork, last of all */
+.cx-stage__mark {
+  position: absolute;
+  width: clamp(14px, 1.5vw, 22px);
+  height: clamp(14px, 1.5vw, 22px);
+  border: 0 solid rgba(201, 162, 76, 0.72);
+  pointer-events: none;
+  opacity: 0;
+  animation: cx-mark 0.75s var(--cx-out) forwards;
+}
+.cx-stage__mark[data-corner='tl'] {
+  top: 12px;
+  left: 12px;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+.cx-stage__mark[data-corner='tr'] {
+  top: 12px;
+  right: 12px;
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+.cx-stage__mark[data-corner='bl'] {
+  bottom: 12px;
+  left: 12px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+.cx-stage__mark[data-corner='br'] {
+  bottom: 12px;
+  right: 12px;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}
+
+.cx-stage__view {
+  position: absolute;
+  right: clamp(14px, 1.6vw, 22px);
+  bottom: clamp(14px, 1.6vw, 22px);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 17px;
+  border-radius: 999px;
+  background: rgba(11, 11, 12, 0.82);
+  color: var(--cx-cream);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s var(--cx-ease), transform 0.5s var(--cx-out);
+}
+.cx-stage__frame:hover .cx-stage__view,
+.cx-stage__frame:focus-visible .cx-stage__view {
+  opacity: 1;
+  transform: none;
+}
+@media (hover: none) {
+  .cx-stage__view {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- under the poster ----------------------------------------------------- */
+
+.cx-stage__foot {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px clamp(18px, 3vw, 48px);
+  opacity: 0;
+  animation: cx-fade 0.9s var(--cx-out) 1.2s forwards;
+}
+.cx-stage__cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cx-cream);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: gap 0.45s var(--cx-out);
+}
+.cx-stage__cue:hover {
+  gap: 18px;
+}
+.cx-stage__cueRing {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--cx-line);
+  border-radius: 50%;
+  transition: border-color 0.4s var(--cx-ease), background-color 0.4s var(--cx-ease);
+}
+.cx-stage__cue:hover .cx-stage__cueRing {
+  border-color: rgba(242, 236, 225, 0.5);
+  background: rgba(242, 236, 225, 0.06);
+}
+.cx-stage__cueArrow {
+  font-size: 13px;
+  animation: cx-nudge 2.4s var(--cx-ease) infinite;
+}
+
+/* ---- the fact rail -------------------------------------------------------- */
+
+.cx-rail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding-inline: var(--cx-gutter);
+  border-top: 1px solid var(--cx-line);
+}
+.cx-rail__cell {
+  display: flex;
+  flex-flow: column;
+  gap: 9px;
+  padding: clamp(12px, 1.4vw, 18px) clamp(14px, 2.2vw, 34px);
+  border-left: 1px solid var(--cx-line);
+  opacity: 0;
+  animation: cx-fade 0.85s var(--cx-out) forwards;
+}
+.cx-rail__cell:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.cx-rail__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cx-quiet);
+}
+.cx-rail__value {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0;
+  min-width: 0;
+}
+.cx-rail__figure {
+  font-size: clamp(16px, 1.5vw, 22px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--cx-cream);
+}
+.cx-rail__word {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cx-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =============================================================================
+ * 5 — The network
+ * ========================================================================== */
+
+.cx-net {
+  position: relative;
+  background: var(--cx-night);
+  color: var(--cx-cream);
+  padding: clamp(60px, 6.5vw, 100px) 0 clamp(56px, 6vw, 92px);
+  overflow: clip;
+}
+
+/* The head runs across the measure rather than stacking down the left of it.
+ * Left-aligned in a column it left two-thirds of the width empty above a
+ * drawing that is itself mostly space, and the two emptinesses compounded. */
+.cx-net__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: end;
+  gap: 12px clamp(28px, 4vw, 72px);
+}
+.cx-net__head .cx-eyebrow {
+  grid-column: 1 / -1;
+}
+.cx-net__title {
+  margin: 0;
+  font-size: clamp(30px, 4.4vw, 68px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+.cx-net__titleLine {
+  display: block;
+}
+.cx-net__titleLine:last-child {
+  color: var(--cx-dim);
+}
+.cx-net__lede {
+  margin: 0 0 4px;
+  max-width: 44ch;
+  font-size: clamp(14.5px, 1.1vw, 16.5px);
+  line-height: 1.65;
+  color: var(--cx-dim);
+}
+
+/* ---- the drawing ---------------------------------------------------------- */
+
+.cx-net__plot {
+  position: relative;
+  margin-top: clamp(20px, 2.6vw, 38px);
+}
+.cx-net__draw {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.cx-net__orbit {
+  fill: none;
+  stroke: var(--cx-cream);
+  stroke-width: 0.8;
+  opacity: 0.1;
+}
+.cx-net__track {
+  fill: none;
+  stroke: var(--cx-cream);
+  stroke-width: 0.9;
+  opacity: 0.14;
+}
+/* `pathLength="1"` makes the dash offset the progress number itself, so the
+ * line is drawn exactly as far as the reader has scrolled — and un-draws on
+ * the way back up */
+.cx-net__line {
+  fill: none;
+  stroke: var(--cx-gold);
+  stroke-width: 1.2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--draw, 1));
+}
+.cx-net__pulse {
+  fill: none;
+  stroke: #f6e7c4;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 0.032 0.968;
+  opacity: calc(var(--draw, 1) * var(--draw, 1));
+  filter: drop-shadow(0 0 5px rgba(201, 162, 76, 0.5));
+  animation: cx-travel 5.6s linear infinite;
+}
+
+/* ---- the nodes ------------------------------------------------------------ */
+
+.cx-net__nodes {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* a zero box pinned to the point, so the dot centres on it and the card can
+ * hang off it without moving the anchor */
+.cx-net__node {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transition: opacity 0.45s var(--cx-ease);
+}
+.cx-net__node[data-dim] {
+  opacity: 0.34;
+}
+
+/* An 11px dot is not a target. The button is a 52px circle centred on the
+ * point, with the dot drawn in the middle of it — so there is something to
+ * hit with a thumb, something for the focus ring to be drawn around, and a
+ * hover area that does not require landing on a full stop. */
+.cx-net__pin {
+  position: absolute;
+  left: -26px;
+  top: -26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.cx-net__dot {
+  position: relative;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--cx-gold);
+  box-shadow: 0 0 0 4px rgba(201, 162, 76, 0.14);
+}
+.cx-net__node[data-seat] .cx-net__dot {
+  width: 15px;
+  height: 15px;
+}
+.cx-net__halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 162, 76, 0.65);
+  animation: cx-halo 3.6s var(--cx-ease) infinite;
+}
+.cx-net__halo--late {
+  animation-delay: 1.8s;
+}
+
+/* The card is a sibling of the button rather than a child, so that the link
+ * it ends with is a link. The node it sits in is a zero-size box pinned to the
+ * point, so both offsets are measured straight off that point. */
+.cx-net__card {
+  position: absolute;
+  left: 34px;
+  top: -14px;
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 232px;
+}
+/* the seat sits far enough right that its card would run off the measure, so
+ * the two face each other across the arc instead */
+.cx-net__node[data-seat] .cx-net__card {
+  left: auto;
+  right: 36px;
+  align-items: flex-end;
+  text-align: right;
+}
+.cx-net__city {
+  margin: 0;
+  font-size: clamp(20px, 2.2vw, 32px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  transition: transform 0.5s var(--cx-out);
+}
+.cx-net__node[data-open] .cx-net__city {
+  transform: translateX(4px);
+}
+.cx-net__node[data-seat][data-open] .cx-net__city {
+  transform: translateX(-4px);
+}
+.cx-net__role {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cx-gold);
+}
+.cx-net__more {
+  display: flex;
+  flex-flow: column;
+  align-items: inherit;
+  gap: 5px;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: max-height 0.55s var(--cx-out), opacity 0.35s var(--cx-ease), transform 0.55s var(--cx-out);
+}
+.cx-net__node[data-open] .cx-net__more {
+  max-height: 190px;
+  opacity: 1;
+  transform: none;
+}
+.cx-net__detail,
+.cx-net__meta {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--cx-dim);
+}
+.cx-net__meta {
+  color: var(--cx-quiet);
+}
+.cx-net__go {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cx-cream);
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.45s var(--cx-out);
+}
+.cx-net__go:hover,
+.cx-net__go:focus-visible {
+  background-size: 100% 1px;
+}
+.cx-net__node[data-seat] .cx-net__go {
+  background-position: 100% 100%;
+}
+
+.cx-net__caption {
+  display: flex;
+  align-items: center;
+  flex-flow: row wrap;
+  gap: 12px;
+  margin: clamp(16px, 2vw, 26px) 0 0;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--cx-quiet);
+}
+.cx-net__hint {
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cx-dim);
+}
+
+/* =============================================================================
+ * 2 — The meets
+ * ========================================================================== */
+
+.cx-meets {
+  background: #fff;
+  color: var(--cx-ink);
+  padding: clamp(78px, 9vw, 146px) 0 clamp(70px, 8vw, 130px);
+}
+.cx-meets__head {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.cx-meets__title {
+  max-width: 16ch;
+}
+
+/* A drawn rail with a stop on it for each date — the arc from two sections
+ * earlier, turned from places into years. */
+.cx-meets__grid {
+  position: relative;
+  list-style: none;
+  margin: clamp(38px, 5.5vw, 78px) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(30px, 4vw, 76px);
+  align-items: start;
+  border-top: 1px solid var(--cx-faint);
+}
+
+.cx-meet__link {
+  position: relative;
+  display: block;
+  padding-top: clamp(22px, 2.6vw, 34px);
+  color: inherit;
+  text-decoration: none;
+}
+.cx-meet__link:focus-visible {
+  outline: 2px solid var(--cx-ink);
+  outline-offset: 6px;
+  border-radius: 3px;
+}
+/* the stop, sitting on the rail above it */
+.cx-meet__stop {
+  position: absolute;
+  /* centred on the 1px rail above it */
+  top: -3px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cx-gold);
+  transition: transform 0.5s var(--cx-out), box-shadow 0.5s var(--cx-out);
+}
+.cx-meet__link:hover .cx-meet__stop,
+.cx-meet__link:focus-visible .cx-meet__stop {
+  transform: scale(1.5);
+  box-shadow: 0 0 0 5px rgba(201, 162, 76, 0.16);
+}
+
+.cx-meet__head {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  gap: clamp(8px, 1vw, 14px);
+}
+.cx-meet__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cx-muted);
+}
+.cx-meet__status[data-live] {
+  color: var(--cx-ink);
+}
+.cx-meet__status[data-live]::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cx-gold);
+  animation: cx-pip 2.8s var(--cx-ease) infinite;
+}
+/* The year is the picture. Outlined it reads as a figure on the page rather
+ * than a label on a thing, and filling it in is the whole hover state. */
+.cx-meet__year {
+  display: block;
+  font-size: clamp(66px, 9.5vw, 156px);
+  font-weight: 700;
+  line-height: 0.86;
+  letter-spacing: -0.055em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(17, 17, 17, 0.4);
+  transition: color 0.5s var(--cx-ease), transform 0.6s var(--cx-out);
+}
+.cx-meet__link:hover .cx-meet__year,
+.cx-meet__link:focus-visible .cx-meet__year {
+  color: var(--cx-ink);
+  transform: translateX(6px);
+}
+@supports not (-webkit-text-stroke: 1px currentColor) {
+  .cx-meet__year {
+    color: rgba(17, 17, 17, 0.28);
+  }
+}
+
+.cx-meet__body {
+  display: block;
+  padding-top: clamp(16px, 2vw, 26px);
+}
+.cx-meet__kicker {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cx-muted);
+}
+.cx-meet__title {
+  display: block;
+  margin-top: 10px;
+  font-size: clamp(25px, 3.1vw, 44px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.032em;
+  transition: transform 0.55s var(--cx-out);
+}
+.cx-meet__link:hover .cx-meet__title,
+.cx-meet__link:focus-visible .cx-meet__title {
+  transform: translateX(7px);
+}
+.cx-meet__rule {
+  position: relative;
+  display: block;
+  height: 1px;
+  margin-top: clamp(14px, 1.7vw, 20px);
+  background: var(--cx-faint);
+}
+.cx-meet__rule::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--cx-ink);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.65s var(--cx-out);
+}
+.cx-meet__link:hover .cx-meet__rule::after,
+.cx-meet__link:focus-visible .cx-meet__rule::after {
+  transform: scaleX(1);
+}
+.cx-meet__more {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px clamp(16px, 2vw, 32px);
+  padding-top: 14px;
+}
+.cx-meet__when {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--cx-muted);
+}
+/* decoration between two real facts, and hidden from assistive tech, so it is
+ * set to be seen rather than read */
+.cx-meet__dot {
+  padding: 0 8px;
+  color: rgba(17, 17, 17, 0.42);
+}
+.cx-meet__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s var(--cx-ease), transform 0.5s var(--cx-out);
+}
+.cx-meet__link:hover .cx-meet__action,
+.cx-meet__link:focus-visible .cx-meet__action {
+  opacity: 1;
+  transform: none;
+}
+/* nothing hovers on a touch screen, so it is simply always there */
+@media (hover: none) {
+  .cx-meet__action {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =============================================================================
+ * 3 — On the bill
+ * ========================================================================== */
+
+.cx-billwrap {
+  background: var(--cx-paper);
+  color: var(--cx-ink);
+  padding: clamp(78px, 9vw, 146px) 0 0;
+  overflow: clip;
+}
+.cx-billwrap__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+  gap: clamp(20px, 4vw, 64px);
+  align-items: end;
+}
+.cx-billwrap__intro {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.cx-billwrap__title {
+  max-width: 14ch;
+}
+.cx-billwrap__note {
+  margin: 0;
+  max-width: 46ch;
+  font-size: clamp(14.5px, 1.15vw, 17px);
+  line-height: 1.62;
+  color: var(--cx-muted);
+}
+
+.cx-chips {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 8px;
+  list-style: none;
+  margin: clamp(26px, 3vw, 44px) 0 0;
+  padding: 0;
+}
+.cx-chips__item {
+  padding: 9px 17px;
+  border: 1px solid var(--cx-faint);
+  border-radius: 999px;
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+}
+
+/* ---- the index ------------------------------------------------------------ */
+
+.cx-index {
+  list-style: none;
+  margin: clamp(28px, 3.6vw, 52px) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--cx-faint);
+}
+.cx-index__row {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 0.85fr) minmax(0, 1.15fr) 26px;
+  align-items: center;
+  gap: 0 clamp(14px, 2vw, 32px);
+  padding: clamp(18px, 2.3vw, 30px) clamp(10px, 1.6vw, 22px);
+  border-bottom: 1px solid var(--cx-faint);
+  transition: color 0.45s var(--cx-ease);
+}
+.cx-index__wipe {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cx-ink);
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  transition: transform 0.55s var(--cx-out);
+}
+.cx-index__row:hover {
+  color: var(--cx-cream);
+}
+.cx-index__row:hover .cx-index__wipe {
+  transform: scaleY(1);
+}
+.cx-index__num {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--cx-muted);
+  transition: color 0.45s var(--cx-ease);
+}
+.cx-index__row:hover .cx-index__num {
+  color: var(--cx-gold);
+}
+.cx-index__title {
+  font-size: clamp(18px, 2.1vw, 30px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  transition: transform 0.55s var(--cx-out);
+}
+.cx-index__row:hover .cx-index__title {
+  transform: translateX(8px);
+}
+.cx-index__detail {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--cx-muted);
+  transition: color 0.45s var(--cx-ease);
+}
+.cx-index__row:hover .cx-index__detail {
+  color: rgba(242, 236, 225, 0.62);
+}
+/* a mark, not an arrow: the row is a listing, it does not go anywhere */
+.cx-index__mark {
+  justify-self: end;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cx-gold);
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.4s var(--cx-ease), transform 0.5s var(--cx-out);
+}
+.cx-index__row:hover .cx-index__mark {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- the band ------------------------------------------------------------- */
+
+.cx-band {
+  margin-top: clamp(52px, 6.5vw, 96px);
+  padding: clamp(24px, 3vw, 42px) 0 clamp(30px, 3.6vw, 54px);
+  border-top: 1px solid var(--cx-faint);
+  overflow: hidden;
+}
+.cx-band__label {
+  margin: 0 0 clamp(12px, 1.6vw, 22px);
+  padding-inline: var(--cx-gutter);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cx-muted);
+}
+.cx-band__track {
+  display: flex;
+  width: max-content;
+  animation: cx-band 38s linear infinite;
+  will-change: transform;
+}
+.cx-band__track:hover,
+.cx-band__track:focus-within {
+  animation-play-state: paused;
+}
+.cx-band__run {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cx-band__run li {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: clamp(30px, 5.4vw, 78px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(17, 17, 17, 0.34);
+}
+@supports not (-webkit-text-stroke: 1px currentColor) {
+  .cx-band__run li {
+    color: rgba(17, 17, 17, 0.26);
+  }
+}
+.cx-band__sep {
+  margin: 0 clamp(20px, 2.8vw, 44px);
+  /* relative to the name it separates, but never small enough to vanish */
+  font-size: max(9px, 0.2em);
+  color: var(--cx-gold);
+  -webkit-text-stroke-width: 0;
+}
+
+/* =============================================================================
+ * 4 — Attending
+ * ========================================================================== */
+
+.cx-join {
+  background: #fff;
+  padding: clamp(64px, 7.5vw, 118px) 0;
+}
+.cx-join__plate {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(26px, 4vw, 62px);
+  align-items: center;
+  padding: clamp(28px, 3.6vw, 60px);
+  border-radius: 6px;
+  background: var(--cx-night);
+  color: var(--cx-cream);
+  overflow: hidden;
+}
+/* one gold hairline across the top, the only decoration on the plate */
+.cx-join__plate::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(201, 162, 76, 0) 0%, var(--cx-gold) 22%, rgba(201, 162, 76, 0) 78%);
+}
+.cx-join__words {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.cx-join__title {
+  margin: 0;
+  font-size: clamp(26px, 3.2vw, 46px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.032em;
+}
+.cx-join__note {
+  margin: 0;
+  max-width: 36ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--cx-dim);
+}
+.cx-join__cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(14px, 2vw, 26px);
+  align-items: stretch;
+}
+.cx-join__card {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 0;
+  padding: clamp(16px, 2.2vw, 28px);
+  border-radius: 5px;
+  background: #fff;
+}
+.cx-join__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cx-muted);
+}
+/* No `width` here on purpose. Setting it would beat the element's own width
+ * attribute, and with it the box the browser reserves before the file has
+ * arrived — the cards would collapse to nothing and then jump. */
+.cx-join__img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 3px;
+}
+.cx-join__img--qr {
+  max-width: 190px;
+}
+
+/* =============================================================================
+ * 7 — The foot
+ *
+ * A bar, not a section. It carries the same night ground as the network above
+ * it so the page ends in one movement rather than two.
+ * ========================================================================== */
+
+.cx-close {
+  background: var(--cx-night);
+  color: var(--cx-cream);
+  padding: 0 0 clamp(44px, 5vw, 76px);
+}
+.cx-close__bar {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: clamp(18px, 3vw, 44px);
+  padding-top: clamp(30px, 3.6vw, 52px);
+  border-top: 1px solid var(--cx-line);
+}
+.cx-close__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 32px;
+  border-radius: 999px;
+  background: var(--cx-cream);
+  color: var(--cx-night);
+  font-size: clamp(14.5px, 1.15vw, 16.5px);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: gap 0.45s var(--cx-out), transform 0.45s var(--cx-out), background-color 0.4s var(--cx-ease);
+}
+.cx-close__cta:hover {
+  gap: 22px;
+  transform: translateY(-2px);
+  background: #fff;
+}
+.cx-close__arrow {
+  transition: transform 0.45s var(--cx-out);
+}
+.cx-close__cta:hover .cx-close__arrow {
+  transform: translateX(3px);
+}
+.cx-close__links {
+  display: flex;
+  align-items: center;
+  flex-flow: row wrap;
+  gap: 16px;
+  margin: 0;
+  font-size: 13px;
+}
+.cx-close__quiet {
+  color: var(--cx-dim);
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s var(--cx-out), color 0.4s var(--cx-ease);
+}
+.cx-close__quiet:hover {
+  color: var(--cx-cream);
+  background-size: 100% 1px;
+}
+.cx-close__sep {
+  width: 20px;
+  height: 1px;
+  background: var(--cx-line);
+}
+
+/* =============================================================================
+ * The hidden start states
+ *
+ * Only applied once a component has mounted and set the flag, so a page whose
+ * script never runs is the finished composition rather than a blank one.
+ * ========================================================================== */
+
+[data-cx-motion='on'] .cx-meet,
+[data-cx-motion='on'] .cx-chips__item,
+[data-cx-motion='on'] .cx-index__row,
+[data-cx-motion='on'] .cx-join__card {
+  opacity: 0;
+}
+[data-cx-motion='on'] .cx-meet {
+  transform: translateY(34px);
+}
+[data-cx-motion='on'] .cx-chips__item,
+[data-cx-motion='on'] .cx-index__row {
+  transform: translateY(18px);
+}
+[data-cx-motion='on'] .cx-join__card {
+  transform: translateY(24px);
+}
+
+/* =============================================================================
+ * Keyframes
+ * ========================================================================== */
+
+@keyframes cx-riseIn {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* the aperture: closed to a line at the centre, out to the whole box */
+@keyframes cx-aperture {
+  from {
+    clip-path: inset(50% 0 50% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* the artwork landing in the window, finishing after it */
+@keyframes cx-settle {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+/* one raking highlight, and nothing left behind */
+@keyframes cx-sheen {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) skewX(-12deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(340%, 0, 0) skewX(-12deg);
+  }
+}
+@keyframes cx-mark {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes cx-fade {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes cx-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes cx-pip {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+@keyframes cx-nudge {
+  0%,
+  72%,
+  100% {
+    transform: translateY(0);
+  }
+  84% {
+    transform: translateY(3px);
+  }
+}
+@keyframes cx-halo {
+  0% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  70% {
+    opacity: 0;
+  }
+  100% {
+    transform: scale(4.6);
+    opacity: 0;
+  }
+}
+@keyframes cx-travel {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+@keyframes cx-band {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* =============================================================================
+ * Widths
+ *
+ * The phone is not the desktop compressed. The network loses its arc entirely
+ * and becomes a spine with the two places stacked against it; the spread
+ * becomes a column; the sticky name unsticks. Nothing is merely narrower.
+ * ========================================================================== */
+
+@media (max-width: 1199.98px) {
+  .cx-billwrap__head,
+  .cx-net__head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cx-net__head {
+    align-items: start;
+    gap: 14px;
+  }
+  .cx-join__plate {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cx-net__card {
+    width: 200px;
+  }
+}
+
+/* The two cards face each other across the arc, so they close on one another
+ * as the drawing narrows. Around 840px they would meet in the middle; this
+ * pulls both in before they can. */
+@media (max-width: 959.98px) {
+  .cx-net__card {
+    left: 26px;
+    width: 168px;
+  }
+  .cx-net__node[data-seat] .cx-net__card {
+    right: 28px;
+  }
+}
+
+@media (max-width: 809.98px) {
+  .cx-stage {
+    padding-top: 118px;
+  }
+  .cx-stage__crest {
+    right: -28vw;
+    width: min(62vh, 460px);
+    opacity: 0.07;
+  }
+  .cx-stage__masthead {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+  }
+  .cx-stage__title {
+    grid-row: 3;
+    grid-column: 1;
+    justify-self: start;
+    max-width: none;
+    text-align: left;
+  }
+  .cx-stage__chapter {
+    grid-row: 2;
+    grid-column: 1;
+    max-width: none;
+    font-size: clamp(34px, 10vw, 46px);
+  }
+  .cx-stage__foot {
+    justify-content: flex-start;
+  }
+  .cx-stage__foot {
+    align-items: flex-start;
+    flex-flow: column;
+    gap: 16px;
+  }
+  /* on a phone the width is the binding constraint, not the height */
+  .cx-stage__frame {
+    width: 100%;
+  }
+
+  /* the rail turns from three columns into three rows */
+  .cx-rail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cx-rail__cell {
+    flex-flow: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+    border-left: 0;
+    border-top: 1px solid var(--cx-line);
+  }
+  .cx-rail__cell:first-child {
+    border-top: 0;
+  }
+  .cx-rail__value {
+    justify-content: flex-end;
+  }
+
+  /* the arc is meaningless at this width; the network becomes a spine */
+  .cx-net__draw {
+    display: none;
+  }
+  .cx-net__plot {
+    margin-top: clamp(22px, 5vw, 34px);
+  }
+  .cx-net__nodes {
+    position: static;
+    display: flex;
+    flex-flow: column;
+  }
+  /* the dot and its card become two columns of one row against the spine */
+  .cx-net__node {
+    position: static;
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: start;
+    width: auto;
+    height: auto;
+    padding: 22px 0;
+    border-top: 1px solid var(--cx-line);
+    opacity: 1;
+  }
+  .cx-net__node:first-child {
+    border-top: 0;
+    padding-top: 4px;
+  }
+  /* not a control here — just the mark on the spine */
+  .cx-net__pin {
+    position: static;
+    justify-content: flex-start;
+    width: auto;
+    height: auto;
+    margin: 8px 0 0;
+    border-radius: 0;
+  }
+  .cx-net__dot,
+  .cx-net__node[data-seat] .cx-net__dot {
+    width: 11px;
+    height: 11px;
+  }
+  .cx-net__card,
+  .cx-net__node[data-seat] .cx-net__card {
+    position: relative;
+    left: auto;
+    right: auto;
+    width: auto;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .cx-net__node[data-seat] .cx-net__go {
+    background-position: 0 100%;
+  }
+  .cx-net__node[data-open] .cx-net__city,
+  .cx-net__node[data-seat][data-open] .cx-net__city {
+    transform: none;
+  }
+
+
+  /* one column, and the rail runs down the side of the stack rather than
+     across the top of it */
+  .cx-meets__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    border-top: 0;
+  }
+  .cx-meet + .cx-meet .cx-meet__link {
+    border-top: 1px solid var(--cx-faint);
+    margin-top: clamp(30px, 7vw, 46px);
+  }
+  .cx-meet:first-child .cx-meet__link {
+    border-top: 1px solid var(--cx-faint);
+  }
+
+  .cx-index__row {
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: start;
+    gap: 6px 14px;
+    padding: 18px 10px;
+  }
+  .cx-index__detail {
+    grid-column: 2;
+  }
+  .cx-index__mark {
+    display: none;
+  }
+
+  .cx-join__cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cx-join__img--qr {
+    max-width: 200px;
+  }
+
+  .cx-close__bar {
+    flex-flow: column;
+    align-items: stretch;
+    gap: 22px;
+  }
+  .cx-close__cta {
+    justify-content: space-between;
+  }
+}
+
+/* =============================================================================
+ * Reduced motion
+ *
+ * Every entrance, loop, parallax and hover transition off. The composition is
+ * not changed by a single pixel — it is simply already finished.
+ * ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-page *,
+  .cx-page *::before,
+  .cx-page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  /* the frame is open, the artwork is settled, the marks are drawn, and the
+     sheen never happened */
+  .cx-stage__frame {
+    clip-path: inset(0 0 0 0);
+  }
+  .cx-stage__poster {
+    transform: none;
+  }
+  .cx-stage__sheen {
+    display: none;
+  }
+  .cx-stage__mark,
+  .cx-stage__rise,
+  .cx-stage__chapter,
+  .cx-stage__eyebrow,
+  .cx-stage__foot,
+  .cx-rail__cell,
+  [data-cx-motion='on'] .cx-meet,
+  [data-cx-motion='on'] .cx-chips__item,
+  [data-cx-motion='on'] .cx-index__row,
+  [data-cx-motion='on'] .cx-join__card {
+    opacity: 1;
+    transform: none;
+  }
+  .cx-stage__weave path {
+    stroke-dashoffset: 0;
+  }
+  .cx-net__line {
+    stroke-dashoffset: 0;
+  }
+  .cx-net__pulse {
+    display: none;
+  }
+  .cx-stage__crest,
+  .cx-stage__weave,
+  .cx-stage__shell,
+  .cx-stage__frame,
+  .cx-meet__year,
+  .cx-meet__stop {
+    transform: none;
+  }
+  .cx-meet__action,
+  .cx-stage__view {
+    opacity: 1;
+    transform: none;
+  }
+}
