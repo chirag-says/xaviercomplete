@@ -1,15 +1,10 @@
 /**
  * POST /api/access-request — "please give me directory access".
  *
- * Every successful path returns the same sentence. Whether the address is
- * already an alumnus, already has access, already has a request outstanding, or
- * has never been seen, the answer is identical — anything else turns this form
- * into a way to test who is a Xaverian, which is the disclosure the whole
- * allowlist design exists to prevent.
+ * Submits the request directly to the admin queue. Turnstile provides bot
+ * protection; the admin decides whether the applicant is a Xaverian.
  *
- * A fixed response floor holds the timing steady too, for the same reason as
- * the sign-in route: a lookup that hits and one that misses differ by a few
- * milliseconds, and a few milliseconds is an answer.
+ * No OTP step — the request is queued immediately after validation.
  */
 
 import { NextResponse, after } from 'next/server';
@@ -23,9 +18,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const RESPONSE_FLOOR_MS = 900;
-
-/** The only thing this endpoint says about an address. */
-const NEUTRAL = 'If we can reach that address, a six-digit code is on its way. Enter it below.';
 
 export async function POST(request: Request): Promise<NextResponse> {
   const startedAt = Date.now();
@@ -42,18 +34,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ message: 'Bad request.' }, { status: 400 });
   }
 
-  /*
-   * The honeypot. The Framer form markup this page is built from ships a set of
-   * invisible fields for exactly this, and a bot that fills every input it finds
-   * will fill them. A human never sees them.
-   *
-   * Answered with the neutral message rather than an error: telling a bot it was
-   * caught is telling it what to change.
-   */
   const honeypot = form.get('website');
   if (typeof honeypot === 'string' && honeypot.trim() !== '') {
     await padTo(startedAt, RESPONSE_FLOOR_MS);
-    return NextResponse.json({ message: NEUTRAL }, { status: 200 });
+    return NextResponse.json(
+      { message: 'Your request is with the Association. You will hear from them by email.' },
+      { status: 200 },
+    );
   }
 
   const ip = clientIp(request.headers);
@@ -67,8 +54,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  // `after` runs the mail send once the response is flushed, so the provider's
-  // latency never lands on the response time.
   const outcome = await submitAccessRequest(
     {
       name: form.get('name'),
@@ -91,7 +76,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  return NextResponse.json({ message: NEUTRAL }, { status: 200 });
+  return NextResponse.json(
+    { message: 'Your request is with the Association. You will hear from them by email.' },
+    { status: 200 },
+  );
 }
 
 export async function GET(): Promise<NextResponse> {

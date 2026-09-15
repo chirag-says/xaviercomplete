@@ -173,22 +173,22 @@ export const why = {
  * and the mission are stated elsewhere on the page and are not repeated here.
  */
 export const college = {
-  eyebrow: 'The College',
-  lines: ['Four marks', 'of a', 'Xaverian'],
-  lead: "Xavier's keeps its education open to students of every community, and measures a formation less by what it produces than by the four marks it asks each Xaverian to carry.",
-  /** The four Cs, in the order the College states them. */
+  eyebrow: 'The Chapter',
+  lines: ['Four marks', 'of a', 'West Zone Xaverian'],
+  lead: "The West Zone Chapter carries forward the same four values that St. Xavier's College instilled in every one of us — the marks by which a Xaverian is known, wherever they are.",
+  /** The four Cs — Xaverian values the West Zone alumni carry forward. */
   marks: ['Competence', 'Commitment', 'Conscience', 'Compassion'],
   motto: {
     eyebrow: 'The motto',
     latin: 'Nihil Ultra',
     gloss: 'Nothing Beyond',
   },
-  /** The rail under the motto. Each is an institutional fact from sxccal.edu. */
+  /** The rail under the motto — West Zone chapter facts. */
   facts: [
-    { label: 'Affiliated', value: 'University of Calcutta, since 1862' },
-    { label: 'Accredited', value: 'Grade A++ by NAAC' },
-    { label: 'Programmes', value: 'Undergraduate, postgraduate and doctoral' },
-    { label: 'Beyond the classroom', value: 'Research and outreach' },
+    { label: 'Zone', value: 'Western India' },
+    { label: 'Cities', value: 'Mumbai, Pune, Ahmedabad, Goa and beyond' },
+    { label: 'Spirit', value: 'Nihil Ultra — nothing beyond' },
+    { label: 'Community', value: 'Alumni events, drives and reconnections' },
   ],
 };
 
@@ -207,23 +207,25 @@ export interface FactCard {
 /** The three fact cards under the story images. Each counts up when scrolled into view. */
 export const facts: FactCard[] = [
   {
-    value: 1860,
+    value: 0,
     suffix: '',
-    title: 'Established',
-    description: 'Founded by the Society of Jesus, and teaching in Kolkata every year since.',
+    display: 'West',
+    title: 'Zone Chapter',
+    description: 'The SXCCAA West Zone Chapter — uniting Xaverians settled across western India.',
   },
   {
-    value: 8600,
+    value: 4,
     suffix: '+',
-    group: true,
-    title: 'Students',
-    description: "On the rolls at St. Xaviers College (Calcutta).",
+    group: false,
+    title: 'Major Cities',
+    description: 'Alumni across Mumbai, Pune, Ahmedabad, Goa and other cities in the west.',
   },
   {
-    value: 8,
-    suffix: 'th',
-    title: 'NIRF India Ranking 2025',
-    description: 'In the College category of the National Institutional Ranking Framework.',
+    value: 0,
+    suffix: '',
+    display: 'Nihil Ultra',
+    title: 'Our Motto',
+    description: 'The Xaverian standard we carry forward — nothing beyond, in everything we do.',
   },
 ];
 

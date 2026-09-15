@@ -21,7 +21,7 @@ export const hero = {
   /** The College, centred at the top, one entry per word so it can wrap. */
   display: ["St.", "Xaviers", 'College', '(Calcutta)'],
   /** The Association's own line, under the College's name. */
-  subtitle: 'Alumni Association',
+  subtitle: 'Alumni Association West Zone',
   /**
    * Both buttons now sit in the About section below the hero. The second one
    * is the shared events link rather than its own literal, so the label and

@@ -21,7 +21,7 @@
  * Markup and class names are Framer's. Link lists come from `data/site.ts`.
  */
 
-import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { usePathname } from 'next/navigation';
 import { animate, type AnimationPlaybackControls } from 'motion';
 import { AccountMenu, useAccountSummary, type AccountSummary } from '@/components/layout/AccountMenu';
@@ -37,8 +37,7 @@ const textColor = (color: string) => ({ '--framer-text-color': `var(--extracted-
 const BORDER = 0.6000000238418579;
 const SHADOW = 'rgba(17, 17, 17, 0.25) 0px 2px 40px 0px';
 const HIDE_SPRING = { type: 'spring' as const, stiffness: 300, damping: 40, mass: 1 };
-/** The "Explore" dropdown sits before this entry of `mainNav`, i.e. third in the bar. */
-const PAGES_MENU_INDEX = 2;
+
 
 function isCurrent(pathname: string, href: string) {
   return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
@@ -285,7 +284,7 @@ function barStyle(scrolled: boolean, shadow = true): CSSProperties {
   return { backgroundColor: scrolled ? tokens.white : tokens.transparent, width: '100%', boxShadow: scrolled && shadow ? SHADOW : 'none' };
 }
 
-function DesktopBar({ tone, scrolled, lightPage, pathname, me, pagesOpen, setPagesOpen, openSearch }: BarProps & { pagesOpen: boolean; setPagesOpen: (v: boolean) => void; openSearch: () => void }) {
+function DesktopBar({ tone, scrolled, lightPage, pathname, me, openSearch }: BarProps & { openSearch: () => void }) {
   // One Framer container class per pill; the last is reused if `mainNav` outgrows
   // the list, since every one of them carries the same declarations.
   const itemClasses = ['framer-y6kjx2-container', 'framer-hq3sy-container', 'framer-9wtvq4-container', 'framer-1t4mhpx-container', 'framer-15fi588-container'];
@@ -301,12 +300,7 @@ function DesktopBar({ tone, scrolled, lightPage, pathname, me, pagesOpen, setPag
               <div className="framer-1ni2m92" data-framer-name="Menu Item Wrapper">
                 <div className="framer-18gaspg" data-framer-name="Menu Item Wrap">
                   {mainNav.map((link, i) => (
-                    <Fragment key={`${link.href}-${i}`}>
-                      {i === PAGES_MENU_INDEX && (
-                        <PagesMenu tone={tone} open={pagesOpen} onOpen={() => setPagesOpen(true)} onClose={() => setPagesOpen(false)} pathname={pathname} />
-                      )}
-                      <DesktopNavItem link={link} tone={tone} current={isCurrent(pathname, link.href)} containerClass={itemClasses[i] ?? itemClasses[itemClasses.length - 1]} />
-                    </Fragment>
+                    <DesktopNavItem key={link.href} link={link} tone={tone} current={isCurrent(pathname, link.href)} containerClass={itemClasses[i] ?? itemClasses[itemClasses.length - 1]} />
                   ))}
                 </div>
               </div>
@@ -359,7 +353,7 @@ export function Header({ containerClass = 'framer-yg91o4-container', lightPage =
   const pathname = usePathname();
   const container = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
-  const [pagesOpen, setPagesOpen] = useState(false);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
@@ -369,7 +363,6 @@ export function Header({ containerClass = 'framer-yg91o4-container', lightPage =
   // Route changes close whatever was open.
   useEffect(() => {
     setMenuOpen(false);
-    setPagesOpen(false);
     setSearchOpen(false);
   }, [pathname]);
 
@@ -416,7 +409,7 @@ export function Header({ containerClass = 'framer-yg91o4-container', lightPage =
     <>
       <div ref={container} className={containerClass} data-framer-layout-hint-center-x="true" style={{ willChange: 'transform', opacity: 1, transform: 'translateX(-50%)' }}>
         <div className="ssr-variant hidden-mygaao hidden-4y47at">
-          <DesktopBar tone={tone} scrolled={scrolled} lightPage={lightPage} pathname={pathname} me={me} pagesOpen={pagesOpen} setPagesOpen={setPagesOpen} openSearch={() => setSearchOpen(true)} />
+          <DesktopBar tone={tone} scrolled={scrolled} lightPage={lightPage} pathname={pathname} me={me} openSearch={() => setSearchOpen(true)} />
         </div>
         <div className="ssr-variant hidden-4y47at hidden-8j9uhy">
           <CompactBar layout="phone" tone={tone} scrolled={scrolled} lightPage={lightPage} pathname={pathname} me={me} menuOpen={menuOpen} toggleMenu={toggleMenu} closeMenu={closeMenu} />

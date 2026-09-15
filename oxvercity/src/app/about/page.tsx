@@ -4,10 +4,9 @@ import { AboutBanner } from '@/components/about/AboutBanner';
 import { AboutStory } from '@/components/about/AboutStory';
 import { PillarsSection } from '@/components/about/PillarsSection';
 import { HistorySection } from '@/components/about/HistorySection';
-import { WhySection } from '@/components/about/WhySection';
 import { CollegeSection } from '@/components/about/CollegeSection';
 
-export const metadata: Metadata = { title: 'About SXCCAA — St. Xavier\u2019s College Alumni Association' };
+export const metadata: Metadata = { title: 'About SXCCAA West Zone — St. Xavier\u2019s College Alumni Association' };
 
 /**
  * The page opens with the Association, turns to the College it came out of —
@@ -25,10 +24,10 @@ export default function AboutPage() {
           <AboutStory />
           <PillarsSection />
           <HistorySection />
-          <WhySection />
           <CollegeSection />
         </div>
       </div>
     </SiteShell>
   );
 }
+

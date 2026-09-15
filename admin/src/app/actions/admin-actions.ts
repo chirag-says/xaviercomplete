@@ -870,6 +870,7 @@ export async function commitAlumniImport(_prev: unknown, formData: FormData): Pr
       admin.adminId,
       {
         grantAccess: formData.get('grantAccess') === 'on',
+        sendInvitations: formData.get('sendInvitations') === 'on',
         consentNote,
         consentAt: Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate,
       },
@@ -880,6 +881,7 @@ export async function commitAlumniImport(_prev: unknown, formData: FormData): Pr
     const r = outcome.result;
     const parts = [`${r.created} added`];
     if (r.granted) parts.push(`${r.granted} can sign in`);
+    if (r.invited) parts.push(`${r.invited} invitation emails sent`);
     if (r.skipped) parts.push(`${r.skipped} already in the directory`);
     if (r.failed.length) parts.push(`${r.failed.length} failed`);
 
