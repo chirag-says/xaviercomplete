@@ -38,6 +38,7 @@ import { readSheetFromBuffer, SheetReadError } from './ingest/workbook.ts';
 import { adminDb, type Sql } from './db.ts';
 import { audit, blindIndexOfNormalised } from './shared.ts';
 import { createAlumnus, grantAlumnusAccess } from './alumni-create.ts';
+import { invitationEmail, mailConfig, send } from './shared-email.ts';
 
 /** Same cap as a photograph. A spreadsheet of five hundred rows is well under a megabyte. */
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
@@ -187,6 +188,7 @@ export async function previewImport(
 export interface ImportResult {
   created: number;
   granted: number;
+  invited: number;
   skipped: number;
   failed: Array<{ rowNumber: number; name: string; message: string }>;
 }
@@ -204,7 +206,7 @@ export async function commitImport(
   bytes: Buffer,
   filename: string,
   adminId: string,
-  options: { grantAccess: boolean; consentNote: string; consentAt: Date },
+  options: { grantAccess: boolean; sendInvitations: boolean; consentNote: string; consentAt: Date },
   sql: Sql = adminDb(),
 ): Promise<{ ok: true; result: ImportResult } | { ok: false; message: string }> {
   const parsed = await previewImport(bytes, filename, sql);
@@ -213,7 +215,10 @@ export async function commitImport(
   const { valid, duplicates } = parsed.preview;
   const duplicateRows = new Set(duplicates.map((row) => row.rowNumber));
 
-  const result: ImportResult = { created: 0, granted: 0, skipped: duplicateRows.size, failed: [] };
+  const result: ImportResult = { created: 0, granted: 0, invited: 0, skipped: duplicateRows.size, failed: [] };
+
+  // Collect emails to invite after all records are created.
+  const toInvite: string[] = [];
 
   for (const row of valid) {
     if (duplicateRows.has(row.rowNumber)) continue;
@@ -230,8 +235,6 @@ export async function commitImport(
         email: row.loginEmail,
         otherInfo: row.otherInfo,
         consentNote: options.consentNote,
-        // The sheet's own Timestamp column is the better evidence where it
-        // exists; the operator's note covers the rows where it does not.
         consentAt: row.submittedAt ?? options.consentAt,
       },
       adminId,
@@ -248,10 +251,37 @@ export async function commitImport(
     if (options.grantAccess && row.loginEmail) {
       if (await grantAlumnusAccess(created.id, adminId, sql)) result.granted++;
     }
+
+    // Queue invitation email if the option is on and the alumni has an email
+    if (options.sendInvitations && row.loginEmail) {
+      toInvite.push(row.loginEmail);
+    }
   }
 
-  // Counts only. A row-by-row log here would put the mailing list in the audit
-  // trail, which is the thing the blind index exists to avoid.
+  // Send invitation emails — fire and forget per email so one failure
+  // does not block the rest. Failures are logged but do not affect the result.
+  if (toInvite.length > 0) {
+    let config: ReturnType<typeof mailConfig>;
+    try {
+      config = mailConfig();
+    } catch (error) {
+      console.error('[import] cannot send invitations — mail is not configured:', (error as Error).message);
+      config = null as never;
+    }
+
+    if (config) {
+      const loginUrl = `${process.env.APP_URL ?? config.appUrl}/login`;
+      for (const email of toInvite) {
+        try {
+          await send({ to: email, ...invitationEmail(email, loginUrl) }, config);
+          result.invited++;
+        } catch (error) {
+          console.error(`[import] could not send invitation to ${email}:`, (error as Error).message);
+        }
+      }
+    }
+  }
+
   await audit(
     {
       actorType: 'admin',
@@ -261,6 +291,7 @@ export async function commitImport(
       meta: {
         created: result.created,
         granted: result.granted,
+        invited: result.invited,
         skipped: result.skipped,
         failed: result.failed.length,
         rejected: parsed.preview.rejected.length,

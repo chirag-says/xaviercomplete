@@ -5,7 +5,6 @@ import { ChapterStage } from '@/components/chapters/ChapterStage';
 import { ChapterNetwork } from '@/components/chapters/ChapterNetwork';
 import { ChapterMeets } from '@/components/chapters/ChapterMeets';
 import { ChapterBill } from '@/components/chapters/ChapterBill';
-import { ChapterJoin } from '@/components/chapters/ChapterJoin';
 import { ChapterClose } from '@/components/chapters/ChapterClose';
 
 export const metadata: Metadata = {
@@ -48,7 +47,6 @@ export default function ChaptersPage() {
         <ChapterStage />
         <ChapterMeets />
         <ChapterBill />
-        <ChapterJoin />
         <ChapterNetwork />
         <ChapterClose />
       </div>

@@ -3,21 +3,13 @@
  *
  * A direct `fetch` rather than the `resend` SDK: this is one POST to one
  * endpoint, and a dependency that wraps fifteen lines is a dependency whose
- * transitive tree we now own. The SDK earns its place when we need batching,
- * attachments or webhooks; none of that is in this plan.
+ * transitive tree we now own.
  *
  * ## Rules these templates follow
  *
- * - **No PII beyond the recipient's own address.** Not their name, not their
- *   batch, nothing about anyone else. A mailbox is not a place to put a
- *   directory, and an email sitting in a breached inbox should reveal nothing
- *   about the Association's members.
- * - **Nothing that confirms membership to a bystander.** We only ever email an
- *   address already on the allowlist, so the mere arrival is a signal — but the
- *   content adds nothing to it.
- * - **Plain text alongside HTML.** Some alumni read mail in clients that will
- *   not render the HTML, and a sign-in link that does not appear is a support
- *   request.
+ * - **No PII beyond the recipient's own address.**
+ * - **Nothing that confirms membership to a bystander.**
+ * - **Plain text alongside HTML.**
  */
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails';
@@ -49,13 +41,6 @@ export function mailConfig(): MailConfig {
   return { apiKey, from, replyTo: process.env.MAIL_REPLY_TO, appUrl: appUrl.replace(/\/$/, '') };
 }
 
-/**
- * A file travelling with a message.
- *
- * Only the event poster uses this. `content` is the raw bytes; the base64 the
- * provider wants is done at the last moment in {@link send}, so nothing above
- * this layer handles an encoded blob it could accidentally log.
- */
 export interface Attachment {
   filename: string;
   content: Buffer;
@@ -66,40 +51,14 @@ export interface Mail {
   subject: string;
   text: string;
   html: string;
-  /**
-   * Overrides `MailConfig.replyTo` for this one message.
-   *
-   * Used by the enquiry form so the Association can simply hit reply. The value
-   * is whatever the sender typed into a public form, so it is validated before
-   * it gets here and the message body says plainly that it is unverified.
-   * Injection is not a concern — this goes to Resend as JSON, not as SMTP
-   * headers — but impersonation is, and no amount of escaping fixes that.
-   */
   replyTo?: string;
-  /**
-   * Files to attach. Kept small on purpose — see `MAX_ATTACHMENT_BYTES`.
-   */
   attachments?: Attachment[];
 }
 
-/**
- * The ceiling on one message's attachments.
- *
- * Not a provider limit — Resend accepts considerably more. It is a limit on
- * what is sensible to send five hundred times: every megabyte here is a
- * megabyte uploaded per recipient, and a large attachment is a deliverability
- * problem as much as a bandwidth one. The poster is re-encoded well under this
- * before it ever reaches here; the check exists so that a future caller who
- * skips that step fails immediately rather than at recipient two hundred.
- */
 export const MAX_ATTACHMENT_BYTES = 2 * 1024 * 1024;
 
 /**
- * Send one message.
- *
- * Throws on failure so the caller decides what the user sees — which for the
- * login route is nothing, because revealing that sending failed would also
- * reveal that the address was on the allowlist.
+ * Send one message via Resend.
  */
 export async function send(mail: Mail, config: MailConfig = mailConfig()): Promise<{ id: string }> {
   const attachments = mail.attachments ?? [];
@@ -124,15 +83,10 @@ export async function send(mail: Mail, config: MailConfig = mailConfig()): Promi
         ? { attachments: attachments.map((file) => ({ filename: file.filename, content: file.content.toString('base64') })) }
         : {}),
     }),
-    // Longer than the default when carrying a file: the request body is now
-    // megabytes rather than kilobytes, and a timeout here is recorded as a
-    // failed recipient that the next chunk would retry.
     signal: AbortSignal.timeout(attachments.length > 0 ? 30_000 : 10_000),
   });
 
   if (!response.ok) {
-    // The body can echo the recipient address, so it is read for the status
-    // code's sake and deliberately not included in the thrown message.
     await response.text().catch(() => '');
     throw new Error(`Resend rejected the message with status ${response.status}.`);
   }
@@ -146,7 +100,7 @@ export async function send(mail: Mail, config: MailConfig = mailConfig()): Promi
 const WRAP = (body: string, footer: string) => `<!doctype html>
 <html lang="en"><body style="margin:0;padding:32px 16px;background:#f6f5f3;font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1a1a1a">
 <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;padding:36px 32px">
-<p style="margin:0 0 24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a">St Xavier's College Calcutta Alumni Association</p>
+<p style="margin:0 0 24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a">St Xavier's College Calcutta Alumni Association West Zone</p>
 ${body}
 <hr style="border:0;border-top:1px solid #eae8e4;margin:32px 0 20px">
 <p style="margin:0;font-size:13px;color:#8a8a8a">${footer}</p>

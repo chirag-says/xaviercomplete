@@ -1,24 +1,6 @@
 /**
  * Sending mail, through Resend.
  *
- * A direct `fetch` rather than the `resend` SDK: this is one POST to one
- * endpoint, and a dependency that wraps fifteen lines is a dependency whose
- * transitive tree we now own. The SDK earns its place when we need batching,
- * attachments or webhooks; none of that is in this plan.
- *
- * ## Rules these templates follow
- *
- * - **No PII beyond the recipient's own address.** Not their name, not their
- *   batch, nothing about anyone else. A mailbox is not a place to put a
- *   directory, and an email sitting in a breached inbox should reveal nothing
- *   about the Association's members.
- * - **Nothing that confirms membership to a bystander.** We only ever email an
- *   address already on the allowlist, so the mere arrival is a signal — but the
- *   content adds nothing to it.
- * - **Plain text alongside HTML.** Some alumni read mail in clients that will
- *   not render the HTML, and a sign-in link that does not appear is a support
- *   request.
- *
  * COPIED from oxvercity/src/lib/email.ts to make the admin app self-contained
  * for separate Hostinger hosting.
  */
@@ -36,7 +18,6 @@ export interface MailConfig {
   apiKey: string;
   from: string;
   replyTo?: string;
-  /** Public origin used to build links. Swapping domains is this one value. */
   appUrl: string;
 }
 
@@ -52,13 +33,6 @@ export function mailConfig(): MailConfig {
   return { apiKey, from, replyTo: process.env.MAIL_REPLY_TO, appUrl: appUrl.replace(/\/$/, '') };
 }
 
-/**
- * A file travelling with a message.
- *
- * Only the event poster uses this. `content` is the raw bytes; the base64 the
- * provider wants is done at the last moment in {@link send}, so nothing above
- * this layer handles an encoded blob it could accidentally log.
- */
 export interface Attachment {
   filename: string;
   content: Buffer;
@@ -69,41 +43,12 @@ export interface Mail {
   subject: string;
   text: string;
   html: string;
-  /**
-   * Overrides `MailConfig.replyTo` for this one message.
-   *
-   * Used by the enquiry form so the Association can simply hit reply. The value
-   * is whatever the sender typed into a public form, so it is validated before
-   * it gets here and the message body says plainly that it is unverified.
-   * Injection is not a concern — this goes to Resend as JSON, not as SMTP
-   * headers — but impersonation is, and no amount of escaping fixes that.
-   */
   replyTo?: string;
-  /**
-   * Files to attach. Kept small on purpose — see `MAX_ATTACHMENT_BYTES`.
-   */
   attachments?: Attachment[];
 }
 
-/**
- * The ceiling on one message's attachments.
- *
- * Not a provider limit — Resend accepts considerably more. It is a limit on
- * what is sensible to send five hundred times: every megabyte here is a
- * megabyte uploaded per recipient, and a large attachment is a deliverability
- * problem as much as a bandwidth one. The poster is re-encoded well under this
- * before it ever reaches here; the check exists so that a future caller who
- * skips that step fails immediately rather than at recipient two hundred.
- */
 export const MAX_ATTACHMENT_BYTES = 2 * 1024 * 1024;
 
-/**
- * Send one message.
- *
- * Throws on failure so the caller decides what the user sees — which for the
- * login route is nothing, because revealing that sending failed would also
- * reveal that the address was on the allowlist.
- */
 export async function send(mail: Mail, config: MailConfig = mailConfig()): Promise<{ id: string }> {
   const attachments = mail.attachments ?? [];
   const attachedBytes = attachments.reduce((total, file) => total + file.content.byteLength, 0);
@@ -127,15 +72,10 @@ export async function send(mail: Mail, config: MailConfig = mailConfig()): Promi
         ? { attachments: attachments.map((file) => ({ filename: file.filename, content: file.content.toString('base64') })) }
         : {}),
     }),
-    // Longer than the default when carrying a file: the request body is now
-    // megabytes rather than kilobytes, and a timeout here is recorded as a
-    // failed recipient that the next chunk would retry.
     signal: AbortSignal.timeout(attachments.length > 0 ? 30_000 : 10_000),
   });
 
   if (!response.ok) {
-    // The body can echo the recipient address, so it is read for the status
-    // code's sake and deliberately not included in the thrown message.
     await response.text().catch(() => '');
     throw new Error(`Resend rejected the message with status ${response.status}.`);
   }
@@ -149,7 +89,7 @@ export async function send(mail: Mail, config: MailConfig = mailConfig()): Promi
 const WRAP = (body: string, footer: string) => `<!doctype html>
 <html lang="en"><body style="margin:0;padding:32px 16px;background:#f6f5f3;font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1a1a1a">
 <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;padding:36px 32px">
-<p style="margin:0 0 24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a">St Xavier's College Calcutta Alumni Association</p>
+<p style="margin:0 0 24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a">St Xavier's College Calcutta Alumni Association West Zone</p>
 ${body}
 <hr style="border:0;border-top:1px solid #eae8e4;margin:32px 0 20px">
 <p style="margin:0;font-size:13px;color:#8a8a8a">${footer}</p>
@@ -158,6 +98,51 @@ ${body}
 /** The one call to action a message is allowed. Inline styles, because mail clients strip stylesheets. */
 const BUTTON = (href: string, label: string) =>
   `<a href="${href}" style="display:inline-block;background:#1a1a1a;color:#fff;text-decoration:none;padding:14px 30px;border-radius:50px;font-weight:500">${label}</a>`;
+
+/**
+ * Invitation email sent to alumni when they are imported via spreadsheet.
+ *
+ * Tells them they have been added to the Nostalgia 26 alumni directory
+ * and gives them the email address they can use to sign in.
+ */
+export function invitationEmail(
+  alumniEmail: string,
+  loginUrl: string,
+): Omit<Mail, 'to'> {
+  const text = [
+    `You've been invited to Nostalgia '26!`,
+    '',
+    `The St. Xavier\u2019s College Calcutta Alumni Association West Zone has added you to the alumni directory.`,
+    '',
+    `You can sign in anytime using your email address: ${alumniEmail}`,
+    '',
+    `Visit ${loginUrl} to explore the directory, reconnect with batchmates, and update your profile.`,
+    '',
+    'No password needed — we will email you a one-time code each time you sign in.',
+    '',
+    'We look forward to seeing you there.',
+    '',
+    'Warm regards,',
+    'SXCCAA',
+  ].join('\n');
+
+  const html = WRAP(
+    `<h1 style="margin:0 0 8px;font-size:22px;font-weight:600">You\u2019re invited to Nostalgia \u201926</h1>
+<p style="margin:0 0 20px;color:#555">The St. Xavier\u2019s College Calcutta Alumni Association West Zone has added you to the alumni directory.</p>
+<p style="margin:0 0 8px;font-size:14px;color:#8a8a8a">Your sign-in email</p>
+<p style="margin:0 0 24px;font-size:18px;font-weight:600;font-family:monospace;background:#f6f5f3;padding:12px 16px;border-radius:8px;word-break:break-all">${alumniEmail}</p>
+<p style="margin:0 0 24px;color:#555">No password needed \u2014 we\u2019ll email you a one-time code each time you sign in.</p>
+<div style="text-align:center;margin:28px 0">${BUTTON(loginUrl, 'Sign in to the directory')}</div>
+<p style="margin:0;font-size:14px;color:#555">Reconnect with your batchmates, explore the directory, and update your profile.</p>`,
+    'You received this because the Association added your details to the alumni directory. If this was not expected, simply ignore this message.',
+  );
+
+  return {
+    subject: `You're invited to Nostalgia '26 — SXCCAA Alumni Directory`,
+    text,
+    html,
+  };
+}
 
 /**
  * The sign-in code.

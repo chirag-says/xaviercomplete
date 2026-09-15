@@ -4,8 +4,6 @@ import { Hero } from '@/components/home/Hero';
 import { AboutSection } from '@/components/home/AboutSection';
 import { FacultySection } from '@/components/home/FacultySection';
 import { ProgramSection } from '@/components/home/ProgramSection';
-import { CampusSection } from '@/components/home/CampusSection';
-import { VoicesSection } from '@/components/home/VoicesSection';
 
 export default function HomePage() {
   return (
@@ -17,8 +15,6 @@ export default function HomePage() {
           <AboutSection />
           <FacultySection />
           <ProgramSection />
-          <CampusSection />
-          <VoicesSection />
         </div>
       </div>
     </SiteShell>

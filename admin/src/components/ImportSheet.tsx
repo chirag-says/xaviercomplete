@@ -258,8 +258,17 @@ export function ImportSheet() {
                   <input id="grantAccess" name="grantAccess" type="checkbox" defaultChecked style={{ width: 'auto', marginTop: 3 }} />
                   <span>
                     <strong>Let them sign in.</strong> Adds each address to the allowlist. Without this
-                    they appear in the directory but cannot log in. Nobody is emailed either way — use
-                    the invitation run for that.
+                    they appear in the directory but cannot log in.
+                  </span>
+                </label>
+              </div>
+
+              <div className="field">
+                <label htmlFor="sendInvitations" style={{ display: 'flex', gap: 9, alignItems: 'flex-start', fontWeight: 400 }}>
+                  <input id="sendInvitations" name="sendInvitations" type="checkbox" defaultChecked style={{ width: 'auto', marginTop: 3 }} />
+                  <span>
+                    <strong>Send invitation emails.</strong> Each person with an email address gets a
+                    Nostalgia &rsquo;26 welcome message with their sign-in email and a link to the directory.
                   </span>
                 </label>
               </div>
