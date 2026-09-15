@@ -1,0 +1,54 @@
+{
+  "name": "ox-versity",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3300",
+    "dev:preview": "next dev",
+    "build": "next build",
+    "start": "next start -p 3300",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"tests/**/*.test.ts\"",
+    "keys:generate": "node tools/keys/generate.ts",
+    "ingest": "node tools/ingest/run.ts",
+    "ingest:sample": "node tools/ingest/fixtures/make-sample.ts",
+    "db:migrate": "node --env-file-if-exists=.env tools/db/migrate.ts",
+    "db:verify": "node --env-file-if-exists=.env tools/db/verify.ts",
+    "auth:verify": "node --env-file-if-exists=.env tools/db/auth-verify.ts",
+    "app:verify": "node --env-file-if-exists=.env tools/app/verify.ts",
+    "app:auth-verify": "node --env-file-if-exists=.env tools/app/auth-verify.ts",
+    "app:demo-user": "node --env-file-if-exists=.env tools/app/demo-user.ts",
+    "gate:verify": "node --env-file-if-exists=.env tools/db/gate-verify.ts",
+    "request:verify": "node --env-file-if-exists=.env tools/db/request-verify.ts",
+    "restore:proof": "node --env-file-if-exists=.env tools/db/restore-proof.ts",
+    "harden:verify": "node --env-file-if-exists=.env tools/db/harden-verify.ts",
+    "scan:secrets": "node tools/security/scan-secrets.ts",
+    "invite": "node --env-file-if-exists=.env tools/invite/run.ts",
+    "launch:check": "node --env-file-if-exists=.env tools/db/launch-check.ts"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "file-type": "^22.0.2",
+    "motion": "^12.23.12",
+    "next": "^15.5.2",
+    "postgres": "^3.4.9",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/react": "^19.1.11",
+    "@types/react-dom": "^19.1.7",
+    "cheerio": "^1.2.0",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "^15.5.2",
+    "typescript": "^5.9.2"
+  },
+  "overrides": {
+    "postcss": "^8.5.28",
+    "uuid": "^11.1.0"
+  },
+  "overridesRationale": "Reviewed 11 Sep 2026. postcss: next 15.5.25 pins 8.4.31, which carries four sourceMappingURL path-traversal advisories; 8.5.x is the patched line and semver-compatible. uuid: exceljs pins 8.3.2, whose v3/v5/v6 buffer bounds check is unreachable for us (exceljs calls only v4, and only when writing xlsx) but the override costs nothing."
+}

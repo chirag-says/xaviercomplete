@@ -1,0 +1,482 @@
+/*
+ * "Voices From Our Community" — the scroll-driven review section above the
+ * footer. Nothing in this file touches an existing selector; every rule is
+ * under `.sx-voices`, and the keyframes are namespaced to match.
+ *
+ * SCROLL IS THE CLOCK. Every card animation here is declared `paused`, so it
+ * never advances on its own. What moves it is `animation-delay`: a negative
+ * delay on a paused animation holds it at that offset, so feeding the delay
+ * from the section's scroll progress scrubs the animation frame by frame. Stop
+ * scrolling and it stops; scroll back and it rewinds. `VoicesSection` writes
+ * exactly one number, `--sx-p`, and does nothing else.
+ *
+ * Geometry taken from the reference recording, measured at 1916x1155:
+ *
+ *   stage              the full viewport, pinned
+ *   card width         439px   = 22.9vw   -> clamp(260px, 23vw, 440px)
+ *   distance to edge    50px   =  2.6vw   -> clamp(20px, 2.6vw, 50px)
+ *   resting centre     535 + 353/2 of 1155 = 61% down the stage
+ *   travel in          626px of 1155 = 0.542 x stage, from below the clipped edge
+ *   travel out         893px of 1155 = 0.773 x stage, up through the top edge
+ *
+ * A card is two elements: `.sx-voices__slot` places the resting position and
+ * never moves, `.sx-voice` carries the animation. Keeping them apart means the
+ * keyframes only ever set `transform` and `opacity`.
+ */
+
+/* Typed so the delay `calc()` resolves as a number everywhere. */
+@property --sx-p {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* ---- the pinned section ------------------------------------------------------
+ * The section is taller than the screen; the stage inside it is exactly one
+ * screen and sticks to the top. The extra height is the scroll track the cards
+ * are scrubbed along, and when it runs out the page carries on to the footer
+ * as normal. Only this section pins.
+ */
+.sx-voices {
+  --sx-stage-h: 100vh;
+  /* Sized so one card's whole rise, hold and release costs about two thirds of
+   * a screen of scrolling, which is brisk enough not to feel like the page has
+   * stopped working. Three reviews take 0.388 of the track each, so 175vh. */
+  --sx-track: 175vh;
+  --sx-enter: calc(var(--sx-stage-h) * 0.542);
+  --sx-exit: calc(var(--sx-stage-h) * -0.773);
+  --sx-card-w: clamp(300px, 23vw, 440px);
+  --sx-lane-inset: clamp(20px, 2.6vw, 50px);
+  /* Where a card rests, as a percentage of the stage. */
+  --sx-rest: 61%;
+
+  position: relative;
+  z-index: 1;
+  display: block;
+  flex: none;
+  width: 100%;
+  max-width: 100%;
+  height: calc(var(--sx-stage-h) + var(--sx-track));
+  background-color: var(--token-1c49fc01-5a06-4e84-9621-823d64297d7d, rgb(17, 17, 17));
+}
+
+.sx-voices__pin {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: var(--sx-stage-h);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ---- the photograph, which is the stage --------------------------------------
+ * Full bleed and dominant, darkened just enough to carry white type and the
+ * glass cards. `object-fit: cover` with the focus low and central keeps the
+ * gate and the archway in frame as the viewport narrows, rather than cropping
+ * to the sky.
+ */
+.sx-voices__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.sx-voices__bg picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.sx-voices__bg img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+}
+/* The site's own hero recipe — the navy token over ink — but weighted to the
+ * top and bottom edges rather than laid flat, so the photograph keeps its own
+ * light through the middle and only carries enough shade where the title and
+ * the cards need to stay legible. */
+.sx-voices__bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(17, 17, 17, 0.42), rgba(17, 17, 17, 0.14) 42%, rgba(17, 17, 17, 0.46)),
+    var(--token-c4ab01f3-84bc-4e19-b61a-a114e990929b, rgba(19, 62, 109, 0.12));
+}
+
+/* ---- the centre, which the cards move around and never displace ------------- */
+
+.sx-voices__centre {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  gap: 20px;
+  width: calc(100% - 2 * (var(--sx-card-w) + var(--sx-lane-inset) + 28px));
+  max-width: 760px;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.sx-voices__centre h2 {
+  margin: 0;
+  color: var(--token-5cace45c-5aeb-4596-8405-46748e8b644b, rgb(255, 255, 255));
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.4);
+  text-wrap: balance;
+}
+
+.sx-voices__standfirst {
+  max-width: 520px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-family: 'Inter', 'Inter Placeholder', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.55;
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* ---- the lanes ---------------------------------------------------------------
+ * The clipping frame. A card is only half-visible at the moment it arrives and
+ * the moment it leaves, which is what gives the pass its edges.
+ */
+.sx-voices__field {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sx-voices__slot {
+  position: absolute;
+  width: var(--sx-card-w);
+  top: var(--sx-rest);
+  transform: translateY(-50%);
+}
+.sx-voices__slot[data-side='left'] {
+  left: var(--sx-lane-inset);
+}
+.sx-voices__slot[data-side='right'] {
+  right: var(--sx-lane-inset);
+}
+
+/* ---- the card ----------------------------------------------------------------
+ * Transparent glass over the photograph: the college stays readable through it,
+ * which is the whole point of the composition.
+ */
+.sx-voice {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  box-sizing: border-box;
+  /* The reference card measures 353px tall at 439px wide and both of its cards
+   * are the same height, which is what keeps the composition steady. */
+  min-height: 348px;
+  padding: 32px 28px 28px;
+  /* 20px is the radius the contact card on this page already uses. */
+  border-radius: 20px;
+  border: 1px solid var(--token-7d75b990-1db7-4479-b923-4e356c6d6b9d, rgba(255, 255, 255, 0.2));
+  background-color: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.34);
+  text-align: center;
+  will-change: transform, opacity;
+
+  /* Scrubbed, never played. The 1s duration is a unit, not a speed: the delay
+   * below maps scroll progress onto it, so the only thing 1s does is make
+   * `--sx-p` read straight across as 0 → 1. */
+  animation: sx-voice-move 1s linear paused both, sx-voice-fade 1s linear paused both;
+  /* `--sx-p` is progress across the whole section; `--sx-start` and `--sx-span`
+   * are this card's slice of it. Before its slice the positive delay leaves the
+   * animation unstarted (backwards fill holds the 0% state); after it, the
+   * delay is past -1s and forwards fill holds the 100% state. */
+  animation-delay: calc((var(--sx-start) - var(--sx-p)) / var(--sx-span) * 1s);
+}
+
+.sx-voice__quote {
+  margin: 0;
+  color: var(--token-5cace45c-5aeb-4596-8405-46748e8b644b, rgb(255, 255, 255));
+  font-family: 'Inter', 'Inter Placeholder', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* No reviewer supplied a photograph, so the round element the reference puts
+ * here is a monogram rather than a stand-in face. */
+.sx-voice__monogram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  margin-top: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--token-7d75b990-1db7-4479-b923-4e356c6d6b9d, rgba(255, 255, 255, 0.2));
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--token-5cace45c-5aeb-4596-8405-46748e8b644b, rgb(255, 255, 255));
+  font-family: 'Instrument Sans', 'Instrument Sans Placeholder', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.sx-voice__name {
+  margin: 0;
+  color: var(--token-5cace45c-5aeb-4596-8405-46748e8b644b, rgb(255, 255, 255));
+  font-family: 'Instrument Sans', 'Instrument Sans Placeholder', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sx-voice__role {
+  margin: -10px 0 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-family: 'Inter', 'Inter Placeholder', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* ---- the pass ----------------------------------------------------------------
+ * The path, in the proportions the recording gives: 50.3% of the pass rising,
+ * a 6% hold, the rest leaving. The recording's own velocities are not eased
+ * curves — they are the pace of the scroll that produced them — so these
+ * segments are close to linear, with only enough softening at the joints to
+ * stop the direction changes reading as a snap. Scrolling supplies the rest.
+ */
+@keyframes sx-voice-move {
+  0% {
+    transform: translate3d(0, var(--sx-enter), 0);
+    animation-timing-function: cubic-bezier(0.32, 0, 0.5, 1);
+  }
+  50.3% {
+    transform: translate3d(0, 0, 0);
+    animation-timing-function: linear;
+  }
+  56.3% {
+    transform: translate3d(0, 0, 0);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  100% {
+    transform: translate3d(0, var(--sx-exit), 0);
+  }
+}
+
+/* No fade in: the reference card's brightest row measures a flat ~137 from the
+ * moment it clears the bottom edge, so it arrives at full strength and the 2%
+ * ramp only covers the frames where it is still clipped. The fade out tracks
+ * the same measure falling away over the last third — 137 at 70% of the pass,
+ * 119 at 72%, 73 at 82%, 51 at 94%, gone by the end. */
+@keyframes sx-voice-fade {
+  0% {
+    opacity: 0;
+  }
+  2%,
+  70% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- read by assistive technology, never seen ------------------------------- */
+
+.sx-voices__transcript {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  list-style: none;
+}
+
+/* ---- tablet and phone --------------------------------------------------------
+ * Not the desktop composition scaled down. Below 1200px there is no room for a
+ * title between two lanes, so the title takes the top of the stage and the
+ * cards get a frame of their own underneath it — clipped at both edges exactly
+ * as the full stage is on desktop, just shorter. The pass is untouched: a card
+ * still rises from behind the bottom edge, holds and is released, scrubbed by
+ * the same scroll progress. It simply cannot reach the title, because its
+ * frame ends first.
+ *
+ * One lane rather than two, since a 390px screen has no sides to speak of. The
+ * cards still arrive in the same order and still overlap, so the sequence
+ * reads the same.
+ */
+@media (max-width: 1199.98px) {
+  .sx-voices {
+    --sx-track: 185vh;
+    --sx-field-top: 42%;
+    --sx-field-h: calc(var(--sx-stage-h) * 0.58);
+    /* A short frame needs a longer run-up, or the card would already be
+     * half-visible when its pass begins. */
+    --sx-enter: calc(var(--sx-field-h) * 0.7);
+    --sx-exit: calc(var(--sx-field-h) * -0.85);
+    --sx-card-w: min(100% - 40px, 420px);
+    --sx-lane-inset: 0px;
+  }
+  .sx-voices__field {
+    top: var(--sx-field-top);
+  }
+  .sx-voices__centre {
+    /* Clear of the sticky header, which floats over the top of every section. */
+    top: 15%;
+    width: calc(100% - 40px);
+    max-width: 620px;
+    gap: 16px;
+    transform: translate(-50%, 0);
+  }
+  .sx-voices__slot,
+  .sx-voices__slot[data-side='left'],
+  .sx-voices__slot[data-side='right'] {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+  }
+  .sx-voices__bg img {
+    object-position: 54% 60%;
+  }
+  .sx-voices__standfirst {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 809.98px) {
+  .sx-voices {
+    --sx-track: 165vh;
+    --sx-field-top: 40%;
+    --sx-field-h: calc(var(--sx-stage-h) * 0.6);
+  }
+  .sx-voices__centre {
+    top: 13%;
+    gap: 12px;
+  }
+  .sx-voice {
+    min-height: 250px;
+    padding: 26px 22px;
+    gap: 13px;
+  }
+  .sx-voice__quote {
+    font-size: 15px;
+  }
+  .sx-voices__standfirst {
+    font-size: 15px;
+  }
+  /* The mobile portrait image already frames the gate naturally. */
+  .sx-voices__bg img {
+    object-position: center center;
+  }
+}
+
+/* ---- short viewports ---------------------------------------------------------
+ * The stage is one screen tall, so on a short screen the cards have to fit into
+ * a short frame. The three reviews are very different lengths — 76 characters
+ * to 305 — and the longest one, set at desktop sizes in a narrow card, grows
+ * past the frame and gets clipped at rest. These two tiers step the card's type
+ * and spacing down with the viewport height so it always fits, and they key off
+ * height rather than width because that is the dimension that runs out.
+ */
+@media (max-height: 860px) {
+  .sx-voice {
+    min-height: 300px;
+    padding: 26px 24px 24px;
+    gap: 13px;
+  }
+  .sx-voice__quote {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .sx-voice__monogram {
+    width: 48px;
+    height: 48px;
+    font-size: 19px;
+  }
+  .sx-voice__name {
+    font-size: 17px;
+  }
+}
+
+@media (max-height: 700px) {
+  .sx-voices {
+    /* The reference rests a card at 61% of its frame, which assumes the card is
+     * comfortably shorter than the frame. On a 640px phone the longest review
+     * fills four fifths of it, and 61% would hang the bottom over the edge, so
+     * the rest position moves to the middle. */
+    --sx-rest: 50%;
+  }
+  .sx-voice {
+    min-height: 250px;
+    padding: 22px 20px 20px;
+    gap: 10px;
+  }
+  .sx-voice__quote {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .sx-voice__monogram {
+    width: 42px;
+    height: 42px;
+    font-size: 17px;
+  }
+  .sx-voice__name {
+    font-size: 16px;
+  }
+  .sx-voice__role {
+    font-size: 12px;
+    margin-top: -6px;
+  }
+}
+
+/* Between 1200 and 1400 the two lanes leave the title a narrow column, and the
+ * preset's 80px display wraps to three lines in it. Stepping it down here keeps
+ * the title on two lines without touching the preset anywhere else on the site. */
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .sx-voices__centre h2 {
+    --framer-font-size: 62px;
+  }
+}
+
+/* ---- reduced motion ----------------------------------------------------------
+ * The travel comes out; the sequence does not. Scrolling still moves through
+ * the two voices, they just cross-fade in place instead of flying.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .sx-voice {
+    animation-name: sx-voice-quiet;
+    will-change: opacity;
+  }
+  @keyframes sx-voice-quiet {
+    0% {
+      opacity: 0;
+    }
+    14%,
+    72% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}

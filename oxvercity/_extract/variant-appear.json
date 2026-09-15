@@ -1,0 +1,53 @@
+[
+ {
+  "module": "8OAyH4qqX2mH",
+  "className": null,
+  "once": false,
+  "threshold": 0,
+  "variant": "rMktJRT5R",
+  "at": 134225
+ },
+ {
+  "module": "8OAyH4qqX2mH",
+  "className": null,
+  "id": "QaP3eExAJ",
+  "once": false,
+  "threshold": 0,
+  "variant": "UDSHdkd2S",
+  "at": 134455
+ },
+ {
+  "module": "JYwI76K8hHPs",
+  "className": null,
+  "id": "oaC5F4xxk",
+  "once": false,
+  "threshold": 0,
+  "variant": "SoY_iR9XN",
+  "at": 88996
+ },
+ {
+  "module": "JYwI76K8hHPs",
+  "className": null,
+  "id": "GMdlzOIGZ",
+  "once": false,
+  "threshold": 0,
+  "variant": "SoY_iR9XN",
+  "at": 90093
+ },
+ {
+  "module": "script_main",
+  "className": null,
+  "id": "YrfdVw44f",
+  "once": false,
+  "threshold": 0,
+  "at": 203015
+ },
+ {
+  "module": "script_main",
+  "className": null,
+  "id": "paUmw_XyC",
+  "once": false,
+  "threshold": 0,
+  "at": 208104
+ }
+]

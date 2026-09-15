@@ -1,0 +1,279 @@
+/*
+ * The access-request band on /contact.
+ *
+ * Built from the alumni page's vocabulary — same ink, cream, green, radius and
+ * type scale — so it reads as part of the site rather than a bolted-on form.
+ * It sits on the cream ground to separate it from the Framer enquiry form
+ * above, which is a different thing doing a different job.
+ */
+
+.req-section {
+  background: var(--al-cream);
+  padding: clamp(60px, 8vw, 110px) 24px;
+  color: var(--al-ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+.req-shell {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.req-head {
+  margin-bottom: clamp(24px, 4vw, 36px);
+}
+
+.req-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--al-muted);
+  margin: 0 0 10px;
+}
+
+.req-title {
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  margin: 0 0 14px;
+}
+
+.req-lede {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--al-muted);
+  margin: 0;
+  max-width: 62ch;
+}
+
+/* ── The form card ── */
+.req-card {
+  background: var(--al-white);
+  border: 1px solid var(--al-faint);
+  border-radius: var(--al-radius);
+  padding: clamp(22px, 3.5vw, 34px);
+}
+
+.req-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.req-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.req-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.req-field input,
+.req-field textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--al-faint);
+  border-radius: 9px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--al-ink);
+  background: var(--al-white);
+}
+
+.req-field input:focus,
+.req-field textarea:focus {
+  outline: 2px solid var(--al-green);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.req-field input:disabled,
+.req-field textarea:disabled {
+  background: var(--al-plate);
+  color: var(--al-muted);
+}
+
+.req-field textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+/*
+ * The code input. Wide tracking and a large face because this is read off a
+ * phone and typed by someone who will otherwise transpose two digits.
+ */
+.req-field--code input {
+  max-width: 220px;
+  font: 600 22px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.24em;
+  text-align: center;
+}
+
+.req-hint {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--al-muted);
+  margin: 6px 0 0;
+}
+
+.req-sent {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--al-ink);
+  margin: 0;
+}
+
+.req-sent strong {
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.req-turnstile {
+  min-height: 65px;
+}
+
+.req-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.req-submit {
+  align-self: flex-start;
+  padding: 13px 28px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  background: var(--al-ink);
+  color: var(--al-white);
+  cursor: pointer;
+  transition: background 0.3s var(--al-out), transform 0.3s var(--al-out);
+}
+
+.req-submit:hover:not(:disabled) {
+  background: var(--al-green);
+  transform: translateY(-1px);
+}
+
+.req-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.req-back {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--al-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.req-back:hover:not(:disabled) {
+  color: var(--al-ink);
+}
+
+/* ── Notices ── */
+.req-notice {
+  margin: 16px 0 0;
+  padding: 13px 16px;
+  border-radius: 9px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  background: var(--al-green-soft);
+  color: var(--al-green);
+}
+
+.req-notice--problem {
+  background: rgba(163, 36, 31, 0.08);
+  color: #a3241f;
+}
+
+/* ── Done ── */
+.req-done {
+  background: var(--al-white);
+  border: 1px solid var(--al-faint);
+  border-radius: var(--al-radius);
+  padding: clamp(24px, 4vw, 36px);
+}
+
+.req-done__title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0 0 10px;
+}
+
+.req-done__body {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--al-muted);
+  margin: 0 0 10px;
+  max-width: 60ch;
+}
+
+.req-done__body:last-child {
+  margin-bottom: 0;
+}
+
+/* ── The three steps ── */
+.req-steps {
+  margin: clamp(24px, 4vw, 34px) 0 0;
+  padding: 0 0 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.req-steps li {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--al-muted);
+  max-width: 60ch;
+}
+
+.req-steps strong {
+  color: var(--al-ink);
+  font-weight: 600;
+}
+
+.req-foot {
+  margin: 22px 0 0;
+  font-size: 14.5px;
+  color: var(--al-muted);
+}
+
+.req-foot a {
+  color: var(--al-green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 620px) {
+  .req-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .req-submit {
+    transition: none;
+  }
+  .req-submit:hover:not(:disabled) {
+    transform: none;
+  }
+}

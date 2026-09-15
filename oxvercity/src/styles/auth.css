@@ -1,0 +1,247 @@
+/*
+ * Sign-in page.
+ *
+ * Built from the site's own tokens and type scale rather than a new look: the
+ * Framer design is untouched, and this page is a new room in the same house.
+ * The type family, ink colour and pill button radius all come from framer.css.
+ */
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72vh;
+  padding: 120px 24px 96px;
+  background: var(--token-5cace45c-5aeb-4596-8405-46748e8b644b, rgb(255, 255, 255));
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+}
+
+.auth-eyebrow {
+  margin: 0 0 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.5);
+}
+
+.auth-title {
+  margin: 0 0 14px;
+  font-family: 'Instrument Sans', 'Inter', sans-serif;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.12;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--token-1c49fc01-5a06-4e84-9621-823d64297d7d, rgb(17, 17, 17));
+}
+
+.auth-lede {
+  margin: 0 0 32px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(17, 17, 17, 0.7);
+}
+
+.auth-field {
+  display: block;
+  margin-bottom: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(17, 17, 17);
+}
+
+.auth-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px; /* 16px or iOS zooms the page on focus */
+  color: rgb(17, 17, 17);
+  background: rgb(248, 248, 248);
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.auth-input:focus-visible {
+  border-color: rgba(17, 17, 17, 0.55);
+  background: rgb(255, 255, 255);
+}
+
+.auth-input::placeholder {
+  color: rgba(17, 17, 17, 0.35);
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 18px;
+  padding: 16px 32px;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+  background: rgb(17, 17, 17);
+  border: 0;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.auth-submit:hover:not(:disabled) { opacity: 0.85; }
+.auth-submit:disabled { opacity: 0.45; cursor: default; }
+
+/*
+ * One notice element for every outcome. The sign-in flow deliberately cannot
+ * tell the visitor whether an address is registered, so "sent" and "not
+ * registered" must be visually identical too — a different colour or icon would
+ * give away exactly what the wording is careful not to.
+ */
+.auth-notice {
+  margin: 24px 0 0;
+  padding: 16px 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  border-radius: 12px;
+  background: rgb(248, 248, 248);
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  color: rgba(17, 17, 17, 0.8);
+}
+
+.auth-notice--problem {
+  background: rgba(190, 60, 40, 0.06);
+  border-color: rgba(190, 60, 40, 0.22);
+  color: rgb(128, 42, 28);
+}
+
+.auth-foot {
+  margin: 28px 0 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(17, 17, 17, 0.55);
+}
+
+.auth-foot a { color: rgb(17, 17, 17); text-decoration: underline; text-underline-offset: 3px; }
+
+.auth-turnstile { margin-top: 18px; min-height: 0; }
+
+/* --- the code step ------------------------------------------------------- */
+
+/*
+ * Which mailbox to look in, kept on screen while the code is typed. The address
+ * is bold because that is the one word being checked against a phone.
+ */
+.auth-sent {
+  margin: 0 0 24px;
+  padding: 14px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  border-radius: 12px;
+  background: rgb(248, 248, 248);
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  color: rgba(17, 17, 17, 0.8);
+}
+
+.auth-sent strong { color: rgb(17, 17, 17); font-weight: 500; word-break: break-all; }
+
+/*
+ * Six digits, spaced out and monospaced, so a transposed pair is visible at a
+ * glance rather than after a failed attempt.
+ */
+.auth-input--code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 24px;
+  letter-spacing: 0.32em;
+  text-align: center;
+  padding: 16px 18px;
+}
+
+.auth-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+/* A button that reads as a link: same weight as the prose around it, so it does
+   not compete with the one thing on this step that is a button. */
+.auth-link {
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: rgba(17, 17, 17, 0.6);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-link:hover:not(:disabled) { color: rgb(17, 17, 17); }
+.auth-link:disabled { opacity: 0.45; cursor: default; }
+
+/* --- the way out for everyone else --------------------------------------- */
+
+/*
+ * Deliberately a panel rather than a line of small print. Most people reaching
+ * this page cannot sign in and never will be able to, and the form is unable to
+ * tell them so — this is the only thing on the page that can.
+ */
+.auth-door {
+  margin: 36px 0 0;
+  padding: 22px 22px 24px;
+  border-radius: 14px;
+  background: rgb(248, 248, 248);
+  border: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.auth-door__title {
+  margin: 0 0 8px;
+  font-family: 'Instrument Sans', 'Inter', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: rgb(17, 17, 17);
+}
+
+.auth-door__body {
+  margin: 0 0 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(17, 17, 17, 0.65);
+}
+
+.auth-door__link {
+  display: inline-block;
+  padding: 12px 26px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: rgb(17, 17, 17);
+  background: rgb(255, 255, 255);
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  border-radius: 50px;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.auth-door__link:hover {
+  background: rgb(17, 17, 17);
+  border-color: rgb(17, 17, 17);
+  color: rgb(255, 255, 255);
+}
+
+@media (max-width: 600px) {
+  .auth-page { padding: 96px 20px 72px; }
+  .auth-input--code { font-size: 20px; letter-spacing: 0.24em; }
+}

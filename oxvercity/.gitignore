@@ -1,0 +1,21 @@
+node_modules
+.next
+out
+*.tsbuildinfo
+next-env.d.ts
+_extract/shots
+
+# --- Never commit -------------------------------------------------------------
+# Secrets. .env.example is the only one that belongs in the repo.
+.env
+.env.*
+!.env.example
+
+# The alumni spreadsheet and anything derived from it. This directory is also
+# listed in .git/info/exclude, and the ingest tool refuses to run if it finds the
+# source file inside a git-tracked path.
+private-data/
+
+# Ingest dry-run output: counts and error reasons only, but there is no reason
+# for it to be in version control.
+tools/ingest/reports/

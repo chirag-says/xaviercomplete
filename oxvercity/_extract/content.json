@@ -1,0 +1,418 @@
+{
+ "programs": [
+  {
+   "title": "B.Sc. in Computer Science",
+   "description": "Comprehensive bachelor degrees with modern curriculum personalized learning, effectively preparing students strong academic professional foundations for future success worldwide in the every field.",
+   "href": "./programs/b-sc-in-computer-science",
+   "image": {
+    "src": "/images/programs/bsc-computer-science.jpg",
+    "width": 6000,
+    "height": 4000,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Postgraduate",
+   "description": "Designed for future leaders, our postgraduate programs combine cutting-edge curriculum and individualized learning to build advanced expertise and global career readiness across all professional fields.",
+   "href": "./programs/postgraduate",
+   "image": {
+    "src": "/images/programs/postgraduate.jpg",
+    "width": 8256,
+    "height": 5504,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Professional Studies",
+   "description": "Our professional studies programs integrate modern, industry-relevant curriculum with personalized learning pathways—empowering learners to advance their careers with practical skills and global competence.",
+   "href": "./programs/professional-studies",
+   "image": {
+    "src": "/images/programs/professional-studies.jpg",
+    "width": 6000,
+    "height": 4000,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Certificate & Courses",
+   "description": "Flexible and targeted, our certificate programs and short courses offer modern, skills-based learning tailored to individual goals—ideal for upskilling, reskilling, or launching a new career in today’s competitive world.",
+   "href": "./programs/certificate-courses",
+   "image": {
+    "src": "/images/programs/certificate-courses.jpg",
+    "width": 5472,
+    "height": 3468,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Online Programs",
+   "description": "Our online programs offer the flexibility of remote learning combined with a modern, interactive curriculum and personalized support—designed to help students achieve academic and professional success from anywhere in the world.",
+   "href": "./programs/online-programs",
+   "image": {
+    "src": "/images/programs/online-programs.jpg",
+    "width": 3840,
+    "height": 2160,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Research Degrees",
+   "description": "Our research degrees foster innovation and critical inquiry through a modern curriculum and dedicated supervision—empowering scholars to contribute original knowledge and solve real-world challenges across disciplines.",
+   "href": "./programs/research-degrees",
+   "image": {
+    "src": "/images/programs/research-degrees.jpg",
+    "width": 8256,
+    "height": 5504,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Short-Term Programs",
+   "description": "Our short-term programs offer fast, focused learning experiences with up-to-date curriculum and personalized instruction—perfect for gaining new skills, exploring interests, or advancing your career in a short time.",
+   "href": "./programs/short-term-programs",
+   "image": {
+    "src": "/images/programs/short-term-programs.jpg",
+    "width": 5184,
+    "height": 3456,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Exchange Programs",
+   "description": "Our exchange programs provide students with international academic experiences, blending modern curriculum with cultural immersion—fostering global awareness, adaptability, and a broader perspective on education and career.",
+   "href": "./programs/exchange-programs",
+   "image": {
+    "src": "/images/programs/exchange-programs.jpg",
+    "width": 6048,
+    "height": 4024,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Thumbnail Image"
+   }
+  }
+ ],
+ "campus": [
+  {
+   "title": "Sports & Wellness",
+   "description": "State-of-the-art facilities supporting fitness athletics, providing students with top-notch equipment and training spaces.",
+   "image": {
+    "src": "/images/home/campus-sports-wellness.jpg",
+    "width": 4852,
+    "height": 3239,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Card Image"
+   }
+  },
+  {
+   "title": "Libaries",
+   "description": "State-of-the-art facilities supporting fitness athletics, providing students with top-notch equipment and training spaces.",
+   "image": {
+    "src": "/images/home/campus-libraries.jpg",
+    "width": 2832,
+    "height": 4256,
+    "widths": [
+     681,
+     1362,
+     2725
+    ],
+    "alt": "Card Image"
+   }
+  },
+  {
+   "title": "Gym",
+   "description": "State of the art facilities supporting fitness athletics, providing students with top-notch equipment and training spaces.",
+   "image": {
+    "src": "/images/home/campus-gym.jpg",
+    "width": 6755,
+    "height": 4508,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Card Image"
+   }
+  },
+  {
+   "title": "University Lab",
+   "description": "State-of-the-art facilities supporting fitness athletics, providing students with top-notch equipment and training spaces.",
+   "image": {
+    "src": "/images/home/campus-university-lab.jpg",
+    "width": 3840,
+    "height": 2160,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Card Image"
+   }
+  }
+ ],
+ "events": [
+  {
+   "title": "Perspectives On Higher Education",
+   "year": "2025",
+   "place": "Examination Hall",
+   "href": "./events/perspectives-on-higher-education",
+   "variant": "Primary",
+   "image": {
+    "src": "/images/events/perspectives-on-higher-education.png",
+    "width": 2984,
+    "height": 2080,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Digital Transformation",
+   "year": "2025",
+   "place": "Research Library",
+   "href": "./events/digital-transformation",
+   "variant": "Small",
+   "image": {
+    "src": "/images/events/digital-transformation.png",
+    "width": 2248,
+    "height": 1600,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Graduate Open House",
+   "year": "2025",
+   "place": "On Campus (All Faculties)",
+   "href": "./events/graduate-open-house",
+   "variant": "Primary",
+   "image": {
+    "src": "/images/events/graduate-open-house.png",
+    "width": 2984,
+    "height": 2080,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Poetry & Philosophy",
+   "year": "2025",
+   "place": "Heritage Garden",
+   "href": "./events/poetry-philosophy",
+   "variant": "Phone",
+   "image": {
+    "src": "/images/events/poetry-philosophy.png",
+    "width": 2248,
+    "height": 1600,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Innovations In Medical Research",
+   "year": "2025",
+   "place": "Convocation House",
+   "href": "./events/innovations-in-medical-research",
+   "variant": "Phone",
+   "image": {
+    "src": "/images/events/innovations-in-medical-research.png",
+    "width": 2984,
+    "height": 2080,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "title": "Global Entrepreneurship Summit",
+   "year": "2025",
+   "place": "Innovation Hub",
+   "href": "./events/global-entrepreneurship-summit",
+   "variant": "Phone",
+   "image": {
+    "src": "/images/events/global-entrepreneurship-summit.png",
+    "width": 2984,
+    "height": 2080,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  }
+ ],
+ "news": [
+  {
+   "category": "Academics",
+   "date": "Sep 23, 2025",
+   "title": "Pioneering Education for the Future of 2025",
+   "href": "./blog/pioneering-education-for-the-future-of-2025",
+   "image": {
+    "src": "/images/news/pioneering-education-for-the-future-of.jpg",
+    "width": 3840,
+    "height": 2400,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "category": "Community",
+   "date": "Sep 10, 2025",
+   "title": "Innovative Projects From Our Research Teams",
+   "href": "./blog/innovative-projects-from-our-research-teams",
+   "image": {
+    "src": "/images/news/innovative-projects-from-our-research-teams.jpg",
+    "width": 3840,
+    "height": 2160,
+    "widths": [
+     512,
+     1024,
+     2048
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "category": "Alumni",
+   "date": "Sep 9, 2025",
+   "title": "Alumni Achievements That Inspire",
+   "href": "./blog/alumni-achievements-that-inspire",
+   "image": {
+    "src": "/images/news/alumni-achievements-that-inspire.jpg",
+    "width": 8256,
+    "height": 5504,
+    "widths": [
+     512,
+     1024,
+     2048,
+     4096
+    ],
+    "alt": "Thumbnail Image"
+   }
+  },
+  {
+   "category": "Technology",
+   "date": "Sep 8, 2025",
+   "title": "Integrating Tech into Modern Education",
+   "href": "./blog/integrating-tech-into-modern-education",
+   "image": {
+    "src": "/images/news/integrating-tech-into-modern-education.png",
+    "width": 1472,
+    "height": 1200,
+    "widths": [
+     512,
+     1024
+    ],
+    "alt": "Thumbnail Image"
+   }
+  }
+ ],
+ "facts": [
+  {
+   "value": "88%",
+   "title": "Happy Students",
+   "description": "Our dedication to nurturing green spaces ensures the every client enjoys a vibrant, healthy, and beautiful outdoor haven."
+  },
+  {
+   "value": "15+",
+   "title": "Years of Expertise",
+   "description": "For over two a decades, we've cultivated stunning a landscapes, adapting our craft to every unique garden's needs vision."
+  },
+  {
+   "value": "490+",
+   "title": "University Topers",
+   "description": "With a proven track record a consistently bringing lush visions to the life, we deliver impactful gardening solutions."
+  }
+ ],
+ "counters": [
+  {
+   "value": "82%",
+   "text": "Graduates employed or in grad school within 6 months",
+   "variant": "Desktop Initial"
+  },
+  {
+   "value": "82%",
+   "text": "Graduates employed or in grad school within 6 months",
+   "variant": "Tablet Initial"
+  }
+ ],
+ "aboutCard": {
+  "eyebrow": "SINCE 1960",
+  "title": "When curiosity truly meets new opportunities, brighter futures open wide.",
+  "text": "Founded in 1960, Brivora is a vibrant, community-driven university where groundbreaking research, dedicated a mentorship, impactful real-world projects seamlessly come together.",
+  "reviews": "5000+Student reviews5000+Student reviews"
+ }
+}

@@ -1,0 +1,1345 @@
+/* =============================================================================
+ * /events — "Alumni events & activities"
+ *
+ * The page is set in the site's own face, Instrument Sans, across four steps:
+ * a display for the opening, a section title, a row title, and one small
+ * tracked uppercase for every piece of metadata. No second family is added —
+ * an editorial voice here comes from the size jumps and the space around them,
+ * not from a borrowed serif, and a second webfont would cost more than it
+ * returns on a page whose photographs are already the weight.
+ *
+ * Colour is the site's: ink #111, white, and the export's #f8f8f8 plate. The
+ * one addition is a warm off-white ground (--ev-paper), half a step off white,
+ * which separates the archive from the sections around it without introducing
+ * a colour.
+ *
+ * The measure is the site's too: sections at 150/80/60, a shell of 1296px
+ * inside 20px gutters.
+ * ========================================================================== */
+
+.ev-page {
+  --ev-ink: var(--token-1c49fc01-5a06-4e84-9621-823d64297d7d, #111);
+  --ev-muted: rgba(17, 17, 17, 0.56);
+  --ev-faint: rgba(17, 17, 17, 0.13);
+  --ev-paper: #f7f6f3;
+  --ev-plate: var(--token-d5147b08-e506-4b4a-b908-10ebbdc474cc, #f8f8f8);
+  --ev-ease: cubic-bezier(0.44, 0, 0.56, 1);
+  --ev-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  font-family: 'Instrument Sans', 'Instrument Sans Placeholder', sans-serif;
+  color: var(--ev-ink);
+  background: #fff;
+  /* the layout template centres its children, so without this the page shrinks
+   * to the shell's width and every section's ground stops short of the edge */
+  width: 100%;
+}
+
+.ev-shell {
+  width: 100%;
+  max-width: 1336px;      /* 1296 measure + the 20px gutters */
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---- shared type ---------------------------------------------------------- */
+
+.ev-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+}
+
+.ev-section-title {
+  margin: 0;
+  font-size: clamp(34px, 4.6vw, 62px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+}
+
+.ev-rule {
+  display: inline-block;
+  width: 34px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+  vertical-align: middle;
+}
+
+.ev-link {
+  color: var(--ev-ink);
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s var(--ev-out);
+}
+.ev-link:hover,
+.ev-link:focus-visible { background-size: 100% 1px; }
+
+.ev-page :focus-visible {
+  outline: 2px solid var(--ev-ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* =============================================================================
+ * Stage — the one activity that has not happened yet
+ *
+ * The page used to open on a headline with this poster in a 340px column
+ * beside it, which read as a sidebar. It leads now, at the size the artwork
+ * was drawn for, with everything printed on it set alongside as text.
+ *
+ * The ground is the poster's own: sampling the file gives #140c27 across
+ * roughly two-thirds of it, with #98632a gold and warm purple through the
+ * rest. Building the stage from those three means the artwork sits in the
+ * page rather than on top of it, and gives the fixed header something dark to
+ * be white against — the same arrangement as the home hero, including the 1px
+ * trigger that flips the bar solid on the first scroll.
+ * ========================================================================== */
+
+.ev-stage {
+  --stage-ink: #140c27;
+  --stage-gold: #d8a94a;
+  --stage-cream: #f0e3cd;
+  --stage-line: rgba(240, 227, 205, 0.18);
+
+  position: relative;
+  isolation: isolate;
+  background: var(--stage-ink);
+  color: var(--stage-cream);
+  /* clears the fixed header, then lets the poster breathe */
+  padding: clamp(118px, 11.5vw, 168px) 0 clamp(76px, 8vw, 112px);
+  overflow: clip;
+}
+/* two washes lifted off the artwork, so the plate is not a flat rectangle */
+.ev-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 90% at 78% 18%, rgba(152, 99, 42, 0.34), transparent 62%),
+    radial-gradient(90% 80% at 12% 88%, rgba(86, 45, 82, 0.42), transparent 66%);
+}
+/* the hairline that hands the page back to white */
+.ev-stage::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(216, 169, 74, 0.5), transparent);
+}
+.ev-stage__trigger { position: absolute; top: 0; left: 0; width: 1px; height: 1px; }
+
+.ev-stage__shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 48px clamp(48px, 6vw, 92px);
+}
+
+.ev-stage__words { min-width: 0; display: flex; flex-flow: column; align-items: flex-start; }
+
+/* The page's own name: a centred band across the full width of the stage, well
+ * above the eyebrow scale so it reads as a title. The tracking is trailing, so
+ * the glyphs sit half a space left of the centred line box — the indent of half
+ * the tracking puts them back on the middle. */
+.ev-stage__page {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 100%;
+  font-size: clamp(15px, 1.5vw, 22px);
+  letter-spacing: 0.3em;
+  text-indent: 0.15em;
+  text-align: center;
+  color: rgba(240, 227, 205, 0.72);
+}
+
+/* the page title used to sit above this line inside the text column and the
+ * margin held them apart; on two columns the line now starts the column */
+@media (min-width: 900px) {
+  .ev-stage__words > .ev-stage__label { margin-top: 0; }
+}
+.ev-stage__label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+  color: var(--stage-gold);
+}
+/* the live marker: a slow pulse, because one thing on this page is still ahead */
+.ev-stage__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--stage-gold);
+  flex: none;
+  box-shadow: 0 0 0 0 rgba(216, 169, 74, 0.55);
+  animation: ev-pulse 2.6s var(--ev-ease) infinite;
+}
+@keyframes ev-pulse {
+  60%, 100% { box-shadow: 0 0 0 11px rgba(216, 169, 74, 0); }
+}
+
+.ev-stage__title {
+  margin: 12px 0 0;
+  font-size: clamp(38px, 5.2vw, 78px);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  color: #fff;
+}
+/* the same masked rise the retrospective's headline uses, so the two openings
+ * are recognisably one page */
+.ev-stage__line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.ev-stage__line:nth-child(2) { padding-left: 0.06em; }
+.ev-stage__rise {
+  display: block;
+  transform: translateY(105%);
+  animation: ev-rise 1s var(--ev-out) forwards;
+}
+
+.ev-stage__sub {
+  margin: 16px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--stage-gold);
+}
+
+.ev-stage__lede {
+  max-width: 40ch;
+  margin: 18px 0 0;
+  font-size: clamp(16px, 1.3vw, 19px);
+  line-height: 1.55;
+  color: rgba(240, 227, 205, 0.8);
+}
+
+.ev-stage__count {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 8px 17px 8px 15px;
+  border: 1px solid var(--stage-line);
+  border-radius: 40px;
+  background: rgba(240, 227, 205, 0.05);
+}
+.ev-stage__countNum {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.ev-stage__countWord {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(240, 227, 205, 0.66);
+}
+
+.ev-stage__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, auto));
+  gap: 0 clamp(26px, 3.4vw, 54px);
+  margin: 28px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--stage-line);
+}
+.ev-stage__fact { display: flex; flex-flow: column; gap: 7px; min-width: 0; }
+.ev-stage__fact dt {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(240, 227, 205, 0.5);
+}
+.ev-stage__fact dd {
+  margin: 0;
+  font-size: clamp(14px, 1.15vw, 17px);
+  font-weight: 600;
+  line-height: 1.35;
+  color: #fff;
+}
+
+.ev-stage__actions { display: flex; flex-flow: row wrap; gap: 12px; margin: 26px 0 0; }
+.ev-stage__cta {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border: 1px solid transparent;
+  border-radius: 40px;
+  background: var(--stage-cream);
+  color: var(--stage-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.4s var(--ev-ease), color 0.4s var(--ev-ease),
+              border-color 0.4s var(--ev-ease), transform 0.4s var(--ev-out);
+}
+.ev-stage__cta span { transition: transform 0.4s var(--ev-out); }
+.ev-stage__cta:hover { transform: translateY(-2px); background: #fff; }
+.ev-stage__cta:hover span { transform: translate(3px, -3px); }
+.ev-stage__cta--quiet {
+  background: transparent;
+  border-color: var(--stage-line);
+  color: var(--stage-cream);
+}
+.ev-stage__cta--quiet:hover { background: rgba(240, 227, 205, 0.1); color: #fff; }
+.ev-stage__cta--quiet:hover span { transform: translateX(4px); }
+
+/* ---- the artwork ----------------------------------------------------------- */
+
+.ev-stage__frame { position: relative; justify-self: end; }
+/* a soft throw of the poster's gold behind it, so it is lit rather than pasted */
+.ev-stage__frame::before {
+  content: '';
+  position: absolute;
+  inset: -14% -12%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(216, 169, 74, 0.3), transparent 72%);
+  filter: blur(14px);
+}
+
+.ev-stage__poster {
+  appearance: none;
+  display: block;
+  width: clamp(260px, 32vw, 450px);
+  padding: 0;
+  border: 1px solid rgba(240, 227, 205, 0.22);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  background: var(--stage-ink);
+  cursor: zoom-in;
+  font: inherit;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+  transition: transform 0.55s var(--ev-out), box-shadow 0.55s var(--ev-out),
+              border-color 0.55s var(--ev-ease);
+  /* no delay and no `backwards`: the poster's resting state is visible, so if
+   * the animation never runs — reduced motion, a background tab, a browser
+   * that skips it — the artwork is still there. It is the reason for the
+   * section; it must not depend on an entrance to be seen. */
+  animation: ev-stage-poster 1.1s var(--ev-out);
+}
+@keyframes ev-stage-poster {
+  from { opacity: 0; transform: translateY(26px) scale(0.97); }
+}
+.ev-stage__poster img { display: block; width: 100%; height: auto; }
+.ev-stage__poster:hover,
+.ev-stage__poster:focus-visible {
+  transform: translateY(-5px);
+  border-color: rgba(216, 169, 74, 0.55);
+  box-shadow: 0 52px 110px rgba(0, 0, 0, 0.62);
+}
+.ev-stage__zoom {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 8px 15px;
+  border-radius: 30px;
+  background: rgba(240, 227, 205, 0.94);
+  color: var(--stage-ink);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s var(--ev-out), transform 0.4s var(--ev-out);
+}
+.ev-stage__poster:hover .ev-stage__zoom,
+.ev-stage__poster:focus-visible .ev-stage__zoom { opacity: 1; transform: none; }
+
+.ev-stage :focus-visible { outline-color: var(--stage-cream); }
+
+@media (max-width: 1199.98px) {
+  .ev-stage__shell { gap: 40px 44px; }
+  .ev-stage__facts { gap: 0 26px; }
+}
+/* On one column the poster still leads — it is the reason for the section —
+ * but not before the two lines that say what it is. `display: contents` drops
+ * the text column's children into the stack so the labels can be lifted above
+ * the artwork and the rest of the copy can follow it. */
+@media (max-width: 899.98px) {
+  /* every child already carries its own top margin, so the grid's row gap
+     would be counted twice down the stack */
+  .ev-stage__shell { display: flex; flex-flow: column; gap: 0; }
+  .ev-stage__words { display: contents; }
+  .ev-stage__page { order: 0; }
+  .ev-stage__label { order: 1; }
+  .ev-stage__frame { order: 2; justify-self: start; margin: 24px 0 6px; }
+  .ev-stage__title { order: 3; margin-top: 18px; }
+  .ev-stage__sub { order: 4; }
+  .ev-stage__lede { order: 5; max-width: none; }
+  .ev-stage__count { order: 6; align-self: flex-start; }
+  .ev-stage__facts { order: 7; }
+  .ev-stage__actions { order: 8; }
+  .ev-stage__poster { width: min(100%, 400px); }
+}
+@media (max-width: 559.98px) {
+  .ev-stage__facts { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .ev-stage__actions { flex-flow: column; align-items: stretch; }
+  .ev-stage__cta { justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ev-stage__rise,
+  .ev-stage__poster { animation: none; transform: none; }
+  .ev-stage__dot { animation: none; }
+}
+
+/* =============================================================================
+ * Hero
+ * ========================================================================== */
+
+.ev-hero {
+  /* the column on the right is tall, so the opening is given less headroom:
+   * the whole of it, and the top edge of the band, land inside one screen */
+  padding: 150px 0 0;
+  overflow: clip;
+}
+
+/* The words hold the left, the one thing still to come holds the right. Both
+ * columns start on the same line — the eyebrow and the "next event" label sit
+ * on it together — so the poster reads as set against the headline rather than
+ * floated beside it. Ending them together instead would push the words down by
+ * the difference in height and open a hole above the eyebrow. */
+.ev-hero__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 56px 70px;
+}
+
+.ev-hero__words { min-width: 0; }
+
+.ev-hero__headline {
+  margin: 18px 0 0;
+  /* sized so the headline and the band below it are one composition rather
+   * than two screens */
+  font-size: clamp(44px, 8vw, 112px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+/* The mask has to clear the descenders it is not meant to cut — the g in
+ * "Together" sits well below a 0.9 line — so the box is grown downwards and
+ * pulled back up by the same amount, leaving the line spacing untouched. */
+.ev-hero__line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+/* a staircase, one step per line, however many lines the copy runs to */
+.ev-hero__line:nth-child(2) { padding-left: 0.07em; }
+.ev-hero__line:nth-child(3) { padding-left: 0.14em; }
+.ev-hero__line:nth-child(4) { padding-left: 0.21em; }
+.ev-hero__line:nth-child(5) { padding-left: 0.28em; }
+.ev-hero__word {
+  display: block;
+  transform: translateY(105%);
+  animation: ev-rise 1s var(--ev-out) forwards;
+}
+@keyframes ev-rise { to { transform: translateY(0); } }
+
+.ev-hero__intro {
+  max-width: 52ch;
+  margin: 34px 0 0;
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--ev-muted);
+}
+
+/* ---- the upcoming event ---------------------------------------------------- */
+
+.ev-hero__next {
+  width: 340px;
+  max-width: 100%;
+  display: flex;
+  flex-flow: column;
+  gap: 16px;
+}
+.ev-hero__nextLabel { display: flex; align-items: center; gap: 9px; color: var(--ev-ink); }
+/* the one live thing on a page of finished ones */
+.ev-hero__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b8860b;
+  flex: none;
+}
+
+.ev-hero__poster {
+  appearance: none;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--ev-plate);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  cursor: zoom-in;
+  font: inherit;
+  box-shadow: 0 18px 44px rgba(17, 17, 17, 0.14);
+  transition: transform 0.5s var(--ev-out), box-shadow 0.5s var(--ev-out);
+}
+.ev-hero__poster img { display: block; width: 100%; height: auto; }
+.ev-hero__poster:hover,
+.ev-hero__poster:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 26px 60px rgba(17, 17, 17, 0.2);
+}
+.ev-hero__zoom {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 7px 13px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ev-ink);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s var(--ev-out), transform 0.4s var(--ev-out);
+}
+.ev-hero__poster:hover .ev-hero__zoom,
+.ev-hero__poster:focus-visible .ev-hero__zoom { opacity: 1; transform: none; }
+
+.ev-hero__nextBody { display: flex; flex-flow: column; gap: 4px; }
+.ev-hero__nextTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.14;
+  letter-spacing: -0.025em;
+}
+.ev-hero__nextSub {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+}
+.ev-hero__facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 6px 14px;
+  border-top: 1px solid var(--ev-faint);
+  padding-top: 12px;
+}
+.ev-hero__facts > div { display: contents; }
+.ev-hero__facts dt {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+  padding-top: 2px;
+}
+.ev-hero__facts dd { margin: 0; font-size: 14px; line-height: 1.45; }
+
+/* the band: a mask that opens from the centre as the reader arrives at it */
+.ev-hero__band {
+  --open: 0;
+  margin: clamp(56px, 8vw, 110px) 0 0;
+}
+.ev-hero__mask {
+  max-width: 1121px;      /* the file's own width; never drawn softer than it is */
+  margin: 0 auto;
+  aspect-ratio: 21 / 9;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--ev-plate);
+  /* 0 → a 6% sliver at the centre line, 1 → the whole band */
+  clip-path: inset(calc((1 - var(--open)) * 47%) 0 round 2px);
+}
+.ev-hero__mask img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  transform: scale(calc(1.14 - 0.14 * var(--open)));
+}
+
+.ev-hero__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  max-width: 1121px;
+  margin: 18px auto 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+  opacity: var(--open);
+  transition: opacity 0.3s linear;
+}
+.ev-hero__capdot { opacity: 0.5; }
+
+/* =============================================================================
+ * Index — the contents page and the supplied poster
+ * ========================================================================== */
+
+.ev-index { padding: clamp(90px, 12vw, 170px) 0; }
+.ev-index__shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 70px 90px;
+  align-items: start;
+}
+
+.ev-index__statement {
+  max-width: 20ch;
+  margin: 0;
+  font-size: clamp(26px, 3.1vw, 42px);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+  max-inline-size: 26ch;
+}
+.ev-index__intro {
+  max-width: 46ch;
+  margin: 26px 0 0;
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--ev-muted);
+}
+
+.ev-index__strands {
+  list-style: none;
+  margin: 54px 0 0;
+  padding: 0;
+  max-width: 520px;
+  border-top: 1px solid var(--ev-faint);
+}
+.ev-index__strands li { border-bottom: 1px solid var(--ev-faint); }
+.ev-index__strands a {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 15px 0;
+  text-decoration: none;
+  color: var(--ev-ink);
+}
+.ev-index__strandName {
+  font-size: 15px;
+  font-weight: 500;
+  transition: transform 0.4s var(--ev-out);
+}
+.ev-index__strands a:hover .ev-index__strandName,
+.ev-index__strands a:focus-visible .ev-index__strandName { transform: translateX(6px); }
+.ev-index__strandRule { flex: 1; height: 1px; background: var(--ev-faint); }
+.ev-index__strandCount {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ev-muted);
+}
+
+.ev-index__poster { width: 414px; max-width: 100%; }
+.ev-index__poster figure {
+  margin: 14px 0 0;
+  padding: 26px;
+  background: var(--ev-plate);
+  border-radius: 3px;
+}
+.ev-index__poster img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+.ev-index__poster figcaption {
+  display: flex;
+  flex-flow: column;
+  gap: 5px;
+  margin-top: 20px;
+}
+.ev-index__posterTitle { font-size: 15px; font-weight: 600; }
+.ev-index__posterMeta {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+}
+
+/* =============================================================================
+ * Story — the pinned scroll
+ * ========================================================================== */
+
+.ev-story { position: relative; background: #fff; color: var(--ev-ink); }
+.ev-story .ev-eyebrow { color: var(--ev-muted); }
+
+.ev-story__pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+  overflow: clip;
+  padding: 60px 0;
+  box-sizing: border-box;
+}
+
+.ev-story__frame {
+  display: flex;
+  flex-flow: column;
+  gap: clamp(28px, 4vh, 56px);
+  width: 100%;
+}
+
+/* Every chapter is laid into the same grid cell rather than positioned out of
+ * the flow, so the stack takes the height of its tallest member on its own.
+ * That is what lets the phone turn the chapter from a row into a column
+ * without a hand-set height to keep in step with it. */
+.ev-story__chapters {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  align-content: center;
+  width: 100%;
+  flex: 1;
+}
+
+/* one hairline for the whole sequence: where the reader is in it */
+.ev-story__progress {
+  height: 1px;
+  background: var(--ev-faint);
+  overflow: hidden;
+}
+.ev-story__progressFill {
+  display: block;
+  height: 100%;
+  background: var(--ev-ink);
+  transform: scaleX(var(--p, 0));
+  transform-origin: left;
+}
+
+.ev-story__chapter {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 48%);
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+  opacity: var(--on, 0);
+  will-change: opacity;
+}
+
+.ev-story__copy {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  gap: 16px;
+  /* the chapter carries the picture's fade; the words carry their own, which
+   * clears the overlap so two headlines are never legible at once */
+  opacity: var(--onText, 0);
+  transform: translate3d(0, calc(var(--drift, 0) * -26px), 0);
+}
+.ev-story__index {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+}
+.ev-story__of { color: var(--ev-muted); }
+.ev-story__title {
+  margin: 0;
+  font-size: clamp(30px, 3.6vw, 54px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.ev-story__meta {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ev-muted);
+}
+.ev-story__strand { margin-top: 6px; }
+
+.ev-story__plate {
+  margin: 0;
+  max-height: calc(100svh - 180px);
+  overflow: hidden;
+  border-radius: 3px;
+  background: transparent;
+  transform: translate3d(0, calc(var(--drift, 0) * -18px), 0);
+  will-change: transform;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ev-story__plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: calc(100svh - 180px);
+  object-fit: contain;
+  transform: scale(calc(1.02 - 0.02 * var(--on, 0)));
+}
+
+/* the scroll the pinned frame is played across: one viewport per chapter */
+.ev-story__track { height: 300svh; }
+
+/* =============================================================================
+ * Archive
+ * ========================================================================== */
+
+.ev-archive {
+  padding: clamp(90px, 12vw, 170px) 0;
+  background: var(--ev-paper);
+}
+.ev-archive__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
+  gap: 24px 60px;
+  align-items: end;
+}
+.ev-archive__note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ev-muted);
+}
+
+/* filters — an editorial row, not a control panel */
+.ev-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 26px;
+  margin: 46px 0 0;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--ev-faint);
+}
+.ev-filter {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 4px 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ev-muted);
+  cursor: pointer;
+  position: relative;
+  transition: color 0.4s var(--ev-ease);
+}
+.ev-filter sup {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin-left: 4px;
+  vertical-align: super;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+.ev-filter::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -23px;
+  height: 1px;
+  background: var(--ev-ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--ev-out);
+}
+.ev-filter:hover { color: var(--ev-ink); }
+.ev-filter[aria-pressed='true'] { color: var(--ev-ink); }
+.ev-filter[aria-pressed='true']::after { transform: scaleX(1); }
+
+.ev-archive__list { position: relative; }
+.ev-archive__list ol { list-style: none; margin: 0; padding: 0; }
+.ev-archive__list[data-state='out'] ol { opacity: 0; transform: translateY(8px); }
+.ev-archive__list[data-state='in'] ol {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.42s var(--ev-out), transform 0.42s var(--ev-out);
+}
+.ev-archive__list[data-state='out'] ol { transition: opacity 0.16s linear, transform 0.16s linear; }
+
+.ev-row__year {
+  margin: 54px 0 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ev-ink);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+}
+.ev-row:first-child .ev-row__year { margin-top: 34px; }
+
+.ev-row__inner {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) 150px;
+  gap: 30px;
+  align-items: start;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--ev-faint);
+  transition: background-color 0.45s var(--ev-ease);
+}
+.ev-row__inner:hover { background-color: rgba(17, 17, 17, 0.028); }
+
+.ev-row__stamp {
+  margin: 0;
+  display: flex;
+  flex-flow: column;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.ev-row__day {
+  font-size: clamp(38px, 4vw, 54px);
+  font-weight: 700;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+/* "09–11", "Mar", "2025" — anything longer than a two-figure day is stepped
+ * down so it still sits on one line inside the same column */
+.ev-row__day[data-wide] { font-size: clamp(24px, 2.4vw, 33px); }
+.ev-row__month {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+}
+
+.ev-row__body { display: flex; flex-flow: column; gap: 9px; }
+.ev-row__title {
+  margin: 0;
+  font-size: clamp(20px, 2vw, 27px);
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+  transition: transform 0.45s var(--ev-out);
+}
+.ev-row__inner:hover .ev-row__title { transform: translateX(8px); }
+.ev-row__meta {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+}
+.ev-row__date { opacity: 0.75; }
+.ev-row__desc {
+  margin: 4px 0 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.62;
+  color: rgba(17, 17, 17, 0.72);
+}
+.ev-row__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+}
+.ev-row__awaited {
+  color: var(--ev-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.ev-row__strand {
+  margin: 6px 0 0;
+  text-align: right;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+}
+
+/* the plate that rides the pointer over rows that have photographs */
+.ev-archive__plate {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 260px;
+  margin: -84px 0 0 26px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.34s var(--ev-out);
+}
+.ev-archive__plate[data-on='yes'] { opacity: 1; }
+.ev-archive__plate img {
+  display: block;
+  width: 100%;
+  height: 168px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 24px 60px rgba(17, 17, 17, 0.22);
+}
+@media (hover: none) {
+  .ev-archive__plate { display: none; }
+}
+
+/* =============================================================================
+ * Gallery
+ * ========================================================================== */
+
+.ev-gallery { padding: clamp(90px, 12vw, 170px) 0 clamp(110px, 14vw, 200px); overflow: clip; }
+.ev-gallery__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 30rem);
+  gap: 24px 60px;
+  align-items: end;
+  margin-bottom: clamp(50px, 6vw, 96px);
+}
+.ev-gallery__note { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ev-muted); }
+
+/* Justified rows. A cell grows by its own aspect ratio from a zero basis, so
+ * the widths come out in proportion to the aspects and the row fills the
+ * measure exactly; and because height is width ÷ aspect, every picture in a
+ * row lands on the same height without one being set. Nothing here is a hand
+ * number, so it stays aligned at every width. */
+.ev-gallery__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-flow: column;
+  gap: clamp(30px, 3.6vw, 58px);
+}
+.ev-gallery__row { will-change: transform; }
+.ev-gallery__row > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(16px, 2.2vw, 32px);
+}
+.ev-gallery__cell {
+  flex: var(--grow) 1 0;
+  min-width: 0;
+}
+
+.ev-gallery__button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: zoom-in;
+  display: block;
+  width: 100%;
+}
+.ev-gallery__frame {
+  display: block;
+  position: relative;
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--ev-plate);
+}
+.ev-gallery__frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--ev-out);
+}
+.ev-gallery__button:hover img,
+.ev-gallery__button:focus-visible img { transform: scale(1.035); }
+.ev-gallery__zoom {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 7px 13px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ev-ink);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s var(--ev-out), transform 0.4s var(--ev-out);
+}
+.ev-gallery__button:hover .ev-gallery__zoom,
+.ev-gallery__button:focus-visible .ev-gallery__zoom { opacity: 1; transform: none; }
+
+.ev-gallery__caption { display: flex; flex-flow: column; gap: 4px; margin-top: 14px; }
+.ev-gallery__title { font-size: 13px; font-weight: 600; }
+.ev-gallery__date {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+}
+
+/* =============================================================================
+ * Lightbox
+ * ========================================================================== */
+
+.ev-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  /* minmax(0, 1fr) rather than 1fr: the row has to be allowed to shrink below
+   * its content, or a tall picture cannot be told to fit inside it */
+  grid-template-rows: minmax(0, 1fr) auto;
+  place-items: center;
+  padding: clamp(20px, 4vw, 56px);
+  font-family: 'Instrument Sans', 'Instrument Sans Placeholder', sans-serif;
+}
+.ev-lightbox__scrim {
+  /* Fixed, not absolute: the dialog is a grid, and an absolutely positioned
+   * grid child is contained by its grid area rather than by the padding box —
+   * which left the scrim 143px short of the bottom of the screen and the page
+   * showing through underneath it. */
+  position: fixed;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  cursor: zoom-out;
+  background: rgba(12, 12, 12, 0.94);
+  opacity: 0;
+  transition: opacity 0.42s var(--ev-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+.ev-lightbox[data-flown='yes'] .ev-lightbox__scrim { opacity: 1; }
+
+.ev-lightbox__frame {
+  position: relative;
+  z-index: 1;
+  max-width: min(100%, 1180px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+/* The ceiling goes on the picture, not on the frame. A percentage against a
+ * frame that is itself sized by the picture resolves to nothing, which is what
+ * left the portrait poster at 365px and then, once the frame had a height, let
+ * the flex item stretch to a box the wrong shape. In viewport units it is
+ * definite, the frame goes on hugging the picture — which is what the flight
+ * out of the thumbnail measures — and the reserved space is the padding, the
+ * caption bar and its margin. */
+.ev-lightbox__frame img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100svh - 190px);
+  width: auto;
+  height: auto;
+  border-radius: 3px;
+}
+
+.ev-lightbox__bar,
+.ev-lightbox__nav { position: relative; z-index: 1; color: #fff; }
+.ev-lightbox__bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px 30px;
+  width: 100%;
+  max-width: 1180px;
+  margin-top: 24px;
+  opacity: 0;
+  transition: opacity 0.5s var(--ev-out, cubic-bezier(0.16, 1, 0.3, 1)) 0.16s;
+}
+.ev-lightbox[data-flown='yes'] .ev-lightbox__bar { opacity: 1; }
+.ev-lightbox__caption { display: flex; flex-flow: column; gap: 5px; margin: 0; }
+.ev-lightbox__title { font-size: 15px; font-weight: 600; }
+.ev-lightbox__meta {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.58);
+}
+.ev-lightbox__count {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.ev-lightbox__nav {
+  position: absolute;
+  top: clamp(18px, 3vw, 34px);
+  right: clamp(18px, 3vw, 34px);
+  display: flex;
+  gap: 8px;
+}
+.ev-lightbox__nav button {
+  appearance: none;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 15px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.35s var(--ev-ease, ease), border-color 0.35s var(--ev-ease, ease);
+}
+.ev-lightbox__nav button:hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.5); }
+.ev-lightbox :focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* =============================================================================
+ * Breakpoints — the site's own: 1200 and 810
+ * ========================================================================== */
+
+@media (max-width: 1199.98px) {
+  .ev-hero { padding-top: 170px; }
+  .ev-hero__next { width: 300px; }
+  .ev-hero__nextTitle { font-size: 20px; }
+
+  .ev-index__shell { grid-template-columns: minmax(0, 1fr); }
+  .ev-index__poster { width: 340px; }
+
+  .ev-story__chapter { grid-template-columns: minmax(0, 1fr) minmax(0, 46%); gap: 44px; }
+
+  .ev-row__inner { grid-template-columns: 104px minmax(0, 1fr); }
+  .ev-row__strand { grid-column: 2; text-align: left; margin-top: 2px; }
+
+  .ev-gallery__head,
+  .ev-archive__head { grid-template-columns: minmax(0, 1fr); }
+  /* four across is too thin at this measure, so the strip breaks into 2 + 2.
+   * Each line is still justified and still internally height-aligned — the
+   * basis is what decides how many fit, the grow still does the aligning. */
+  .ev-gallery__row[data-count='4'] > ul { flex-wrap: wrap; row-gap: 30px; }
+  /* The basis stays at zero — that is what keeps each width exactly
+   * proportional to its aspect, and so keeps the heights on a line identical.
+   * A minimum is what breaks the line instead: two at 38% fit, the third
+   * cannot, and the minimum is never large enough to bind afterwards. */
+  .ev-gallery__row[data-count='4'] .ev-gallery__cell { min-width: 38%; }
+}
+
+@media (max-width: 809.98px) {
+  .ev-hero { padding-top: 132px; }
+  /* the poster drops under the words rather than being squeezed beside them */
+  .ev-hero__top { grid-template-columns: minmax(0, 1fr); gap: 44px; }
+  .ev-hero__next { width: 100%; max-width: 340px; }
+  .ev-hero__intro { margin-top: 26px; }
+  .ev-hero__headline { letter-spacing: -0.035em; }
+  .ev-hero__line:nth-child(2) { padding-left: 0.05em; }
+  .ev-hero__line:nth-child(3) { padding-left: 0.1em; }
+  .ev-hero__mask { aspect-ratio: 4 / 3; }
+  .ev-hero__caption { gap: 7px; font-size: 10px; }
+  .ev-hero__caption .ev-rule { width: 22px; }
+
+  .ev-index__shell { gap: 54px; }
+  .ev-index__strands { margin-top: 38px; max-width: none; }
+  .ev-index__poster { width: 100%; }
+  .ev-index__poster figure { padding: 18px; }
+
+  /* The story stays pinned — the scroll is the point of it — but the chapter
+   * turns from a row into a column: the picture, then its words underneath.
+   * Same reading order, read down instead of across. */
+  .ev-story__pin { padding: 22px 0; min-height: 0; }
+  .ev-story__frame { gap: 20px; }
+  .ev-story__chapter {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 22px;
+  }
+  .ev-story__copy { grid-row: 2; gap: 10px; }
+  .ev-story__plate { grid-row: 1; }
+  .ev-story__title { font-size: clamp(26px, 7.4vw, 34px); }
+  .ev-story__meta { font-size: 13.5px; }
+  .ev-story__track { height: 260svh; }
+
+  .ev-archive__head { gap: 16px; }
+  .ev-filters { gap: 2px 20px; margin-top: 34px; }
+  .ev-row__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 26px 0;
+  }
+  .ev-row__inner:hover .ev-row__title { transform: none; }
+  .ev-row__stamp { flex-flow: row; align-items: baseline; gap: 9px; }
+  .ev-row__day { font-size: 32px; }
+  .ev-row__strand { grid-column: 1; text-align: left; }
+
+  /* one column: each picture at its own ratio, full measure */
+  .ev-gallery__row > ul { flex-flow: column; gap: 34px; }
+  .ev-gallery__rows { gap: 34px; }
+
+  .ev-lightbox { padding: 16px; }
+  /* the nav wraps under the caption here, so more is reserved */
+  .ev-lightbox__frame img { max-height: calc(100svh - 232px); }
+  .ev-lightbox__nav { position: static; margin-top: 16px; justify-content: center; width: 100%; }
+  .ev-lightbox { grid-template-rows: 1fr auto auto; }
+}
+
+/* =============================================================================
+ * Reduced motion — nothing moves, and the pinned story simply lays itself out
+ * ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ev-hero__word { transform: none; animation: none; }
+  .ev-hero__mask { clip-path: none; }
+  .ev-hero__mask img { transform: none; }
+  .ev-hero__caption { opacity: 1; }
+
+  .ev-story__pin { position: static; height: auto; min-height: 0; padding: 90px 0; }
+  .ev-story__chapters { display: flex; flex-flow: column; gap: 90px; }
+  .ev-story__chapter { opacity: 1 !important; visibility: visible !important; }
+  .ev-story__copy { opacity: 1 !important; }
+  .ev-story__copy,
+  .ev-story__plate { transform: none !important; }
+  .ev-story__plate img { transform: none; }
+  .ev-story__track { display: none; }
+
+  .ev-gallery__cell { transform: none !important; }
+  .ev-archive__list ol { transition: none; }
+  .ev-page *, .ev-lightbox * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
