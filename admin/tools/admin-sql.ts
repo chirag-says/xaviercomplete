@@ -36,8 +36,8 @@
 import { stdout } from 'node:process';
 import { randomUUID } from 'node:crypto';
 
-import { encryptField, fieldContext } from '../../oxvercity/src/lib/core/crypto.ts';
-import { emailBlindIndex } from '../../oxvercity/src/lib/core/hmac.ts';
+import { encryptField, fieldContext } from '../src/lib/core/crypto.ts';
+import { emailBlindIndex } from '../src/lib/core/hmac.ts';
 import { groupForReading } from '../src/lib/base32.ts';
 import { newTotpSecret, otpauthUri, verifyTotp } from '../src/lib/totp.ts';
 import { assessPassword, hashPassword } from '../src/lib/password.ts';
@@ -70,7 +70,7 @@ async function main(): Promise<void> {
     encryptField('probe', fieldContext('admin_user', 'probe', 'probe'));
   } catch (error) {
     write(`  ${(error as Error).message}`);
-    write('  The key ring must be loaded. Check ../oxvercity/.env exists.\n');
+    write('  The key ring must be loaded. Check .env exists and contains DATA_ENCRYPTION_KEYS.\n');
     process.exitCode = 1;
     return;
   }

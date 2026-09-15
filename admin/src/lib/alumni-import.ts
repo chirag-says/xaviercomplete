@@ -32,9 +32,9 @@
  * disagreement would show up as rows silently dropped.
  */
 
-import { detectColumns } from '../../../oxvercity/tools/ingest/columns.ts';
-import { validateSheet, type RowProblem, type ValidRow } from '../../../oxvercity/tools/ingest/validate.ts';
-import { readSheetFromBuffer, SheetReadError } from '../../../oxvercity/tools/ingest/workbook.ts';
+import { detectColumns } from './ingest/columns.ts';
+import { validateSheet, type RowProblem, type ValidRow } from './ingest/validate.ts';
+import { readSheetFromBuffer, SheetReadError } from './ingest/workbook.ts';
 import { adminDb, type Sql } from './db.ts';
 import { audit, blindIndexOfNormalised } from './shared.ts';
 import { createAlumnus, grantAlumnusAccess } from './alumni-create.ts';

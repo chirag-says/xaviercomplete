@@ -13,9 +13,9 @@
  * design and a fair record of what happened.
  */
 
-import { connect, type Sql } from '../../oxvercity/src/lib/db.ts';
-import { decryptField, encryptField, fieldContext } from '../../oxvercity/src/lib/core/crypto.ts';
-import { emailBlindIndex, ipBlindIndex } from '../../oxvercity/src/lib/core/hmac.ts';
+import { connect, type Sql } from '../src/lib/shared-db.ts';
+import { decryptField, encryptField, fieldContext } from '../src/lib/core/crypto.ts';
+import { emailBlindIndex, ipBlindIndex } from '../src/lib/core/hmac.ts';
 import { signIn, stepUp, changeOwnPassword, lockoutFor } from '../src/lib/admin-auth.ts';
 import {
   createAdminSession,

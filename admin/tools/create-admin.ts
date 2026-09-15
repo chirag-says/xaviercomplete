@@ -23,9 +23,9 @@
 
 import { stdout } from 'node:process';
 
-import { connect, type Sql } from '../../oxvercity/src/lib/db.ts';
-import { encryptField, fieldContext } from '../../oxvercity/src/lib/core/crypto.ts';
-import { emailBlindIndex } from '../../oxvercity/src/lib/core/hmac.ts';
+import { connect, type Sql } from '../src/lib/shared-db.ts';
+import { encryptField, fieldContext } from '../src/lib/core/crypto.ts';
+import { emailBlindIndex } from '../src/lib/core/hmac.ts';
 import { groupForReading } from '../src/lib/base32.ts';
 import { newTotpSecret, otpauthUri, verifyTotp } from '../src/lib/totp.ts';
 import { assessPassword } from '../src/lib/password.ts';
