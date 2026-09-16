@@ -52,7 +52,7 @@ export default async function NewAlumnusPage() {
 
           <div className="field">
             <label htmlFor="fullName">Full name</label>
-            <input id="fullName" name="fullName" maxLength={120} required autoFocus />
+            <input id="fullName" name="fullName" maxLength={200} required autoFocus />
             <p className="hint">As the Association would have it on record. This appears publicly.</p>
           </div>
 
@@ -63,24 +63,24 @@ export default async function NewAlumnusPage() {
             </div>
             <div style={{ flex: '1 1 240px' }}>
               <label htmlFor="stream">Stream of study</label>
-              <input id="stream" name="stream" maxLength={120} placeholder="B.Com." />
+              <input id="stream" name="stream" maxLength={200} placeholder="B.Com." />
             </div>
           </div>
 
           <div className="field" style={{ marginTop: 14 }}>
             <label htmlFor="currentOrg">Current organisation</label>
-            <input id="currentOrg" name="currentOrg" maxLength={200} />
+            <input id="currentOrg" name="currentOrg" maxLength={500} />
             <p className="hint">Freelance, self-employed, studying, retired — whatever describes it.</p>
           </div>
 
           <div className="field">
             <label htmlFor="designation">Designation and role</label>
-            <input id="designation" name="designation" maxLength={200} />
+            <input id="designation" name="designation" maxLength={500} />
           </div>
 
           <div className="field">
             <label htmlFor="previousRole">Previous organisation or role</label>
-            <input id="previousRole" name="previousRole" maxLength={400} />
+            <input id="previousRole" name="previousRole" maxLength={1000} />
             <p className="hint">Not public. Visible to signed-in Xaverians only.</p>
           </div>
 
@@ -106,7 +106,7 @@ export default async function NewAlumnusPage() {
 
           <div className="field">
             <label htmlFor="otherInfo">Other information</label>
-            <textarea id="otherInfo" name="otherInfo" maxLength={2000} rows={3} />
+            <textarea id="otherInfo" name="otherInfo" maxLength={4000} rows={3} />
           </div>
 
           <h2 style={{ margin: '26px 0 8px' }}>Consent</h2>

@@ -50,8 +50,17 @@ export type PhotoStatus = 'none' | 'live' | 'removed';
  */
 export interface PublicRow {
   id: string;
-  fullName: string;
-  batchYear: number;
+  /**
+   * Null when the spreadsheet row had no name (migration 0014).
+   *
+   * Not a placeholder. The string "Name not provided" belongs to whatever is
+   * rendering, never to the data — a placeholder stored here would eventually
+   * be mailed to somebody as if it were their name, or matched against on
+   * import as if it were a real one.
+   */
+  fullName: string | null;
+  /** Null when the Form answer held no year a parser could read (migration 0014). */
+  batchYear: number | null;
   stream: string | null;
   currentOrg: string | null;
   designation: string | null;
@@ -83,13 +92,43 @@ export interface AlumniRecord extends PublicRow {
  */
 export interface PublicAlumnus {
   id: string;
-  fullName: string;
-  batchYear: number;
+  /** Null when unknown. Renderers use {@link DISPLAY_NAME_FALLBACK}. */
+  fullName: string | null;
+  batchYear: number | null;
   stream: string | null;
   currentOrg: string | null;
   designation: string | null;
   /** Null means "show the fallback avatar" — either no photo, or not for this viewer. */
   photoUrl: string | null;
+}
+
+/**
+ * What to show where a name is missing.
+ *
+ * One exported constant rather than the same string typed into six components,
+ * so the directory, the profile page, the card, the header and both portals
+ * cannot drift into saying it three different ways.
+ */
+export const DISPLAY_NAME_FALLBACK = 'Name not provided';
+
+/** The name to render. Never returns an empty string, never returns null. */
+export function displayName(fullName: string | null): string {
+  return fullName?.trim() ? fullName : DISPLAY_NAME_FALLBACK;
+}
+
+/**
+ * Initials for the avatar, or null when there is no name to take them from.
+ *
+ * Returns null rather than initials of the fallback text: "NP" on an avatar
+ * would look like somebody's actual initials, which is a small lie the plain
+ * silhouette does not tell.
+ */
+export function initialsOf(fullName: string | null): string | null {
+  const parts = fullName?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (parts.length === 0) return null;
+  const first = parts[0]![0] ?? '';
+  const last = parts.length > 1 ? (parts[parts.length - 1]![0] ?? '') : '';
+  return (first + last).toUpperCase() || null;
 }
 
 /**

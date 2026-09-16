@@ -40,9 +40,9 @@ export interface PreviewEntry {
   rowNumber: number;
   kind: Action['kind'];
   id: string;
-  /** Public-tier, shown as-is. */
-  name: string;
-  batchYear: number;
+  /** Public-tier, shown as-is. Null where the sheet had no name (migration 0014). */
+  name: string | null;
+  batchYear: number | null;
   changes: Array<{ label: string; from: string; to: string }>;
   skipped: Array<{ label: string; from: string; to: string }>;
 }

@@ -290,12 +290,20 @@ export async function restoreGrant(_prev: unknown, formData: FormData): Promise<
 
 // --- alumni records ----------------------------------------------------------
 
+/**
+ * Raised in step with migration 0014 and src/lib/alumni-create.ts.
+ *
+ * These bound what an admin can type into the edit form. They must not exceed
+ * the database's CHECK constraints — a value that passes here and fails there
+ * surfaces as "Something went wrong. Nothing was changed." with the real reason
+ * only in the server log.
+ */
 const TEXT_LIMITS: Record<string, number> = {
-  fullName: 120,
-  stream: 120,
-  currentOrg: 200,
-  designation: 200,
-  previousRole: 400,
+  fullName: 200,
+  stream: 200,
+  currentOrg: 500,
+  designation: 500,
+  previousRole: 1000,
 };
 
 export async function updateAlumni(_prev: unknown, formData: FormData): Promise<ActionResult> {

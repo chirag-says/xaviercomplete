@@ -252,8 +252,8 @@ export async function listGrants(
 
 export interface AlumniListRow {
   id: string;
-  fullName: string;
-  batchYear: number;
+  fullName: string | null;
+  batchYear: number | null;
   stream: string | null;
   currentOrg: string | null;
   designation: string | null;
@@ -269,8 +269,8 @@ export async function listAlumni(search: string, sql: Sql = adminDb()): Promise<
   const rows = await sql<
     Array<{
       id: string;
-      full_name: string;
-      batch_year: number;
+      full_name: string | null;
+      batch_year: number | null;
       stream: string | null;
       current_org: string | null;
       designation: string | null;
@@ -332,8 +332,8 @@ export async function readAlumni(id: string, sql: Sql = adminDb()): Promise<Alum
   const rows = await sql<
     Array<{
       id: string;
-      full_name: string;
-      batch_year: number;
+      full_name: string | null;
+      batch_year: number | null;
       stream: string | null;
       current_org: string | null;
       designation: string | null;

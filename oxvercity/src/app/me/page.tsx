@@ -42,7 +42,7 @@ export default async function MePage() {
             <header className="me-head">
               <p className="al-eyebrow">Your profile</p>
               <h1 className="me-head__title">
-                {profile ? profile.fullName : 'Your profile'}
+                {profile?.fullName ?? 'Your profile'}
               </h1>
               <p className="me-head__lede">
                 This is what other Xaverians see, and what they do not. Everything on this page is yours

@@ -2,13 +2,29 @@
  * Row validation: one spreadsheet row in, one clean record or a list of reasons out.
  *
  * Nothing untyped reaches the database. Every value here is either normalised
- * into a canonical form or rejected with a reason the operator can act on, and
- * the reasons are deliberately specific — "row 213: batch_year — no plausible
- * year found in '2nd batch'" is fixable, "invalid row" is not.
+ * into a canonical form, or carried through with a warning the operator can act
+ * on — and the warnings are deliberately specific: "row 213: batchYear — no
+ * four-digit year found in '2nd batch'" is fixable, "invalid row" is not.
  *
- * Rows are rejected, never repaired by guessing. A wrong phone number that got
- * through because the parser was clever is worse than a rejected row that
- * appears in the report.
+ * ## What changed, and what did not
+ *
+ * This file used to reject a row outright when the name cell was blank, the
+ * batch year was unreadable, or any field ran past its ceiling. Between them
+ * those rules discarded more of the Association's Form export than everything
+ * else combined — and each discarded row took with it the email address that
+ * would have let that person sign in and correct the rest themselves. Migration
+ * 0014 made `full_name` and `batch_year` nullable so a record can exist with a
+ * gap in it, and over-length values are now cut rather than fatal.
+ *
+ * What did not change is the rule underneath: **rows are never repaired by
+ * guessing.** A phone number that cannot be normalised is dropped with a
+ * warning, not reshaped until it parses; an impossible year is refused rather
+ * than clamped. A wrong value that got through because the parser was clever is
+ * worse than a gap that shows up in the report.
+ *
+ * KEEP IN SYNC with admin/src/lib/ingest/validate.ts, which is the copy the
+ * portal's upload uses. The two differ only in their import paths. The tests in
+ * tests/ingest-validate.test.ts cover this one.
  */
 
 import { normaliseEmail } from '../../src/lib/core/email.ts';
@@ -17,27 +33,20 @@ import type { ColumnMap, FieldKey } from './columns.ts';
 
 /** A row that is safe to encrypt and store. */
 export interface ValidRow {
-  /** 1-based row number in the sheet, as the operator sees it in Excel. */
   rowNumber: number;
-  fullName: string;
-  batchYear: number;
+  /** Null when the row had no name. Migration 0014 allows the column to be null. */
+  fullName: string | null;
+  /** Null when no readable four-digit year was in the cell. */
+  batchYear: number | null;
   stream: string | null;
   currentOrg: string | null;
   designation: string | null;
   previousRole: string | null;
-  /** E.164, or null when the alumnus declined or left it blank. */
   contact: string | null;
-  /** Normalised; the address shown to other alumni and used for login. */
   gmail: string | null;
-  /** Normalised; the address the form response came from. Admin-only. */
   formEmail: string | null;
   otherInfo: string | null;
   submittedAt: Date | null;
-  /**
-   * The address this person will log in with: column 10, falling back to
-   * column 2. Null means they get a directory entry but no way in — which is a
-   * warning, not an error, and is counted separately in the report.
-   */
   loginEmail: string | null;
 }
 
@@ -50,20 +59,31 @@ export interface RowProblem {
 export interface ValidationOutcome {
   valid: ValidRow[];
   rejected: RowProblem[];
-  /** Rows that will import but need the operator's attention. */
   warnings: RowProblem[];
 }
 
+/**
+ * Ceilings, raised in step with migration 0014.
+ *
+ * These are not opinions about how long a job title ought to be. They exist so
+ * a spreadsheet cannot push unbounded text into the database, and the old
+ * numbers were set from a guess rather than from the sheet: a 240-character
+ * designation is somebody with a long role at an organisation with a long name,
+ * and under the previous 200 it lost their entire row.
+ *
+ * Must not exceed the CHECK constraints in 0014, or a row passes here and then
+ * fails at the insert with a message naming a constraint the operator has never
+ * heard of.
+ */
 const MAX_LENGTHS: Partial<Record<FieldKey, number>> = {
-  fullName: 120,
-  stream: 120,
-  currentOrg: 200,
-  designation: 200,
-  previousRole: 400,
+  fullName: 200,
+  stream: 200,
+  currentOrg: 500,
+  designation: 500,
+  previousRole: 1000,
   otherInfo: 4000,
 };
 
-/** Ways a respondent says "nothing here", beyond an empty cell. */
 const BLANKISH = new Set(['', '-', '--', 'na', 'n/a', 'n.a', 'n.a.', 'nil', 'none', 'null', 'nan']);
 
 function cellText(row: unknown[], index: number | undefined): string {
@@ -72,7 +92,6 @@ function cellText(row: unknown[], index: number | undefined): string {
   if (value === null || value === undefined) return '';
   if (value instanceof Date) return value.toISOString();
   if (typeof value === 'object') {
-    // exceljs hands back rich text and hyperlink objects for formatted cells.
     const maybe = value as { text?: unknown; result?: unknown; richText?: Array<{ text?: string }> };
     if (Array.isArray(maybe.richText)) return maybe.richText.map((part) => part.text ?? '').join('');
     if (typeof maybe.text === 'string') return maybe.text;
@@ -82,40 +101,52 @@ function cellText(row: unknown[], index: number | undefined): string {
   return String(value);
 }
 
-function optionalText(row: unknown[], index: number | undefined, field: FieldKey): { value: string | null; problem?: string } {
+/**
+ * Read one optional cell.
+ *
+ * ## Over-length truncates; it does not reject
+ *
+ * This used to return a `problem`, which the caller turned into a rejection —
+ * so one cell four characters past its ceiling discarded the whole person,
+ * including the email address that would have let them sign in and correct it.
+ * That is the wrong trade for a Form export filled in by five hundred people
+ * over several years.
+ *
+ * Now the value is cut to the limit and the caller is handed a `warning`. The
+ * operator sees exactly which rows were shortened and by how much in the import
+ * preview, and can widen the sheet or edit the record afterwards. Data that
+ * arrives slightly clipped beats data that never arrives.
+ */
+function optionalText(
+  row: unknown[],
+  index: number | undefined,
+  field: FieldKey,
+): { value: string | null; warning?: string } {
   const raw = cellText(row, index).trim();
   if (BLANKISH.has(raw.toLowerCase())) return { value: null };
 
+  const collapsed = raw.replace(/\s+/g, ' ');
   const limit = MAX_LENGTHS[field];
-  if (limit && raw.length > limit) {
-    return { value: null, problem: `longer than ${limit} characters (${raw.length})` };
+  if (limit && collapsed.length > limit) {
+    return {
+      value: collapsed.slice(0, limit),
+      warning: `${collapsed.length} characters — kept the first ${limit}, the rest was cut`,
+    };
   }
-  // Collapse the newlines and runs of spaces that come from pasting into a form.
-  return { value: raw.replace(/\s+/g, ' ') };
+  return { value: collapsed };
 }
 
-/**
- * Pull a year of passing out of whatever was typed.
- *
- * "2011", "Batch of 2011", "2011 batch", "2008-2011" all mean 2011. For a range
- * the *last* year is taken, because the question asks when they passed out, and
- * people answer it with the span they attended.
- */
 export function parseBatchYear(raw: string, now = new Date()): { year: number } | { reason: string } {
   const text = raw.trim();
   if (text === '') return { reason: 'empty' };
 
-  // Any four-digit run, not just 19xx/20xx: someone who typed 1823 should be
-  // told the year is out of range, which is actionable, rather than that no
-  // year was found, which sounds like the parser is broken.
   const years = [...text.matchAll(/\b\d{4}\b/g)].map((match) => Number(match[0]));
   if (years.length === 0) {
-    // Two-digit years are genuinely ambiguous: '11 could be 1911 or 2011.
     return { reason: `no four-digit year found in ${JSON.stringify(text.slice(0, 40))}` };
   }
 
   const year = Math.max(...years);
-  const ceiling = now.getFullYear() + 6; // allows a current student's expected year
+  const ceiling = now.getFullYear() + 6;
   if (year < 1900 || year > ceiling) {
     return { reason: `year ${year} is outside 1900–${ceiling}` };
   }
@@ -128,23 +159,41 @@ function parseTimestamp(raw: string): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-/** Validate one row. `rowNumber` is the sheet row the operator would click on. */
 export function validateRow(row: unknown[], map: ColumnMap, rowNumber: number): { ok: true; row: ValidRow; warnings: RowProblem[] } | { ok: false; problems: RowProblem[] } {
   const problems: RowProblem[] = [];
   const warnings: RowProblem[] = [];
-  const problem = (field: FieldKey | 'row', reason: string) => problems.push({ rowNumber, field, reason });
   const warn = (field: FieldKey | 'row', reason: string) => warnings.push({ rowNumber, field, reason });
 
-  // --- required ---------------------------------------------------------------
+  /*
+   * Nothing below rejects a row any more.
+   *
+   * `fullName` and `batchYear` used to be required here, and between them they
+   * were the only two rejections this function ever produced. A blank name cell
+   * or a year written as "Batch of '04" threw away the entire person — name,
+   * employer, phone number, and the email address that was the one thing worth
+   * having, because it is what lets them sign in and fix the rest themselves.
+   *
+   * Migration 0014 made both columns nullable so the record can exist with a
+   * gap in it. Everything that displays a record is responsible for rendering
+   * that gap honestly; see `displayName` in oxvercity/src/lib/visibility.ts.
+   *
+   * `problems` is kept rather than deleted. It is the mechanism by which a row
+   * can be refused, and a future rule that genuinely must refuse one — say, a
+   * value that cannot be stored at all — should use it. Today nothing does.
+   */
   const nameCell = optionalText(row, map.fullName, 'fullName');
-  if (nameCell.problem) problem('fullName', nameCell.problem);
-  if (!nameCell.value) problem('fullName', 'missing');
+  if (nameCell.warning) warn('fullName', nameCell.warning);
+  if (!nameCell.value) warn('fullName', 'no name in this row — imported without one');
 
   const batchRaw = cellText(row, map.batchYear);
   const batch = parseBatchYear(batchRaw);
-  if ('reason' in batch) problem('batchYear', batch.reason);
+  const batchYear = 'year' in batch ? batch.year : null;
+  if (batchYear === null) {
+    // The reason still travels, because "empty" and "no four-digit year found
+    // in 'Batch of 04'" send the operator to different fixes.
+    warn('batchYear', `${(batch as { reason: string }).reason} — imported without a batch year`);
+  }
 
-  // --- optional plaintext -----------------------------------------------------
   const stream = optionalText(row, map.stream, 'stream');
   const currentOrg = optionalText(row, map.currentOrg, 'currentOrg');
   const designation = optionalText(row, map.designation, 'designation');
@@ -154,21 +203,17 @@ export function validateRow(row: unknown[], map: ColumnMap, rowNumber: number): 
     ['stream', stream], ['currentOrg', currentOrg], ['designation', designation],
     ['previousRole', previousRole], ['otherInfo', otherInfo],
   ] as const) {
-    if (cell.problem) problem(field, cell.problem);
+    if (cell.warning) warn(field, cell.warning);
   }
 
-  // --- contact ----------------------------------------------------------------
   const phone = normalisePhone(cellText(row, map.contact));
   let contact: string | null = null;
   if (phone.ok) {
     contact = phone.value;
   } else {
-    // A bad number does not cost them their directory entry; it costs them the
-    // number. The report lists it so the Association can ask.
     warn('contact', `${phone.reason} — imported without a contact number`);
   }
 
-  // --- the two email columns --------------------------------------------------
   const gmail = readEmail(row, map.gmail, 'gmail', warn);
   const formEmail = readEmail(row, map.formEmail, 'formEmail', warn);
 
@@ -184,8 +229,8 @@ export function validateRow(row: unknown[], map: ColumnMap, rowNumber: number): 
     warnings,
     row: {
       rowNumber,
-      fullName: nameCell.value!,
-      batchYear: (batch as { year: number }).year,
+      fullName: nameCell.value,
+      batchYear,
       stream: stream.value,
       currentOrg: currentOrg.value,
       designation: designation.value,
@@ -216,16 +261,6 @@ function readEmail(
   return result.value;
 }
 
-/**
- * Validate a whole sheet and flag duplicates.
- *
- * Duplicates are found on the *normalised* login address, which is the whole
- * point of normalisation: `priya.menon@gmail.com` and `priyamenon@gmail.com`
- * are one person filling the form twice, and without this they would become two
- * directory entries and a unique-constraint failure at push time.
- *
- * The later row wins — it is the more recent answer.
- */
 export function validateSheet(rows: unknown[][], map: ColumnMap, firstRowNumber = 2): ValidationOutcome {
   const valid: ValidRow[] = [];
   const rejected: RowProblem[] = [];
@@ -233,7 +268,7 @@ export function validateSheet(rows: unknown[][], map: ColumnMap, firstRowNumber 
 
   rows.forEach((row, offset) => {
     const rowNumber = firstRowNumber + offset;
-    if (row.every((cell) => cellText([cell], 0).trim() === '')) return; // blank row
+    if (row.every((cell) => cellText([cell], 0).trim() === '')) return;
 
     const outcome = validateRow(row, map, rowNumber);
     if (outcome.ok) {

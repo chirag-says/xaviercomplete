@@ -12,7 +12,7 @@
 import { useState } from 'react';
 
 import { DEMO_BADGE } from '@/data/alumni';
-import type { PublicAlumnus } from '@/lib/visibility';
+import { displayName, type PublicAlumnus } from '@/lib/visibility';
 
 const AVATAR = '/svg/alumni-avatar.svg';
 
@@ -54,8 +54,8 @@ export function AlumniFeatured({
                 data-active={String(i === active)}
                 onClick={() => setActive(i)}
               >
-                <p className="al-featured__tab-year">Class of {p.batchYear}</p>
-                <p className="al-featured__tab-name">{p.fullName}</p>
+                {p.batchYear !== null && <p className="al-featured__tab-year">Class of {p.batchYear}</p>}
+                <p className="al-featured__tab-name">{displayName(p.fullName)}</p>
                 {roleLine(p) && <p className="al-featured__tab-meta">{roleLine(p)}</p>}
                 {p.stream && <p className="al-featured__tab-meta">{p.stream}</p>}
               </button>
@@ -75,11 +75,16 @@ export function AlumniFeatured({
               />
             </div>
             <div className="al-featured__portrait-info">
-              <h3 className="al-featured__portrait-name">{person.fullName}</h3>
+              <h3 className="al-featured__portrait-name">{displayName(person.fullName)}</h3>
               {roleLine(person) && <p className="al-featured__portrait-role">{roleLine(person)}</p>}
-              {person.stream && (
+              {/* Stream and year are independent facts. Joining them with a
+                  separator only reads correctly when both are present; with one
+                  missing the old markup printed a dangling "·" or "Class of". */}
+              {(person.stream || person.batchYear !== null) && (
                 <p className="al-featured__portrait-location">
-                  {person.stream} · Class of {person.batchYear}
+                  {[person.stream, person.batchYear !== null ? `Class of ${person.batchYear}` : null]
+                    .filter(Boolean)
+                    .join(' · ')}
                 </p>
               )}
               {isDemo && <span className="al-featured__portrait-badge">{DEMO_BADGE}</span>}

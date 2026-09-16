@@ -80,16 +80,32 @@ export async function deleteAlumnus(
   adminId: string,
   sql: Sql = adminDb(),
 ): Promise<DeleteOutcome> {
-  const rows = await sql<Array<{ full_name: string; gmail_hmac: Buffer | null }>>`
+  const rows = await sql<Array<{ full_name: string | null; gmail_hmac: Buffer | null }>>`
     select full_name, gmail_hmac from alumni where id = ${id} limit 1
   `;
   const person = rows[0];
   if (!person) return { ok: false, message: 'No such record — it may already have been deleted.' };
 
-  // Compared on trimmed, case-folded text. Requiring the exact casing of a name
-  // somebody is reading off the screen adds no safety and fails honest attempts.
-  if (confirmName.trim().toLowerCase() !== person.full_name.trim().toLowerCase()) {
-    return { ok: false, message: 'That name does not match the record. Nothing was deleted.' };
+  /*
+   * Compared on trimmed, case-folded text. Requiring the exact casing of a name
+   * somebody is reading off the screen adds no safety and fails honest attempts.
+   *
+   * A record may now have no name at all (migration 0014). The point of this
+   * check is to make the operator retype something specific to *this* record
+   * before an irreversible delete, so when there is no name the record's id
+   * stands in — it is on screen, it is unique, and it is equally deliberate to
+   * type. Skipping the check for nameless records would make the one action in
+   * this portal with nothing on the other side of it the easiest to trigger by
+   * accident.
+   */
+  const expected = person.full_name ?? id;
+  if (confirmName.trim().toLowerCase() !== expected.trim().toLowerCase()) {
+    return {
+      ok: false,
+      message: person.full_name
+        ? 'That name does not match the record. Nothing was deleted.'
+        : 'This record has no name, so type its id to confirm. Nothing was deleted.',
+    };
   }
 
   const counts: DeleteCounts = { grants: 0, requests: 0, sessions: 0, loginTokens: 0, photos: 0 };

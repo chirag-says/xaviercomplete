@@ -46,8 +46,8 @@ function safeDecrypt(blob: Buffer | null, id: string, field: string): string | n
 
 interface OwnDbRow {
   id: string;
-  full_name: string;
-  batch_year: number;
+  full_name: string | null;
+  batch_year: number | null;
   stream: string | null;
   current_org: string | null;
   designation: string | null;

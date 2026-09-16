@@ -16,15 +16,30 @@
  */
 
 import { DEMO_BADGE, directoryCopy } from '@/data/alumni';
-import type { PrivateAlumnus } from '@/lib/visibility';
+import { displayName, type PrivateAlumnus } from '@/lib/visibility';
 
 const AVATAR = '/svg/alumni-avatar.svg';
 
-function Fact({ label, value }: { label: string; value: string | number | null | undefined }) {
+/**
+ * `missing` exists because "Not shared" is a claim about the owner's choice.
+ * It is right for a phone number behind a toggle and wrong for a batch year the
+ * spreadsheet never had — one says "they decided you should not see this", the
+ * other says "nobody ever told us". Getting that backwards makes an incomplete
+ * import look like a deliberate withholding.
+ */
+function Fact({
+  label,
+  value,
+  missing = 'Not shared',
+}: {
+  label: string;
+  value: string | number | null | undefined;
+  missing?: string;
+}) {
   return (
     <div className="al-profile__fact">
       <dt>{label}</dt>
-      <dd>{value ?? <span className="al-profile__unshared">Not shared</span>}</dd>
+      <dd>{value ?? <span className="al-profile__unshared">{missing}</span>}</dd>
     </div>
   );
 }
@@ -51,7 +66,9 @@ export function AlumniProfileView({
               {isDemo && (
                 <span className="al-profile__pill al-profile__pill--demo">{DEMO_BADGE} record</span>
               )}
-              <span className="al-profile__pill">Class of {person.batchYear}</span>
+              {person.batchYear !== null && (
+                <span className="al-profile__pill">Class of {person.batchYear}</span>
+              )}
               {person.stream && <span className="al-profile__pill">{person.stream}</span>}
             </div>
 
@@ -69,14 +86,16 @@ export function AlumniProfileView({
           {/* Main content */}
           <div className="al-profile__main">
             <div>
-              <h1 className="al-profile__name">{person.fullName}</h1>
+              <h1 className={`al-profile__name${person.fullName ? '' : ' al-profile__name--unknown'}`}>
+                {displayName(person.fullName)}
+              </h1>
               {role && <p className="al-profile__role">{role}</p>}
             </div>
 
             <div>
               <h2 className="al-profile__section-title">Details</h2>
               <dl className="al-profile__facts">
-                <Fact label="Batch / Year of passing" value={person.batchYear} />
+                <Fact label="Batch / Year of passing" value={person.batchYear} missing="Not provided" />
                 <Fact label="Stream of study" value={person.stream} />
                 <Fact label="Current organisation" value={person.currentOrg} />
                 <Fact label="Designation and role" value={person.designation} />

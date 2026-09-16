@@ -96,7 +96,16 @@ export default async function AlumniListPage({
               {people.map((person) => (
                 <tr key={person.id} style={person.isVisible ? undefined : { opacity: 0.55 }}>
                   <td>
-                    <a href={`/alumni/${person.id}`}><strong>{person.fullName}</strong></a>
+                    <a href={`/alumni/${person.id}`}>
+                      {person.fullName ? (
+                        <strong>{person.fullName}</strong>
+                      ) : (
+                        /* Muted rather than bold: this is a gap to be filled,
+                           and it should not read as somebody's actual name in a
+                           list being scanned. */
+                        <strong className="muted">No name — {person.id}</strong>
+                      )}
+                    </a>
                     <div className="small muted mono">{person.id}</div>
                   </td>
                   <td>
