@@ -38,6 +38,8 @@ export { connect, type Sql } from './shared-db.ts';
 
 export { audit, type AuditEntry, type MetaValue } from './shared-audit.ts';
 
+export { consume, LIMITS, perHour, perDay, refill, type Limit, type Decision } from './shared-rate-limit.ts';
+
 export {
   send,
   mailConfig,

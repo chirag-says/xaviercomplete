@@ -2,24 +2,33 @@
  * The access-request queue.
  *
  * Someone who is not in the original spreadsheet — or whose address has changed
- * — asks for access from the public contact page, verifies the address with a
- * one-time code, and lands here. Approving inserts their address into the
- * allowlist; nothing else does.
+ * — asks for access from the public contact page and lands here. Approving
+ * inserts their address into the allowlist; apart from the spreadsheet import,
+ * nothing else does.
  *
- * The form that creates these rows is Phase 7, so until then this screen is
- * correct and empty. That is worth showing rather than hiding: an admin who
- * finds the queue already built knows where requests will appear.
+ * ## Nothing here has confirmed an address, and the screen says so
  *
- * ## Two things surfaced next to every request
+ * This page used to print a green "Verified" badge and refuse to approve
+ * without it. The one-time code behind that badge was removed when the public
+ * form became single-step, but the badge was not: `submitAccessRequest` kept
+ * stamping `email_verified_at`, so every request arrived marked as proven and
+ * the gate passed every time. The word on screen meant nothing, on the one
+ * screen where somebody decides whether a stranger may read five hundred
+ * people's contact details.
+ *
+ * So the badge is gone. Every request now states plainly that the address is
+ * unconfirmed, and approving requires the admin to tick that they have
+ * satisfied themselves some other way. That tick is not security theatre with a
+ * different label: it is the honest shape of the decision, which was always a
+ * human judgement (plan §7.3) and is now presented as one.
+ *
+ * ## What is still surfaced next to every request
  *
  * **Whether the address matched a directory record.** A request from an address
  * already in the spreadsheet is almost always an alumnus who cannot sign in,
- * not a stranger — a different decision, so it is shown rather than left for
- * the admin to go and check.
- *
- * **Whether the address is verified.** An unverified request cannot be
- * approved. Without the one-time code, anyone could put someone else's address
- * into the allowlist by typing it into a form.
+ * not a stranger. A different decision, so it is shown rather than left for the
+ * admin to go and check — and it is the single most useful signal on this page
+ * now that the badge is gone.
  */
 
 import type { Metadata } from 'next';
@@ -56,7 +65,9 @@ export default async function RequestsPage({
         <h1>Access requests</h1>
         <p className="muted small" style={{ marginTop: 6 }}>
           Approving adds an address to the sign-in allowlist. It is the only thing that does, apart
-          from the spreadsheet import.
+          from the spreadsheet import. Nothing here has proved who is behind an address — the form
+          is open to anyone — so the match against the directory, and what the applicant wrote, are
+          the evidence you have.
         </p>
       </div>
 
@@ -79,8 +90,8 @@ export default async function RequestsPage({
           <div className="empty">
             <p style={{ margin: 0 }}>Nothing here.</p>
             <p className="small" style={{ margin: '6px 0 0' }}>
-              Requests arrive from the contact form on the public site, once an applicant has
-              confirmed their address with a one-time code.
+              Requests arrive from the contact form on the public site. Anyone can submit one for
+              any address, so treat what a request says about itself as a claim, not a fact.
             </p>
           </div>
         ) : (
@@ -109,11 +120,12 @@ export default async function RequestsPage({
                   <td>
                     <span className="mono">{request.email ? maskEmail(request.email) : '—'}</span>
                     <div style={{ marginTop: 4 }}>
-                      {request.verified ? (
-                        <span className="badge badge--good">Verified</span>
-                      ) : (
-                        <span className="badge badge--warn">Not verified</span>
-                      )}
+                      {/*
+                        Stated on every row rather than once at the top of the
+                        page. A caveat in a header is read on the first visit and
+                        never again; this decision is taken one row at a time.
+                      */}
+                      <span className="badge badge--warn">Address not confirmed</span>
                       {request.alreadyGranted && <span className="badge badge--accent">Already has access</span>}
                     </div>
                   </td>
@@ -135,18 +147,26 @@ export default async function RequestsPage({
                   <td>
                     {request.status === 'pending' ? (
                       <div className="row">
-                        {request.verified ? (
-                          <ActionForm
-                            action={approveRequest}
-                            submitLabel="Approve"
-                            variant="primary"
-                            inline
-                            hidden={{ requestId: request.id }}
-                            confirmText={`Grant ${request.name} access to the alumni directory? They will be emailed a sign-in link.`}
-                          />
-                        ) : (
-                          <span className="small muted">Cannot approve until verified</span>
-                        )}
+                        <ActionForm
+                          action={approveRequest}
+                          submitLabel="Approve"
+                          variant="primary"
+                          inline
+                          hidden={{ requestId: request.id }}
+                          confirmText={`Grant ${request.name} access to the alumni directory? They will be able to read every signed-in Xaverian's contact details.`}
+                        >
+                          {/*
+                            Required, and checked again in the action — a
+                            `required` attribute is a convenience for the person
+                            using the page, not a control. Nothing in this system
+                            has confirmed who is behind that address, so the
+                            acknowledgement is the only honest gate there is.
+                          */}
+                          <label className="small" style={{ display: 'flex', gap: 6, alignItems: 'flex-start', maxWidth: 260 }}>
+                            <input type="checkbox" name="confirmed" value="yes" required />
+                            <span>I have satisfied myself this is the person they say they are.</span>
+                          </label>
+                        </ActionForm>
                         <ActionForm
                           action={rejectRequest}
                           submitLabel="Refuse"

@@ -4,13 +4,35 @@
  * For someone the spreadsheet does not cover, or an alumnus whose address has
  * changed. The request is queued for an admin; nothing here grants anything.
  *
- * ## Why the one-time code exists
+ * ## There is no one-time code, and the queue says so
  *
- * Without it, anyone could put someone else's address into the queue, and an
- * admin approving in good faith would add an address its owner never asked for
- * to the allowlist. The code proves the person filling in the form can read
- * mail at the address they typed. It is not proof they are a Xaverian — that is
- * the admin's judgement, and always will be (plan §7.3).
+ * An earlier version mailed a six-digit code and would not queue a request
+ * until it came back. That step was removed when the form became single-step,
+ * and for a while the removal was only half done: `submitAccessRequest` still
+ * stamped `email_verified_at`, so every request reached the portal wearing a
+ * green "Verified" badge for a check that no longer ran. An admin approving in
+ * good faith was reading evidence of something nobody had done.
+ *
+ * So the column is left alone now. `email_verified_at` stays null, the queue
+ * shows "Address not confirmed", and approving requires the admin to say out
+ * loud that they have satisfied themselves some other way. A control that has
+ * been removed should look removed.
+ *
+ * ## What the code was actually worth, so it can be restored knowingly
+ *
+ * It never kept strangers out. Somebody asking for access with their own inbox
+ * passes an inbox check trivially, and whether they are a Xaverian was always
+ * the admin's judgement and always will be (plan §7.3).
+ *
+ * What it bought was narrower: nobody could put a *third party's* address into
+ * the queue. Without it, anyone can type a stranger's address into the form.
+ * The damage ceiling is low — the grant email and every later sign-in code go
+ * to that address, not to whoever submitted the form, so an address cannot be
+ * captured this way — but the Association can be talked into adding someone who
+ * never asked. That is the trade being made, and it is made in the open.
+ *
+ * Turnstile on the route covers the bot half, and the rate limits below cover
+ * the flood half.
  *
  * ## What this module refuses to reveal
  *
@@ -18,26 +40,14 @@
  * alumnus, already has access, has a request outstanding, or has never been
  * seen. Anything else turns the form into a way to test whether a given person
  * is a Xaverian — the disclosure the whole allowlist design exists to prevent.
- *
- * The *email* can say more than the response can, because it only reaches the
- * address in question. Someone who already has access is told so there.
  */
-
-import { createHash, timingSafeEqual } from 'node:crypto';
 
 import { encryptField, fieldContext } from './core/crypto.ts';
 import { emailBlindIndex } from './core/hmac.ts';
-import { newOtp } from './core/ids.ts';
 import { audit } from './audit.ts';
 import { db, type Sql } from './db.ts';
-import { accessRequestOtpEmail, adminNewRequestEmail, mailConfig, send } from './email.ts';
+import { adminNewRequestEmail, mailConfig, send } from './email.ts';
 import { LIMITS, consume } from './rate-limit.ts';
-
-export const OTP_LIFETIME_MINUTES = 10;
-export const MAX_OTP_ATTEMPTS = 5;
-
-/** The stored form. The code itself is never written down. */
-const hashOtp = (code: string) => createHash('sha256').update(code, 'utf8').digest();
 
 export interface RequestFields {
   name: unknown;
@@ -73,11 +83,12 @@ function batchYearOf(value: unknown): number | null {
 }
 
 /**
- * Take a request and queue it directly for admin review.
+ * Take a request and queue it for admin review.
  *
- * No OTP step — Turnstile provides bot protection, and the admin decides
- * whether the applicant is a Xaverian. The request is immediately visible
- * in the admin portal.
+ * `email_verified_at` is deliberately not set. Nothing in this flow proves the
+ * submitter can read mail at the address they typed, so writing a timestamp
+ * that says otherwise would be the portal lying to the person who has to make
+ * the decision. See the header.
  */
 export async function submitAccessRequest(
   fields: RequestFields,
@@ -133,19 +144,16 @@ export async function submitAccessRequest(
     await sql`
       update access_request
          set name = ${name}, batch_year = ${batchYear}, stream = ${stream}, reason = ${reason},
-             email_verified_at = now(), otp_hash = null, otp_expires_at = null, otp_attempts = 0,
              request_ip_hash = ${context.ipSubject}
        where id = ${requestId}
     `;
   } else {
     const rows = await sql<Array<{ id: string }>>`
       insert into access_request (
-        email_enc, email_hmac, name, batch_year, stream, reason,
-        email_verified_at, request_ip_hash
+        email_enc, email_hmac, name, batch_year, stream, reason, request_ip_hash
       ) values (
         ${encryptField(identity.normalised, fieldContext('access_request', 'pending', 'email'))},
-        ${identity.hmac}, ${name}, ${batchYear}, ${stream}, ${reason},
-        now(), ${context.ipSubject}
+        ${identity.hmac}, ${name}, ${batchYear}, ${stream}, ${reason}, ${context.ipSubject}
       )
       returning id
     `;
@@ -179,118 +187,6 @@ export async function submitAccessRequest(
   return { ok: true };
 }
 
-export type VerifyOutcome =
-  | { ok: true; alreadyQueued: boolean }
-  | { ok: false; reason: 'invalid' | 'expired' | 'too_many' | 'rate_limited'; message: string };
-
-/**
- * Check a code and put the request in the queue.
- *
- * Keyed on the address plus the code, not on a request id. Handing out an id
- * would let anyone holding it verify a request they did not make; requiring the
- * address means the two halves must arrive together.
- */
-export async function verifyAccessRequest(
-  rawEmail: unknown,
-  rawCode: unknown,
-  context: { ipSubject: Buffer },
-  sql: Sql = db(),
-  schedule: Scheduler = runInline,
-): Promise<VerifyOutcome> {
-  const limit = await consume(context.ipSubject, LIMITS.otpVerifyIpHour, sql);
-  if (!limit.allowed) {
-    return { ok: false, reason: 'rate_limited', message: 'Too many attempts. Please wait an hour and try again.' };
-  }
-
-  const identity = emailBlindIndex(rawEmail);
-  const code = typeof rawCode === 'string' ? rawCode.replace(/\s/g, '') : '';
-
-  // One message for a wrong code, an unknown address and a malformed one. The
-  // three are indistinguishable on purpose.
-  const wrong: VerifyOutcome = {
-    ok: false,
-    reason: 'invalid',
-    message: 'That code was not right. Check the most recent email and try again.',
-  };
-
-  if (!identity.ok || !/^\d{6}$/.test(code)) return wrong;
-
-  const rows = await sql<
-    Array<{ id: string; otp_hash: Buffer | null; otp_expires_at: Date | null; otp_attempts: number; verified: Date | null }>
-  >`
-    select id, otp_hash, otp_expires_at, otp_attempts, email_verified_at as verified
-      from access_request
-     where email_hmac = ${identity.hmac} and status = 'pending'
-     order by created_at desc
-     limit 1
-  `;
-  const request = rows[0];
-  if (!request) return wrong;
-
-  // Already verified. Say so rather than reporting a wrong code: the person has
-  // done everything asked of them and needs to know they are waiting on a human.
-  if (request.verified) return { ok: true, alreadyQueued: true };
-
-  if (request.otp_attempts >= MAX_OTP_ATTEMPTS) {
-    return {
-      ok: false,
-      reason: 'too_many',
-      message: 'Too many wrong codes for this request. Ask for a new code and start again.',
-    };
-  }
-  if (!request.otp_hash || !request.otp_expires_at || request.otp_expires_at < new Date()) {
-    return { ok: false, reason: 'expired', message: 'That code has expired. Ask for a new one.' };
-  }
-
-  const expected = Buffer.from(request.otp_hash);
-  const actual = hashOtp(code);
-  const matches = expected.length === actual.length && timingSafeEqual(expected, actual);
-
-  if (!matches) {
-    // `least(..., 5)` because the column is constrained to 0–5; a sixth
-    // increment would raise rather than record the attempt.
-    await sql`
-      update access_request set otp_attempts = least(otp_attempts + 1, ${MAX_OTP_ATTEMPTS}) where id = ${request.id}
-    `;
-    await audit(
-      {
-        actorType: 'anonymous',
-        action: 'access_request_code_rejected',
-        targetType: 'access_request',
-        targetId: request.id,
-        ipHash: context.ipSubject,
-      },
-      sql,
-    );
-    return wrong;
-  }
-
-  // Verified. The code is cleared in the same statement — it has done its job,
-  // and a spent code sitting in the row is one more thing that could leak.
-  await sql`
-    update access_request
-       set email_verified_at = now(), otp_hash = null, otp_expires_at = null
-     where id = ${request.id}
-  `;
-
-  await audit(
-    {
-      actorType: 'anonymous',
-      action: 'access_request_verified',
-      targetType: 'access_request',
-      targetId: request.id,
-      ipHash: context.ipSubject,
-    },
-    sql,
-  );
-
-  await schedule(async () => {
-    await notifyAdmins(sql);
-  });
-
-  return { ok: true, alreadyQueued: false };
-}
-
 /**
  * Tell the Association something is waiting.
  *
@@ -298,9 +194,14 @@ export async function verifyAccessRequest(
  * least controlled place this data could sit, and an Association mailbox is
  * often shared (plan §8 step 4). The admin signs in to see who it is.
  *
+ * The count is every pending row. It used to filter on `email_verified_at is
+ * not null`, which was correct while a code had to come back first and is now
+ * a filter that matches nothing — the notification would have said "0 requests
+ * are waiting" for the rest of the system's life.
+ *
  * Failure is logged and swallowed: the request is already queued, and a mail
- * provider having a bad afternoon must not turn a successful verification into
- * an error the applicant cannot act on.
+ * provider having a bad afternoon must not turn a successful submission into an
+ * error the applicant cannot act on.
  */
 async function notifyAdmins(sql: Sql): Promise<void> {
   try {
@@ -311,8 +212,7 @@ async function notifyAdmins(sql: Sql): Promise<void> {
     }
 
     const rows = await sql<Array<{ count: number }>>`
-      select count(*)::int as count from access_request
-       where status = 'pending' and email_verified_at is not null
+      select count(*)::int as count from access_request where status = 'pending'
     `;
     const pending = rows[0]?.count ?? 1;
 
@@ -321,15 +221,4 @@ async function notifyAdmins(sql: Sql): Promise<void> {
   } catch (error) {
     console.error('[access-request] could not notify the Association:', (error as Error).message);
   }
-}
-
-/** Housekeeping: codes that can no longer be used are of no further value. */
-export async function sweepExpiredCodes(sql: Sql = db()): Promise<number> {
-  const rows = await sql`
-    update access_request
-       set otp_hash = null, otp_expires_at = null
-     where otp_hash is not null and otp_expires_at < now() - interval '1 day'
-    returning id
-  `;
-  return rows.length;
 }
