@@ -72,8 +72,12 @@ export async function dashboardCounts(sql: Sql = adminDb()): Promise<DashboardCo
       (select count(*)::int from alumni where not is_visible)                            as alumni_hidden,
       (select count(*)::int from access_grant where revoked_at is null)                  as grants_live,
       (select count(*)::int from access_grant where revoked_at is not null)              as grants_revoked,
-      (select count(*)::int from access_request where status = 'pending'
-          and email_verified_at is not null)                                             as requests_pending,
+      -- Every pending row. This used to add "and email_verified_at is not
+      -- null", which was right while an applicant had to answer a one-time code
+      -- before their request was queued. That step is gone, nothing sets the
+      -- column any more, and the filter would have made the dashboard read
+      -- "0 waiting" forever while the queue filled up behind it.
+      (select count(*)::int from access_request where status = 'pending')                as requests_pending,
       (select count(*)::int from alumni where photo_status = 'live')                     as photos_live,
       (select count(*)::int from admin_user where status = 'active')                     as admins_active,
       (select count(*)::int from admin_invite where consumed_at is null
@@ -107,7 +111,6 @@ export interface AccessRequestRow {
   stream: string | null;
   reason: string | null;
   status: string;
-  verified: boolean;
   createdAt: Date;
   /** A directory record whose login address matches, if there is one. */
   matchedAlumniId: string | null;
@@ -115,6 +118,22 @@ export interface AccessRequestRow {
   /** True if this address already holds a live grant. */
   alreadyGranted: boolean;
 }
+
+/*
+ * There is deliberately no `verified` field above.
+ *
+ * `access_request.email_verified_at` is not read here and must not be
+ * reintroduced. Nothing sets it any more, and the rows written during the
+ * period when `submitAccessRequest` stamped it unconditionally carry a
+ * timestamp for a check that never ran — so a UI driven off that column shows a
+ * green badge backed by nothing, on precisely the screen where somebody decides
+ * whether a stranger may read five hundred contact details.
+ *
+ * The queue now states plainly that no address is confirmed and asks the admin
+ * to say they have satisfied themselves another way. If the one-time code is
+ * ever restored, add the field back *then*, in the same change that starts
+ * writing it.
+ */
 
 export async function listAccessRequests(
   status: string,
@@ -129,7 +148,6 @@ export async function listAccessRequests(
       stream: string | null;
       reason: string | null;
       status: string;
-      email_verified_at: Date | null;
       created_at: Date;
       matched_id: string | null;
       matched_name: string | null;
@@ -137,7 +155,7 @@ export async function listAccessRequests(
     }>
   >`
     select r.id, r.email_enc, r.name, r.batch_year, r.stream, r.reason, r.status,
-           r.email_verified_at, r.created_at,
+           r.created_at,
            a.id as matched_id, a.full_name as matched_name,
            exists (
              select 1 from access_grant g
@@ -158,7 +176,6 @@ export async function listAccessRequests(
     stream: row.stream,
     reason: row.reason,
     status: row.status,
-    verified: row.email_verified_at !== null,
     createdAt: row.created_at,
     matchedAlumniId: row.matched_id,
     matchedAlumniName: row.matched_name,

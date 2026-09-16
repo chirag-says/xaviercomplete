@@ -23,7 +23,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminDb } from '@/lib/db';
-import { audit, emailBlindIndex, encryptOptional, fieldContext } from '@/lib/shared';
+import { audit, consume, emailBlindIndex, encryptOptional, fieldContext, LIMITS } from '@/lib/shared';
 import { requireSettledAdmin, requireStepUp, requireSuperAdmin, StepUpRequired } from '@/lib/guard';
 import { revokeAllAdminSessions } from '@/lib/admin-session';
 import { changeOwnPassword, stepUp } from '@/lib/admin-auth';
@@ -58,11 +58,27 @@ async function guarded(fn: () => Promise<ActionResult>): Promise<ActionResult> {
 
 export async function confirmIdentity(_prev: unknown, formData: FormData): Promise<ActionResult> {
   const admin = await requireSettledAdmin();
+  const ipHash = await clientIpHash();
+
+  /*
+   * `stepUp` deliberately does not touch the lockout counter — it is checking
+   * that the person at the keyboard is still the account holder, not granting
+   * new access, and locking someone out of step-up mid-task is its own kind of
+   * incident. That decision is right and stays; it does mean nothing else
+   * bounded how often this could run a full Argon2id verify.
+   *
+   * The caller already holds a live session, so this is not an anonymous
+   * oracle. It is still work anyone with a session can ask for without limit,
+   * and a bucket is cheaper than the argument about whether that matters.
+   */
+  if (!(await consume(ipHash, LIMITS.adminStepUpIpHour)).allowed) {
+    return { ok: false, error: 'Too many confirmation attempts. Wait a while and try again.' };
+  }
 
   const result = await stepUp(
     admin.adminId,
     { password: formData.get('password'), totpCode: formData.get('code') },
-    { ipHash: await clientIpHash() },
+    { ipHash },
   );
 
   if (!result.ok) {
@@ -88,17 +104,37 @@ export async function approveRequest(_prev: unknown, formData: FormData): Promis
     const requestId = String(formData.get('requestId') ?? '');
     const sql = adminDb();
 
-    const rows = await sql<Array<{ id: string; email_hmac: Buffer; email_enc: Buffer; status: string; verified: Date | null }>>`
-      select id, email_hmac, email_enc, status, email_verified_at as verified
+    const rows = await sql<Array<{ id: string; email_hmac: Buffer; email_enc: Buffer; status: string }>>`
+      select id, email_hmac, email_enc, status
         from access_request where id = ${requestId} limit 1
     `;
     const request = rows[0];
     if (!request) return { ok: false, error: 'That request no longer exists.' };
     if (request.status !== 'pending') return { ok: false, error: 'That request has already been decided.' };
-    if (!request.verified) {
-      // The OTP proves the person controls the address. Granting without it
-      // would let anyone put someone else's address into the allowlist.
-      return { ok: false, error: 'That address has not been verified yet. It cannot be granted.' };
+
+    /*
+     * The gate here used to be `email_verified_at is not null`, with a comment
+     * saying the one-time code proved the person controlled the address.
+     *
+     * That code was removed from the public form, but `submitAccessRequest` went
+     * on stamping the column — so the check passed on every request and the
+     * portal reported a green "Verified" badge for something nobody had done.
+     * A gate that cannot fail is worse than no gate, because it reads as one.
+     *
+     * What replaces it is the honest version of the same decision. Whether an
+     * applicant is a Xaverian was always a human judgement (plan §7.3); the
+     * checkbox on the queue is that judgement being recorded, and it goes into
+     * the audit row so the decision has a name against it.
+     *
+     * Checked here and not only in the browser. `required` on the input stops an
+     * accidental click, which is what it is for; it stops nothing else.
+     */
+    if (formData.get('confirmed') !== 'yes') {
+      return {
+        ok: false,
+        error:
+          'Tick the box to confirm you have satisfied yourself who this is. Nothing in the system has checked the address.',
+      };
     }
 
     await sql.begin(async (tx) => {
@@ -124,6 +160,11 @@ export async function approveRequest(_prev: unknown, formData: FormData): Promis
         action: 'access_granted',
         targetType: 'access_request',
         targetId: requestId,
+        // What the decision rested on. The system confirmed nothing about this
+        // address, and the log should not leave a later reader guessing whether
+        // it did — `address_confirmed_by: 'admin_judgement'` is the whole truth
+        // and stays accurate if a mailbox check is ever added alongside it.
+        meta: { address_confirmed_by: 'admin_judgement' },
       },
       sql,
     );
@@ -231,26 +272,21 @@ export async function restoreGrant(_prev: unknown, formData: FormData): Promise<
   });
 }
 
-/**
- * Reveal one masked address.
+/*
+ * `revealAddress` used to live here and has been removed.
  *
- * Audited, and deliberately one at a time. There is no "reveal all" — a screen
- * showing five hundred addresses in the clear is a screen that gets
- * screenshotted, and the point of masking is that seeing an address should be a
- * decision rather than a side effect of opening a page.
+ * It was never wired to anything: no page imported it, and /grants masks every
+ * address unconditionally. What it did do was write an `address_revealed` audit
+ * row and then reveal nothing — so the only entries that action could ever have
+ * produced were false ones, in the log that exists to be the record of who saw
+ * what. An audit trail that can contain events which did not happen is worse
+ * than a shorter one.
+ *
+ * Masking on /grants is doing its job today. If a reveal control is wanted
+ * later, it needs the same shape as the rest of this file: step-up, the address
+ * actually decrypted and returned to the caller, and the audit row written in
+ * the same action that returns it.
  */
-export async function revealAddress(_prev: unknown, formData: FormData): Promise<ActionResult> {
-  return guarded(async () => {
-    const admin = await requireStepUp();
-    const grantId = String(formData.get('grantId') ?? '');
-    await audit(
-      { actorType: 'admin', actorId: admin.adminId, action: 'address_revealed', targetType: 'access_grant', targetId: grantId },
-      adminDb(),
-    );
-    revalidatePath('/grants');
-    return { ok: true, message: 'Revealed below, and recorded in the audit log.' };
-  });
-}
 
 // --- alumni records ----------------------------------------------------------
 

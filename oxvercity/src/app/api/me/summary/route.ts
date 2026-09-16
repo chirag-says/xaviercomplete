@@ -16,11 +16,15 @@
  * ## What it will not return
  *
  * The smallest thing that draws the control: a display name, initials, and a
- * photo URL if there is one. No batch year, no employer, no contact details, no
- * alumni id — the id is the key to `/api/photo/<id>` and the profile page, and
- * there is no reason for the header to hold one. Anything more would be a
- * second, quieter copy of the profile endpoint with none of its thought about
- * who may see what.
+ * photo URL if there is one. No batch year, no employer, no contact details.
+ * Anything more would be a second, quieter copy of the profile endpoint with
+ * none of its thought about who may see what.
+ *
+ * The caller's own alumni id does travel, inside `photoUrl`, because
+ * `/api/photo/<id>` is how an image is addressed and there is no way to point at
+ * one without it. That is the caller's own id, resolved server-side from their
+ * own session — never taken from the request — and it is already in the URL of
+ * their own profile page. What must not appear here is anybody else's.
  *
  * A signed-in alumnus with no directory record still gets `signedIn: true` with
  * no name. That is a real state — an address can be granted access before the

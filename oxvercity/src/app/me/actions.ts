@@ -8,10 +8,11 @@
  * ones in plan §6.3: twenty saves an hour, five photograph uploads a day.
  *
  * These are Next server actions, which validate the request Origin themselves.
- * The public site's middleware sets `Referrer-Policy: no-referrer`, and under
- * that policy Chrome sends `Origin: null` on a form POST — which Next parses as
- * a URL and rejects with a 500. `/me` is therefore excluded from that header in
- * middleware; see the note there.
+ * That is what middleware sends `Referrer-Policy: same-origin` rather than
+ * `no-referrer` for: under `no-referrer` Chrome serialises the Origin header of
+ * a form POST as the literal string `null`, Next parses it as a URL, and every
+ * action here returns a 500. The header is set once for the whole site — there
+ * is no per-path exception, and none is needed. See the note in middleware.ts.
  */
 
 import { revalidatePath } from 'next/cache';

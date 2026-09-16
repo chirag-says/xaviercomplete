@@ -8,11 +8,13 @@
  *
  * ## What it will not return
  *
- * The smallest thing that draws the profile tab. A name, initials, a photo URL,
- * and the caller's own alumni id. No batch year, no employer, no contact
- * details — those belong to `/me/profile`, which is the endpoint that has
- * thought about who may see what. A second, quieter copy of the profile here
- * would be a second place to get visibility wrong.
+ * The smallest thing that draws the profile tab. A name, initials, and the
+ * caller's own alumni id. No batch year, no employer, no contact details —
+ * those belong to `/me/profile`, which is the endpoint that has thought about
+ * who may see what. A second, quieter copy of the profile here would be a
+ * second place to get visibility wrong.
+ *
+ * `photoUrl` is present in the shape and always null; see the note on it below.
  *
  * The alumni id *is* included, unlike the website's version. The website's
  * header only needs to draw a circle; the app needs to know which profile is its
@@ -75,6 +77,28 @@ export async function GET(request: Request): Promise<NextResponse> {
    */
   const hasPhoto = Boolean(row && row.is_visible && row.photo_status === 'live' && row.photo_path);
 
+  /*
+   * Null until the app's photo route exists.
+   *
+   * This used to return `/api/app/v1/alumni/<id>/photo`, which has never been
+   * built — there is nothing under src/app/api/app/v1/alumni at all. The app
+   * happens not to render the field yet, so the only cost so far was a URL that
+   * 404s, but shipping a link to a route that does not exist is how a broken
+   * avatar arrives in a release nobody connected to this line.
+   *
+   * The website's `/api/photo/<id>` cannot stand in. It resolves the viewer with
+   * `currentSession()`, which reads the `__Host-` cookie, and the app carries a
+   * bearer token instead (src/lib/app-auth.ts) — so it would serve a public
+   * photograph and 404 an alumni-only one, including the caller's own.
+   *
+   * Whoever builds the app's directory endpoints should add the photo route
+   * beside them, resolving the viewer with `appSession()` and reusing
+   * `readPhotoBytes` so the audience decision stays in one place, then point
+   * this back at it. `hasPhoto` is computed above and left in place so that is a
+   * one-line change.
+   */
+  void hasPhoto;
+
   return noStore(
     NextResponse.json(
       {
@@ -82,9 +106,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         alumniId: row?.id ?? null,
         name: row?.full_name ?? null,
         initials: row ? initialsOf(row.full_name) : '',
-        // Relative: the app prefixes its own API host, and an absolute URL
-        // baked here would be wrong the moment the site moves.
-        photoUrl: hasPhoto ? `/api/app/v1/alumni/${row!.id}/photo` : null,
+        photoUrl: null,
         // A live session whose address has no directory row is a real state —
         // access can be granted before the next data load — and the app shows a
         // plain avatar rather than treating it as signed out.

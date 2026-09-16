@@ -17,6 +17,7 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/lib/admin-auth';
 import { currentAdmin, setAdminSessionCookie } from '@/lib/session-cookie';
 import { clientIpHash, userAgent } from '@/lib/request';
+import { consume, LIMITS } from '@/lib/shared';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,6 +30,7 @@ const MESSAGES: Record<string, string> = {
   missing: 'Fill in all three fields.',
   signed_out: 'You have been signed out.',
   expired: 'Your session timed out. Sign in again.',
+  throttled: 'Too many sign-in attempts from this connection. Wait an hour and try again.',
 };
 
 export default async function LoginPage({
@@ -39,7 +41,18 @@ export default async function LoginPage({
   if (await currentAdmin()) redirect('/');
 
   const { e } = await searchParams;
-  const notice = e ? MESSAGES[e] : undefined;
+  /*
+   * `Object.hasOwn`, not a bare `MESSAGES[e]`.
+   *
+   * `e` comes from the query string, and a plain object literal inherits from
+   * Object.prototype — so `/login?e=constructor` makes the bare lookup return a
+   * *function*, which React refuses to render and which turns the sign-in page
+   * into a server error for anyone handed that link. The own-property check
+   * costs nothing and the only alternative is remembering never to index an
+   * object with a string from a URL.
+   */
+  const notice = e && Object.hasOwn(MESSAGES, e) ? MESSAGES[e] : undefined;
+  const isWarning = e === 'locked' || e === 'throttled';
 
   async function attempt(formData: FormData): Promise<void> {
     'use server';
@@ -57,9 +70,32 @@ export default async function LoginPage({
       redirect('/login?e=missing');
     }
 
+    const ipHash = await clientIpHash();
+
+    /*
+     * Spent before `signIn` is called, and that ordering matters twice over.
+     *
+     * It is what makes the limit an actual limit: `signIn` runs a full Argon2id
+     * verify on every attempt including a miss — against a decoy hash when no
+     * account matches, so the timing gives nothing away — and consuming the
+     * token afterwards would mean the work is already done by the time we
+     * decline to do it.
+     *
+     * It also keeps the throttle silent about who exists. The bucket is keyed by
+     * connection and is charged before any lookup, so being throttled is a
+     * statement about this IP and never about whether that address is an admin.
+     *
+     * The per-account lockout in admin-auth.ts stays exactly as it was. Neither
+     * control replaces the other: an attacker with a botnet walks past a
+     * per-account lockout, and an attacker with one connection walks past this.
+     */
+    if (!(await consume(ipHash, LIMITS.adminSignInIpHour)).allowed) {
+      redirect('/login?e=throttled');
+    }
+
     const result = await signIn(
       { email, password, totpCode, recoveryCode },
-      { ipHash: await clientIpHash(), userAgent: await userAgent() },
+      { ipHash, userAgent: await userAgent() },
     );
 
     if (!result.ok) redirect(`/login?e=${result.reason === 'locked' ? 'locked' : 'invalid'}`);
@@ -78,7 +114,7 @@ export default async function LoginPage({
           password and a code from your authenticator.
         </p>
 
-        {notice && <div className={`notice notice--${e === 'locked' ? 'warn' : 'error'}`}>{notice}</div>}
+        {notice && <div className={`notice notice--${isWarning ? 'warn' : 'error'}`}>{notice}</div>}
 
         <form action={attempt}>
           <div className="field">

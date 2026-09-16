@@ -24,6 +24,40 @@ export interface ConnectOptions {
   application_name?: string;
 }
 
+/**
+ * Whether to demand TLS on the wire.
+ *
+ * Default true, and it has to be the default rather than something the URL
+ * carries. postgres.js reads `sslmode` from the connection string when it is
+ * there and connects in the clear when it is not, so a URL pasted from a
+ * dashboard without the parameter silently downgrades every query — and nothing
+ * about a working site would tell you.
+ *
+ * The column encryption does not cover this. Names, batch years, employers and
+ * designations are plaintext columns by design, and every bind parameter is on
+ * the wire too: session token hashes, the email blind index, the IP hash. A
+ * listener on that link reads the directory and can replay a session.
+ *
+ * `rejectUnauthorized: false` is deliberate and is the one concession. Supabase
+ * fronts the pooler with a certificate the default Node trust store does not
+ * chain to, so verification would refuse a connection that is nonetheless
+ * encrypted. This buys confidentiality against a passive listener, not
+ * authentication of the server; pinning the provider CA is the upgrade and is
+ * worth doing the day the CA is pinned anywhere else.
+ *
+ * DB_SSL=disable exists for a local Postgres on a socket, where there is no
+ * network to listen on. It must never be set in production.
+ */
+function sslSetting(): false | { rejectUnauthorized: boolean } {
+  if (process.env.DB_SSL === 'disable') {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('DB_SSL=disable is refused in production. The database connection must be encrypted.');
+    }
+    return false;
+  }
+  return { rejectUnauthorized: false };
+}
+
 export function connect(url: string, options: ConnectOptions = {}): Sql {
   if (!url) {
     throw new Error('No database URL. Set DATABASE_URL (or INGEST_DATABASE_URL for the ingest tool).');
@@ -33,6 +67,7 @@ export function connect(url: string, options: ConnectOptions = {}): Sql {
     max: options.max ?? 5,
     idle_timeout: 20,
     connect_timeout: 10,
+    ssl: sslSetting(),
     connection: { application_name: options.application_name ?? 'sxccaa' },
     // Notices are chatty and occasionally echo statement text. Nothing in this
     // system should be writing query text to a log.

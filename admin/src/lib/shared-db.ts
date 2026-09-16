@@ -27,6 +27,25 @@ export interface ConnectOptions {
   application_name?: string;
 }
 
+/**
+ * Whether to demand TLS on the wire. Mirrors oxvercity/src/lib/db.ts; see the
+ * full reasoning there.
+ *
+ * The short version: postgres.js connects in the clear unless the URL carries
+ * `sslmode`, so leaving this to the connection string means a URL pasted from a
+ * dashboard silently downgrades every query. This portal decrypts every contact
+ * number it displays, so the plaintext is on this link too.
+ */
+function sslSetting(): false | { rejectUnauthorized: boolean } {
+  if (process.env.DB_SSL === 'disable') {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('DB_SSL=disable is refused in production. The database connection must be encrypted.');
+    }
+    return false;
+  }
+  return { rejectUnauthorized: false };
+}
+
 export function connect(url: string, options: ConnectOptions = {}): Sql {
   if (!url) {
     throw new Error('No database URL. Set DATABASE_URL (or INGEST_DATABASE_URL for the ingest tool).');
@@ -36,6 +55,7 @@ export function connect(url: string, options: ConnectOptions = {}): Sql {
     max: options.max ?? 5,
     idle_timeout: 20,
     connect_timeout: 10,
+    ssl: sslSetting(),
     connection: { application_name: options.application_name ?? 'sxccaa' },
     // Notices are chatty and occasionally echo statement text. Nothing in this
     // system should be writing query text to a log.
