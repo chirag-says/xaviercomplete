@@ -21,9 +21,31 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '10mb',
     },
   },
-  // All shared modules now live inside this app's own source tree, so tracing
-  // from __dirname (the default) is sufficient. The old `join(__dirname, '..')`
-  // was required when src/lib/shared.ts reached into ../oxvercity.
+  /*
+   * Trace from this directory, and never let Next guess.
+   *
+   * The comment that used to sit here said tracing from `__dirname` was "the
+   * default". It is not. When `outputFileTracingRoot` is unset, Next walks
+   * upwards looking for lockfiles and infers a workspace root from what it
+   * finds — and this repository has three (admin, mobile, oxvercity), so it
+   * finds several, warns that it may have guessed wrong, and picks one.
+   *
+   * On a developer machine that guess was `D:\bun.lock`, i.e. the **drive
+   * root**. On a deploy host it is whatever sits above the checkout. Either way
+   * Next then tries to trace file dependencies across that entire tree —
+   * oxvercity, mobile, .git, every sibling node_modules — which on a build
+   * container with a memory cap means minutes of file I/O and then the process
+   * being killed. No error, no output, nothing in the log to explain it,
+   * because the build never reached the point of having anything to say.
+   *
+   * That is exactly the failure this portal hit on Hostinger while the public
+   * site deployed fine: oxvercity/next.config.ts has set this since it was
+   * written, and this file never did.
+   *
+   * `__dirname` is correct here because every shared module now lives inside
+   * this app's own source tree. Nothing under src/ reaches into ../oxvercity.
+   */
+  outputFileTracingRoot: __dirname,
   // The portal renders no user-supplied images in Phase 5; photo moderation in
   // Phase 6 streams through a route handler rather than the optimiser.
   images: { unoptimized: true },
