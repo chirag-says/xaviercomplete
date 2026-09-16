@@ -36,6 +36,9 @@ import { assertReportIsClean, writeReport, type RunReport } from './report.ts';
 import { readSheet } from './workbook.ts';
 import { validateSheet } from './validate.ts';
 
+/** How a nameless record reads in the dry-run report an operator scans. */
+const NO_NAME = '(no name)';
+
 const DEFAULT_PORT = 4317;
 
 function die(message: string): never {
@@ -78,7 +81,7 @@ function renderTerminal(preview: Preview, sheetName: string, rejected: number, w
           ? 'all fields'
           : entry.changes.map((c) => `${c.label}: ${c.from} → ${c.to}`).join('; ') || '—';
       lines.push(
-        `  ${pad(String(entry.rowNumber), 6)}${pad(entry.kind, 10)}${pad(entry.name, 30)}${pad(String(entry.batchYear), 7)}${summary}`,
+        `  ${pad(String(entry.rowNumber), 6)}${pad(entry.kind, 10)}${pad(entry.name ?? NO_NAME, 30)}${pad(entry.batchYear?.toString() ?? "—", 7)}${summary}`,
       );
       for (const skip of entry.skipped) {
         lines.push(`  ${' '.repeat(53)}skipped ${skip.label} (theirs: ${skip.from})`);
@@ -104,8 +107,8 @@ function page(preview: Preview, token: string, applied: string | null): string {
       (entry) => `<tr>
         <td>${entry.rowNumber}</td>
         <td><span class="k k-${entry.kind}">${entry.kind}</span></td>
-        <td>${esc(entry.name)}</td>
-        <td>${entry.batchYear}</td>
+        <td>${esc(entry.name ?? NO_NAME)}</td>
+        <td>${entry.batchYear ?? "—"}</td>
         <td>${
           entry.kind === 'insert'
             ? '<em>all fields</em>'

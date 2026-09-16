@@ -75,8 +75,8 @@ async function demoRecords(): Promise<AlumniRecord[]> {
  */
 interface PublicDbRow {
   id: string;
-  full_name: string;
-  batch_year: number;
+  full_name: string | null;
+  batch_year: number | null;
   stream: string | null;
   current_org: string | null;
   designation: string | null;
@@ -104,6 +104,14 @@ function toPublicRow(row: PublicDbRow): PublicRow {
  * owner has withdrawn (plan §7.1) must never be loaded, not merely never
  * rendered. Ordering matches the `alumni_directory` index — newest batch first,
  * then alphabetical — so the query is an index scan rather than a sort.
+ *
+ * `nulls last` on both keys is load-bearing, and must stay in step with the
+ * index definition in migration 0014. Postgres orders DESC as NULLS FIRST by
+ * default, so once `batch_year` became nullable the plain `order by batch_year
+ * desc` would have put every record missing a year at the **top of the public
+ * directory** — the worst possible place for the least complete entries. Change
+ * this and you must change the index, or the sort silently stops being an index
+ * scan.
  */
 export async function listPublicAlumni(
   viewer: ViewerTier,
@@ -117,7 +125,7 @@ export async function listPublicAlumni(
                  photo_audience, photo_status
             from alumni
            where is_visible
-           order by batch_year desc, full_name
+           order by batch_year desc nulls last, full_name nulls last
         `
       ).map(toPublicRow);
 

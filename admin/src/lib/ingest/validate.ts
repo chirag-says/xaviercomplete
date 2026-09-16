@@ -13,8 +13,10 @@ import type { ColumnMap, FieldKey } from './columns.ts';
 /** A row that is safe to encrypt and store. */
 export interface ValidRow {
   rowNumber: number;
-  fullName: string;
-  batchYear: number;
+  /** Null when the row had no name. Migration 0014 allows the column to be null. */
+  fullName: string | null;
+  /** Null when no readable four-digit year was in the cell. */
+  batchYear: number | null;
   stream: string | null;
   currentOrg: string | null;
   designation: string | null;
@@ -39,12 +41,25 @@ export interface ValidationOutcome {
   warnings: RowProblem[];
 }
 
+/**
+ * Ceilings, raised in step with migration 0014.
+ *
+ * These are not opinions about how long a job title ought to be. They exist so
+ * a spreadsheet cannot push unbounded text into the database, and the old
+ * numbers were set from a guess rather than from the sheet: a 240-character
+ * designation is somebody with a long role at an organisation with a long name,
+ * and under the previous 200 it lost their entire row.
+ *
+ * Must not exceed the CHECK constraints in 0014, or a row passes here and then
+ * fails at the insert with a message naming a constraint the operator has never
+ * heard of.
+ */
 const MAX_LENGTHS: Partial<Record<FieldKey, number>> = {
-  fullName: 120,
-  stream: 120,
-  currentOrg: 200,
-  designation: 200,
-  previousRole: 400,
+  fullName: 200,
+  stream: 200,
+  currentOrg: 500,
+  designation: 500,
+  previousRole: 1000,
   otherInfo: 4000,
 };
 
@@ -65,15 +80,39 @@ function cellText(row: unknown[], index: number | undefined): string {
   return String(value);
 }
 
-function optionalText(row: unknown[], index: number | undefined, field: FieldKey): { value: string | null; problem?: string } {
+/**
+ * Read one optional cell.
+ *
+ * ## Over-length truncates; it does not reject
+ *
+ * This used to return a `problem`, which the caller turned into a rejection —
+ * so one cell four characters past its ceiling discarded the whole person,
+ * including the email address that would have let them sign in and correct it.
+ * That is the wrong trade for a Form export filled in by five hundred people
+ * over several years.
+ *
+ * Now the value is cut to the limit and the caller is handed a `warning`. The
+ * operator sees exactly which rows were shortened and by how much in the import
+ * preview, and can widen the sheet or edit the record afterwards. Data that
+ * arrives slightly clipped beats data that never arrives.
+ */
+function optionalText(
+  row: unknown[],
+  index: number | undefined,
+  field: FieldKey,
+): { value: string | null; warning?: string } {
   const raw = cellText(row, index).trim();
   if (BLANKISH.has(raw.toLowerCase())) return { value: null };
 
+  const collapsed = raw.replace(/\s+/g, ' ');
   const limit = MAX_LENGTHS[field];
-  if (limit && raw.length > limit) {
-    return { value: null, problem: `longer than ${limit} characters (${raw.length})` };
+  if (limit && collapsed.length > limit) {
+    return {
+      value: collapsed.slice(0, limit),
+      warning: `${collapsed.length} characters — kept the first ${limit}, the rest was cut`,
+    };
   }
-  return { value: raw.replace(/\s+/g, ' ') };
+  return { value: collapsed };
 }
 
 export function parseBatchYear(raw: string, now = new Date()): { year: number } | { reason: string } {
@@ -102,16 +141,37 @@ function parseTimestamp(raw: string): Date | null {
 export function validateRow(row: unknown[], map: ColumnMap, rowNumber: number): { ok: true; row: ValidRow; warnings: RowProblem[] } | { ok: false; problems: RowProblem[] } {
   const problems: RowProblem[] = [];
   const warnings: RowProblem[] = [];
-  const problem = (field: FieldKey | 'row', reason: string) => problems.push({ rowNumber, field, reason });
   const warn = (field: FieldKey | 'row', reason: string) => warnings.push({ rowNumber, field, reason });
 
+  /*
+   * Nothing below rejects a row any more.
+   *
+   * `fullName` and `batchYear` used to be required here, and between them they
+   * were the only two rejections this function ever produced. A blank name cell
+   * or a year written as "Batch of '04" threw away the entire person — name,
+   * employer, phone number, and the email address that was the one thing worth
+   * having, because it is what lets them sign in and fix the rest themselves.
+   *
+   * Migration 0014 made both columns nullable so the record can exist with a
+   * gap in it. Everything that displays a record is responsible for rendering
+   * that gap honestly; see `displayName` in oxvercity/src/lib/visibility.ts.
+   *
+   * `problems` is kept rather than deleted. It is the mechanism by which a row
+   * can be refused, and a future rule that genuinely must refuse one — say, a
+   * value that cannot be stored at all — should use it. Today nothing does.
+   */
   const nameCell = optionalText(row, map.fullName, 'fullName');
-  if (nameCell.problem) problem('fullName', nameCell.problem);
-  if (!nameCell.value) problem('fullName', 'missing');
+  if (nameCell.warning) warn('fullName', nameCell.warning);
+  if (!nameCell.value) warn('fullName', 'no name in this row — imported without one');
 
   const batchRaw = cellText(row, map.batchYear);
   const batch = parseBatchYear(batchRaw);
-  if ('reason' in batch) problem('batchYear', batch.reason);
+  const batchYear = 'year' in batch ? batch.year : null;
+  if (batchYear === null) {
+    // The reason still travels, because "empty" and "no four-digit year found
+    // in 'Batch of 04'" send the operator to different fixes.
+    warn('batchYear', `${(batch as { reason: string }).reason} — imported without a batch year`);
+  }
 
   const stream = optionalText(row, map.stream, 'stream');
   const currentOrg = optionalText(row, map.currentOrg, 'currentOrg');
@@ -122,7 +182,7 @@ export function validateRow(row: unknown[], map: ColumnMap, rowNumber: number): 
     ['stream', stream], ['currentOrg', currentOrg], ['designation', designation],
     ['previousRole', previousRole], ['otherInfo', otherInfo],
   ] as const) {
-    if (cell.problem) problem(field, cell.problem);
+    if (cell.warning) warn(field, cell.warning);
   }
 
   const phone = normalisePhone(cellText(row, map.contact));
@@ -148,8 +208,8 @@ export function validateRow(row: unknown[], map: ColumnMap, rowNumber: number): 
     warnings,
     row: {
       rowNumber,
-      fullName: nameCell.value!,
-      batchYear: (batch as { year: number }).year,
+      fullName: nameCell.value,
+      batchYear,
       stream: stream.value,
       currentOrg: currentOrg.value,
       designation: designation.value,

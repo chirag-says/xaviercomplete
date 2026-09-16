@@ -30,18 +30,18 @@ import { NextResponse } from 'next/server';
 
 import { appError, appSession, noStore } from '@/lib/app-api';
 import { db } from '@/lib/db';
+import { initialsOf } from '@/lib/visibility';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/** "Priya Menon" → "PM". The fallback when there is no photograph. */
-function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '';
-  const first = parts[0]![0] ?? '';
-  const last = parts.length > 1 ? (parts[parts.length - 1]![0] ?? '') : '';
-  return (first + last).toUpperCase();
-}
+/*
+ * `initialsOf` is imported rather than defined here. It was a local copy in this
+ * file and another in /api/me/summary/route.ts, both typed `string` — which
+ * would have thrown on a record with no name once migration 0014 allowed one.
+ * The shared version in lib/visibility.ts takes a nullable name and returns null
+ * when there is nothing to work from.
+ */
 
 export async function GET(request: Request): Promise<NextResponse> {
   const sql = db();
@@ -60,7 +60,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   const rows = await sql<
-    Array<{ id: string; full_name: string; photo_path: string | null; photo_status: string; is_visible: boolean }>
+    Array<{ id: string; full_name: string | null; photo_path: string | null; photo_status: string; is_visible: boolean }>
   >`
     select id, full_name, photo_path, photo_status, is_visible
       from alumni where gmail_hmac = ${session.emailHmac} limit 1
@@ -105,7 +105,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         signedIn: true,
         alumniId: row?.id ?? null,
         name: row?.full_name ?? null,
-        initials: row ? initialsOf(row.full_name) : '',
+        initials: initialsOf(row?.full_name ?? null) ?? '',
         photoUrl: null,
         // A live session whose address has no directory row is a real state —
         // access can be granted before the next data load — and the app shows a

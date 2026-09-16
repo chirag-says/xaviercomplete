@@ -36,18 +36,20 @@ import { NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
 import { currentSession } from '@/lib/session-cookie';
+import { initialsOf } from '@/lib/visibility';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/** "Priya Menon" → "PM". The fallback when there is no photograph. */
-function initialsOf(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '';
-  const first = parts[0]![0] ?? '';
-  const last = parts.length > 1 ? (parts[parts.length - 1]![0] ?? '') : '';
-  return (first + last).toUpperCase();
-}
+/*
+ * `initialsOf` used to be a local copy here and another in
+ * /api/app/v1/me/route.ts. Both took `string` and would have thrown on a record
+ * with no name once migration 0014 made that possible. It now lives in
+ * lib/visibility.ts alongside `displayName`, takes a nullable name, and returns
+ * null when there is nothing to take initials from — so the avatar falls back
+ * to a silhouette rather than showing "NP", which would read as somebody's
+ * actual initials.
+ */
 
 export async function GET(): Promise<NextResponse> {
   const session = await currentSession();
@@ -61,7 +63,7 @@ export async function GET(): Promise<NextResponse> {
 
   const sql = db();
   const rows = await sql<
-    Array<{ id: string; full_name: string; photo_path: string | null; photo_status: string; is_visible: boolean }>
+    Array<{ id: string; full_name: string | null; photo_path: string | null; photo_status: string; is_visible: boolean }>
   >`
     select id, full_name, photo_path, photo_status, is_visible
       from alumni where gmail_hmac = ${session.emailHmac} limit 1
@@ -83,7 +85,7 @@ export async function GET(): Promise<NextResponse> {
     {
       signedIn: true,
       name: row?.full_name ?? null,
-      initials: row ? initialsOf(row.full_name) : '',
+      initials: initialsOf(row?.full_name ?? null) ?? '',
       // The owner always sees their own photograph, whatever audience they have
       // set it to — `readPhotoBytes` makes the same exception for the same
       // reason, so an alumni-only picture still renders here.

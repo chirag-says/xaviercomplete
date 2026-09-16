@@ -1,0 +1,7 @@
+# Migrations are checksummed by tools/db/migrate.ts, and the checksum is taken
+# over the file's bytes. With core.autocrlf=true Git rewrites these to CRLF on
+# checkout while `schema_migration` holds the LF checksums recorded when they
+# were applied — so every migration reads as "edited since it was applied", and
+# `db:migrate` refuses to run at the first one. Pinning them to LF makes the
+# working copy match what Git stores and what the database recorded.
+oxvercity/db/migrations/*.sql text eol=lf

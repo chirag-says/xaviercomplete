@@ -18,7 +18,7 @@
  */
 
 import { DEMO_BADGE } from '@/data/alumni';
-import type { PublicAlumnus } from '@/lib/visibility';
+import { displayName, type PublicAlumnus } from '@/lib/visibility';
 
 const AVATAR = '/svg/alumni-avatar.svg';
 
@@ -43,7 +43,8 @@ function CardInner({ person, isDemo, isVerified }: { person: PublicAlumnus; isDe
         />
         <div className="al-card__tags">
           {isDemo && <span className="al-card__tag al-card__tag--demo">{DEMO_BADGE}</span>}
-          <span className="al-card__tag">Class of {person.batchYear}</span>
+          {/* No year, no tag. "Class of null" is worse than an absent chip. */}
+          {person.batchYear !== null && <span className="al-card__tag">Class of {person.batchYear}</span>}
         </div>
 
         {/* Verified only — see the note at the top of this file. */}
@@ -59,7 +60,9 @@ function CardInner({ person, isDemo, isVerified }: { person: PublicAlumnus; isDe
       </div>
 
       <div className="al-card__body">
-        <h3 className="al-card__name">{person.fullName}</h3>
+        <h3 className={`al-card__name${person.fullName ? '' : ' al-card__name--unknown'}`}>
+          {displayName(person.fullName)}
+        </h3>
         {role && <p className="al-card__meta">{role}</p>}
         {person.stream && <p className="al-card__meta al-card__meta--dim">{person.stream}</p>}
       </div>

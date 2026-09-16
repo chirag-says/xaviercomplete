@@ -45,7 +45,10 @@ export default async function AlumniPage() {
   // directory — see the note in AlumniHero.
   const stats = {
     total: people.length,
-    batches: new Set(people.map((person) => person.batchYear)).size,
+    // `filter` before the Set, matching what streams already does. Without it a
+    // record with no batch year counts as a batch of its own, so the hero would
+    // claim one more graduating year than the Association has.
+    batches: new Set(people.map((person) => person.batchYear).filter((year) => year !== null)).size,
     streams: new Set(people.map((person) => person.stream).filter(Boolean)).size,
   };
 

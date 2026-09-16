@@ -23,11 +23,26 @@ import type { PublicAlumnus } from '@/lib/visibility';
 
 const EMPTY: Record<FilterKey, string> = { batchYear: '', stream: '' };
 
+/*
+ * `?? ''` rather than `String(...)` on the year.
+ *
+ * A null batch year through `String()` becomes the literal text "null", which
+ * then flows into `unique()` — where it survives the `filter(Boolean)` because
+ * "null" is a non-empty string — and ends up as a selectable option in the
+ * batch dropdown. Empty string is the value this file already uses for "no
+ * value", and `unique` drops it.
+ */
 const valueOf = (person: PublicAlumnus, key: FilterKey): string =>
-  key === 'batchYear' ? String(person.batchYear) : (person.stream ?? '');
+  key === 'batchYear' ? (person.batchYear?.toString() ?? '') : (person.stream ?? '');
 
 const haystack = (person: PublicAlumnus) =>
-  [person.fullName, person.currentOrg, person.designation, person.stream, String(person.batchYear)]
+  [
+    person.fullName,
+    person.currentOrg,
+    person.designation,
+    person.stream,
+    person.batchYear?.toString() ?? null,
+  ]
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
@@ -51,7 +66,7 @@ export function AlumniDiscover({
   // directory.
   const filterOptions = useMemo(
     () => ({
-      batchYear: unique(people.map((person) => String(person.batchYear))).reverse(),
+      batchYear: unique(people.map((person) => person.batchYear?.toString() ?? '')).reverse(),
       stream: unique(people.map((person) => person.stream ?? '')),
     }),
     [people],

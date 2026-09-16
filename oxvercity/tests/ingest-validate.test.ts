@@ -40,11 +40,19 @@ function valid(overrides: Partial<Record<number, unknown>> = {}) {
   return result;
 }
 
-function rejectedFor(overrides: Partial<Record<number, unknown>>, field: string) {
+/**
+ * The row still validates; this returns the warning raised against `field`.
+ *
+ * There is deliberately no `rejectedFor` helper any more. `validateRow` no
+ * longer refuses a row for a missing name, an unreadable year or an over-length
+ * cell — migration 0014 made the first two nullable and the third truncates —
+ * so a helper that asserted `!result.ok` would have nothing left to assert.
+ */
+function warningFor(overrides: Partial<Record<number, unknown>>, field: string) {
   const result = validateRow(row(overrides), MAP, 7);
-  assert.ok(!result.ok, 'expected the row to be rejected');
-  const hit = result.problems.find((problem) => problem.field === field);
-  assert.ok(hit, `expected a problem on ${field}, got ${JSON.stringify(result.problems)}`);
+  assert.ok(result.ok, 'expected the row to be imported, not rejected');
+  const hit = result.warnings.find((warning) => warning.field === field);
+  assert.ok(hit, `expected a warning on ${field}, got ${JSON.stringify(result.warnings)}`);
   return hit.reason;
 }
 
@@ -86,19 +94,49 @@ describe('validateRow — a clean row', () => {
   });
 });
 
-describe('validateRow — rejections stop the row', () => {
-  it('requires a name', () => {
-    assert.equal(rejectedFor({ 2: '   ' }, 'fullName'), 'missing');
+describe('validateRow — an incomplete row is imported, not discarded', () => {
+  /*
+   * These four assertions are the whole point of migration 0014, and they are
+   * the inverse of what this file used to say.
+   *
+   * Each of these rows was previously thrown away in full — taking with it the
+   * email address that is the one thing worth having, because it is what lets
+   * the person sign in and fix everything else themselves. A directory entry
+   * with a gap beats no directory entry.
+   */
+  it('keeps a row with no name, and says so', () => {
+    const { row: record } = valid({ 2: '   ' });
+    assert.equal(record.fullName, null, 'stored as null, never as a placeholder string');
+    assert.match(warningFor({ 2: '   ' }, 'fullName'), /no name in this row/);
   });
 
-  it('requires a year it can actually read', () => {
-    assert.match(rejectedFor({ 3: 'second batch' }, 'batchYear'), /no four-digit year/);
-    assert.match(rejectedFor({ 3: '' }, 'batchYear'), /empty/);
-    assert.match(rejectedFor({ 3: '1823' }, 'batchYear'), /outside 1900/);
+  it('keeps a row whose year cannot be read, and says why', () => {
+    assert.equal(valid({ 3: 'second batch' }).row.batchYear, null);
+    assert.match(warningFor({ 3: 'second batch' }, 'batchYear'), /no four-digit year/);
+    assert.match(warningFor({ 3: '' }, 'batchYear'), /empty/);
   });
 
-  it('rejects a field longer than the column allows', () => {
-    assert.match(rejectedFor({ 2: 'x'.repeat(200) }, 'fullName'), /longer than 120/);
+  it('refuses an impossible year rather than storing it', () => {
+    // Missing and wrong are different. A year outside the range is a wrong
+    // value, and storing it would put a false claim on a public page — so it
+    // becomes a gap, not a guess.
+    assert.equal(valid({ 3: '1823' }).row.batchYear, null);
+    assert.match(warningFor({ 3: '1823' }, 'batchYear'), /outside 1900/);
+  });
+
+  it('truncates an over-length field instead of dropping the person', () => {
+    const { row: record } = valid({ 2: 'x'.repeat(250) });
+    assert.equal(record.fullName?.length, 200, 'cut to the column ceiling');
+    assert.match(warningFor({ 2: 'x'.repeat(250) }, 'fullName'), /250 characters — kept the first 200/);
+  });
+
+  it('accepts the longer designation and organisation the sheet actually contains', () => {
+    // The 200-character ceiling was the single largest source of lost rows:
+    // a long job title at an organisation with a long name exceeded it, and the
+    // whole person went with it.
+    const { row: record } = valid({ 5: 'y'.repeat(480), 6: 'z'.repeat(480) });
+    assert.equal(record.currentOrg?.length, 480, 'well within the new 500');
+    assert.equal(record.designation?.length, 480);
   });
 });
 
@@ -152,13 +190,23 @@ describe('parseBatchYear', () => {
 });
 
 describe('validateSheet', () => {
-  it('separates valid rows, rejections and warnings', () => {
+  it('imports every row it is given and reports the gaps as warnings', () => {
     const outcome = validateSheet(
-      [row(), row({ 2: '' }), row({ 9: 'placeholder.three@gmail.com', 8: 'nonsense' })],
+      [
+        row(),
+        // Its own address on purpose: sharing the default one would make these
+        // two the same person and the dedupe below would collapse them, which
+        // is a different behaviour from the one under test here.
+        row({ 2: '', 9: 'placeholder.two@gmail.com' }),
+        row({ 9: 'placeholder.three@gmail.com', 8: 'nonsense' }),
+      ],
       MAP,
     );
-    assert.equal(outcome.valid.length, 2);
-    assert.equal(outcome.rejected.length, 1);
+    // Three rows in, three rows out. The middle one has no name; it used to be
+    // the rejection this test was named after.
+    assert.equal(outcome.valid.length, 3);
+    assert.equal(outcome.rejected.length, 0, 'nothing rejects a row any more');
+    assert.ok(outcome.warnings.some((w) => w.field === 'fullName'));
     assert.ok(outcome.warnings.some((w) => w.field === 'contact'));
   });
 
@@ -192,7 +240,11 @@ describe('validateSheet', () => {
   });
 
   it('numbers rows the way Excel does, so the operator can find them', () => {
+    // Asserted on a warning rather than a rejection now, but the property under
+    // test is the same and still matters: a report that says "row 2" has to
+    // mean the second line of the operator's spreadsheet, header included.
     const outcome = validateSheet([row({ 2: '' })], MAP);
-    assert.equal(outcome.rejected[0]!.rowNumber, 2, 'row 1 is the header');
+    assert.equal(outcome.warnings[0]!.rowNumber, 2, 'row 1 is the header');
+    assert.equal(outcome.valid[0]!.rowNumber, 2);
   });
 });

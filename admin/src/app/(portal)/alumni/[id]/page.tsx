@@ -41,13 +41,18 @@ export default async function AlumniRecordPage({ params }: { params: Promise<{ i
   const [person, fresh] = await Promise.all([readAlumni(id), canActNow()]);
   if (!person) notFound();
 
+  // One label for every sentence on this page that names the record. A nameless
+  // record still has to be referable to in a confirmation prompt, and its id is
+  // the thing that is unique and on screen.
+  const label = person.fullName ?? `this record (${person.id})`;
+
   return (
     <>
       <div className="main__head">
         <p className="eyebrow">
           <a href="/alumni">Alumni records</a> · {person.id}
         </p>
-        <h1>{person.fullName}</h1>
+        <h1>{label}</h1>
         <div className="row" style={{ marginTop: 8 }}>
           {person.isVisible ? (
             <span className="badge badge--good">Listed in the directory</span>
@@ -107,7 +112,7 @@ export default async function AlumniRecordPage({ params }: { params: Promise<{ i
                   variant="danger"
                   inline
                   hidden={{ alumniId: person.id }}
-                  confirmText={`Remove ${person.fullName}'s photograph? The image is deleted, they are told the Association removed it, and they can upload another straight away.`}
+                  confirmText={`Remove the photograph on ${label}? The image is deleted, they are told the Association removed it, and they can upload another straight away.`}
                 />
               </div>
             </>
@@ -159,35 +164,53 @@ export default async function AlumniRecordPage({ params }: { params: Promise<{ i
         </div>
 
         <ActionForm action={updateAlumni} submitLabel="Save record" variant="primary" hidden={{ id: person.id }}>
+          {/* `required` is gone from both of these, and the empty defaults are
+              the point: a record imported from a ragged spreadsheet row may have
+              neither. Marking them required would mean an admin could not save a
+              correction to somebody's employer without first inventing a name. */}
           <div className="field">
             <label htmlFor="fullName">Full name</label>
-            <input id="fullName" name="fullName" defaultValue={person.fullName} maxLength={120} required />
+            <input
+              id="fullName"
+              name="fullName"
+              defaultValue={person.fullName ?? ''}
+              maxLength={200}
+              placeholder="Not recorded"
+            />
           </div>
 
           <div className="row" style={{ alignItems: 'flex-start' }}>
             <div className="field" style={{ flex: '0 1 160px', marginTop: 14 }}>
               <label htmlFor="batchYear">Batch year</label>
-              <input id="batchYear" name="batchYear" type="number" min={1900} max={2100} defaultValue={person.batchYear} required />
+              <input
+                id="batchYear"
+                name="batchYear"
+                type="number"
+                min={1900}
+                max={2100}
+                defaultValue={person.batchYear ?? ''}
+                placeholder="—"
+              />
             </div>
             <div className="field" style={{ flex: '1 1 220px', marginTop: 14 }}>
               <label htmlFor="stream">Stream of study</label>
-              <input id="stream" name="stream" defaultValue={person.stream ?? ''} maxLength={120} />
+              <input id="stream" name="stream" defaultValue={person.stream ?? ''} maxLength={200} />
             </div>
           </div>
 
           <div className="field">
             <label htmlFor="currentOrg">Current organisation</label>
-            <input id="currentOrg" name="currentOrg" defaultValue={person.currentOrg ?? ''} maxLength={200} />
+            <input id="currentOrg" name="currentOrg" defaultValue={person.currentOrg ?? ''} maxLength={500} />
           </div>
 
           <div className="field">
             <label htmlFor="designation">Designation and role</label>
-            <input id="designation" name="designation" defaultValue={person.designation ?? ''} maxLength={200} />
+            <input id="designation" name="designation" defaultValue={person.designation ?? ''} maxLength={500} />
           </div>
 
           <div className="field">
             <label htmlFor="previousRole">Previous organisation / role</label>
-            <input id="previousRole" name="previousRole" defaultValue={person.previousRole ?? ''} maxLength={400} />
+            <input id="previousRole" name="previousRole" defaultValue={person.previousRole ?? ''} maxLength={1000} />
           </div>
 
           {/*
@@ -232,7 +255,7 @@ export default async function AlumniRecordPage({ params }: { params: Promise<{ i
 
           <div className="field">
             <label htmlFor="otherInfo">Other information</label>
-            <textarea id="otherInfo" name="otherInfo" defaultValue={person.otherInfo ?? ''} maxLength={2000} />
+            <textarea id="otherInfo" name="otherInfo" defaultValue={person.otherInfo ?? ""} maxLength={4000} />
             <p className="hint">Free text the alumnus supplied. Blank clears it.</p>
           </div>
         </ActionForm>
@@ -260,8 +283,8 @@ export default async function AlumniRecordPage({ params }: { params: Promise<{ i
             hidden={{ id: person.id, visible: person.isVisible ? 'false' : 'true' }}
             confirmText={
               person.isVisible
-                ? `Archive ${person.fullName}? They disappear from the public directory immediately.`
-                : `Restore ${person.fullName} to the directory?`
+                ? `Archive ${label}? They disappear from the public directory immediately.`
+                : `Restore ${label} to the directory?`
             }
           />
 
@@ -305,11 +328,11 @@ export default async function AlumniRecordPage({ params }: { params: Promise<{ i
           submitLabel="Delete this record for good"
           variant="danger"
           hidden={{ id: person.id }}
-          confirmText={`Permanently delete ${person.fullName}? There is no undo.`}
+          confirmText={`Permanently delete ${label}? There is no undo.`}
         >
           <div className="field" style={{ maxWidth: 380 }}>
             <label htmlFor="confirmName">
-              Type <strong>{person.fullName}</strong> to confirm
+              Type <strong>{person.fullName ?? person.id}</strong> to confirm
             </label>
             <input id="confirmName" name="confirmName" autoComplete="off" required />
           </div>

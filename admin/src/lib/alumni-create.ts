@@ -27,8 +27,13 @@ import {
 
 /** The fields an administrator supplies. Everything else is derived or defaulted. */
 export interface NewAlumnus {
-  fullName: string;
-  batchYear: number;
+  /**
+   * Null when unknown. Migration 0014 made the column nullable so a spreadsheet
+   * row with a blank name cell still imports rather than being discarded whole.
+   */
+  fullName: string | null;
+  /** Null when the sheet held no readable year. */
+  batchYear: number | null;
   stream: string | null;
   currentOrg: string | null;
   designation: string | null;
@@ -48,13 +53,20 @@ export type CreateOutcome =
   | { ok: true; id: string }
   | { ok: false; field: keyof NewAlumnus | 'duplicate'; message: string };
 
+/**
+ * Must match the CHECK constraints in migration 0014, and the ceilings in
+ * src/lib/ingest/validate.ts. Three copies of the same numbers is two too many,
+ * but the database's are the ones that actually bind: if these ever exceed
+ * them, a record passes validation here and fails at the insert with a message
+ * naming a constraint nobody recognises.
+ */
 const LIMITS = {
-  fullName: 120,
-  stream: 120,
-  currentOrg: 200,
-  designation: 200,
-  previousRole: 400,
-  otherInfo: 2000,
+  fullName: 200,
+  stream: 200,
+  currentOrg: 500,
+  designation: 500,
+  previousRole: 1000,
+  otherInfo: 4000,
   consentNote: 500,
 } as const;
 
@@ -74,13 +86,28 @@ function clamp(value: string | null, max: number): string | null {
 export function validateNewAlumnus(
   input: NewAlumnus,
 ): { ok: true; clean: NewAlumnus & { contact: string | null; email: string | null } } | { ok: false; field: keyof NewAlumnus; message: string } {
+  /*
+   * Neither a name nor a batch year is required.
+   *
+   * They were, and between them they rejected more spreadsheet rows than
+   * everything else combined — a blank name cell or a year the parser could not
+   * read discarded the whole person, email address included. Migration 0014
+   * made both columns nullable; this is the code half of the same decision.
+   *
+   * A year that is *present but impossible* is still refused. "1823" is not a
+   * gap in the data, it is a wrong value, and storing it would put a false
+   * claim on a public page. Missing and wrong are different things.
+   */
   const fullName = clamp(input.fullName, LIMITS.fullName);
-  if (!fullName) {
-    return { ok: false, field: 'fullName', message: 'A name is required.' };
-  }
 
-  if (!Number.isInteger(input.batchYear) || input.batchYear < 1900 || input.batchYear > 2100) {
-    return { ok: false, field: 'batchYear', message: 'Batch year must be a four-digit year between 1900 and 2100.' };
+  if (input.batchYear !== null) {
+    if (!Number.isInteger(input.batchYear) || input.batchYear < 1900 || input.batchYear > 2100) {
+      return {
+        ok: false,
+        field: 'batchYear',
+        message: 'Batch year must be a four-digit year between 1900 and 2100, or left empty.',
+      };
+    }
   }
 
   // A number that cannot be normalised is refused rather than stored as typed.

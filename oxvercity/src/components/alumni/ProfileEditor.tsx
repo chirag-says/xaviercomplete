@@ -276,8 +276,20 @@ export function ProfileEditor({ profile }: { profile: OwnAlumnus }) {
           Email the Association if any of these is wrong and an administrator will correct it.
         </p>
 
-        <Locked label="Full name" value={profile.fullName} why="Identity — changed by the Association only" />
-        <Locked label="Batch / year of passing" value={String(profile.batchYear)} why="Identity — changed by the Association only" />
+        {/* "Not recorded" rather than the public-facing "Name not provided":
+            this is the owner reading their own record, and what they need to
+            know is that the Association is missing it, not how a stranger sees
+            it. The `why` line below already tells them who can fix it. */}
+        <Locked
+          label="Full name"
+          value={profile.fullName ?? 'Not recorded'}
+          why="Identity — changed by the Association only"
+        />
+        <Locked
+          label="Batch / year of passing"
+          value={profile.batchYear?.toString() ?? 'Not recorded'}
+          why="Identity — changed by the Association only"
+        />
         <Locked label="Stream of study" value={profile.stream ?? 'Not recorded'} why="Identity — changed by the Association only" />
         <Locked
           label="Sign-in address"

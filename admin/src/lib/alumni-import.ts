@@ -43,6 +43,20 @@ import { invitationEmail, mailConfig, send } from './shared-email.ts';
 /** Same cap as a photograph. A spreadsheet of five hundred rows is well under a megabyte. */
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
+/** How a nameless record is referred to in a report the operator reads. */
+const UNNAMED = '(no name in the sheet)';
+
+/**
+ * What to call a row in the preview and the result summary.
+ *
+ * Reports are read by a person deciding what to fix, so a nameless row has to
+ * be identifiable by something. The row number is the thing they can act on —
+ * they can open the spreadsheet at that line — so it is what they get.
+ */
+function labelFor(row: { fullName: string | null; rowNumber: number }): string {
+  return row.fullName ?? `${UNNAMED} — row ${row.rowNumber}`;
+}
+
 /** Enough for several graduating years at once, small enough to parse in one request. */
 export const MAX_IMPORT_ROWS = 2000;
 
@@ -133,17 +147,30 @@ export async function previewImport(
   const withoutLoginRows = outcome.valid.filter((row) => !row.loginEmail);
 
   if (withoutLoginRows.length > 0) {
-    const existing = await sql<Array<{ full_name: string; batch_year: number }>>`
-      select full_name, batch_year from alumni where gmail_hmac is null
+    const existing = await sql<Array<{ full_name: string | null; batch_year: number | null }>>`
+      select full_name, batch_year from alumni where gmail_hmac is null and full_name is not null
     `;
-    const seen = new Set(existing.map((row) => `${row.full_name.toLowerCase()}|${row.batch_year}`));
+    const seen = new Set(existing.map((row) => `${row.full_name!.toLowerCase()}|${row.batch_year ?? ''}`));
 
     for (const row of withoutLoginRows) {
-      if (seen.has(`${row.fullName.toLowerCase()}|${row.batchYear}`)) {
+      /*
+       * A row with neither an address nor a name cannot be matched against
+       * anything, so it is imported rather than compared.
+       *
+       * That does mean re-uploading the same sheet creates a second copy of
+       * such a row. It is the lesser of the two failures available here: the
+       * alternative is to treat every nameless, address-less row as a duplicate
+       * of every other, which would collapse them all into one and silently
+       * lose real people. Both keys are gone; there is nothing honest left to
+       * match on.
+       */
+      if (!row.fullName) continue;
+
+      if (seen.has(`${row.fullName.toLowerCase()}|${row.batchYear ?? ''}`)) {
         duplicates.push({
           rowNumber: row.rowNumber,
           name: row.fullName,
-          existing: `${row.fullName} (${row.batchYear}) — matched on name and year, no address to check`,
+          existing: `${row.fullName}${row.batchYear === null ? '' : ` (${row.batchYear})`} — matched on name and year, no address to check`,
         });
       }
     }
@@ -155,14 +182,16 @@ export async function previewImport(
     // into a parameterised tuple, and cannot infer the array type of the second
     // for bytea — it fails with "make_scalar_array_op" rather than anything that
     // points at the cause.
-    const existing = await sql<Array<{ gmail_hmac: Buffer; full_name: string }>>`
+    const existing = await sql<Array<{ gmail_hmac: Buffer; full_name: string | null }>>`
       select gmail_hmac, full_name from alumni where gmail_hmac in ${sql(hmacs)}
     `;
-    const byHmac = new Map(existing.map((row) => [Buffer.from(row.gmail_hmac).toString('hex'), row.full_name]));
+    const byHmac = new Map(
+      existing.map((row) => [Buffer.from(row.gmail_hmac).toString('hex'), row.full_name ?? UNNAMED]),
+    );
 
     for (const row of withLogin) {
       const match = byHmac.get(blindIndexOfNormalised(row.loginEmail!).toString('hex'));
-      if (match) duplicates.push({ rowNumber: row.rowNumber, name: row.fullName, existing: match });
+      if (match) duplicates.push({ rowNumber: row.rowNumber, name: labelFor(row), existing: match });
     }
   }
 
@@ -242,7 +271,7 @@ export async function commitImport(
     );
 
     if (!created.ok) {
-      result.failed.push({ rowNumber: row.rowNumber, name: row.fullName, message: created.message });
+      result.failed.push({ rowNumber: row.rowNumber, name: labelFor(row), message: created.message });
       continue;
     }
 
