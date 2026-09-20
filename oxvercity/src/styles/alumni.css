@@ -22,6 +22,8 @@
   background: var(--al-white);
   color: var(--al-ink);
   overflow-x: clip;
+  width: 100%;
+  min-width: 0;
 }
 
 /* ── Shell ── */
@@ -861,6 +863,14 @@
 @media (max-width: 480px) {
   .al-grid {
     grid-template-columns: 1fr;
+  }
+  .al-hero {
+    padding-top: clamp(120px, 16vh, 180px);
+  }
+  .al-hero__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
   }
 }
 
