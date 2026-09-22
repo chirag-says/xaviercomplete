@@ -4,6 +4,12 @@
  * details and link lists come from src/data/site.ts. The two layout
  * templates (main pages; contact and search) differ only in their breakpoint
  * hashes and the wrapper class, which are props.
+ *
+ * A block added here needs `position: relative` of its own. framer.css:504 is
+ * `[data-framer-component-type]{position:absolute}`, and every generated block
+ * cancels it through its own `.framer-xxxxxx` class. A new one carrying the
+ * attribute but no such class takes no space in the column and lands on top of
+ * whatever sits above it.
  */
 
 import { FooterLink } from './FooterLink';
@@ -38,7 +44,7 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                         </div>
                       </a>
                     </div>
-                    <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ width: "100%", transform: "none" } as React.CSSProperties}>
+                    <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ position: "relative", width: "100%", transform: "none" } as React.CSSProperties}>
                       <p className={"framer-text framer-styles-preset-1dfqlr0"} data-styles-preset={"r3nvaFHNq"}>
                         {associationName}
                       </p>
@@ -147,7 +153,7 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                         </div>
                       </a>
                     </div>
-                    <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ width: "100%", transform: "none" } as React.CSSProperties}>
+                    <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ position: "relative", width: "100%", transform: "none" } as React.CSSProperties}>
                       <p className={"framer-text framer-styles-preset-1dfqlr0"} data-styles-preset={"r3nvaFHNq"}>
                         {associationName}
                       </p>
@@ -259,7 +265,7 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                       </div>
                     </a>
                   </div>
-                  <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ width: "100%", transform: "none" } as React.CSSProperties}>
+                  <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ position: "relative", width: "100%", transform: "none" } as React.CSSProperties}>
                     <p className={"framer-text framer-styles-preset-1dfqlr0"} data-styles-preset={"r3nvaFHNq"}>
                       {associationName}
                     </p>
