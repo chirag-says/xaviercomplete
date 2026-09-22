@@ -10,7 +10,7 @@ import { turnstileSiteKey } from '@/lib/turnstile';
 
 export const metadata: Metadata = {
   title: 'Contact SXCCAA',
-  description: 'Get in touch with the St. Xavier\'s College Calcutta Alumni Association. Reach out for questions about the alumni directory, events, chapters, or Association initiatives.',
+  description: 'Get in touch with the St. Xavier\'s College Calcutta Alumni Association West Zone Chapter. Reach out for questions about the alumni directory, events, chapters, or Association initiatives.',
 };
 
 /**

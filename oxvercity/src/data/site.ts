@@ -29,7 +29,7 @@ export const siteLogo = {
 /** The institution. */
 export const siteName = "St. Xaviers College (Calcutta)";
 /** The Association this site belongs to. */
-export const associationName = "St. Xaviers College (Calcutta) Alumni Association";
+export const associationName = "St. Xavier's College Calcutta Alumni Association West Zone Chapter";
 export const associationShortName = 'SXCCAA';
 /** The College motto, used as a quiet sign-off. */
 export const motto = 'Nihil Ultra';

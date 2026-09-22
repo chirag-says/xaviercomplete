@@ -6,6 +6,7 @@
  * | y (from the footer top) | Block |
  * |---|---|
  * | +59.6 | `logo-dark.svg`, 129 × 32 |
+ * | +14   | the Association's full name — Roboto 15/400/20.625, ink |
  * | +14   | "Association Office" — Instrument Sans 15/600/20.625, ink |
  * | +7.1  | the address — Roboto 15/400/20.625, ink, two lines |
  * | +15.6 | "Email" |
@@ -74,7 +75,7 @@ function FooterLink({ label, href }: { label: string; href: string }): React.Rea
 
 export function SiteFooter(): React.ReactElement {
   const content = useContent();
-  const { contact, logo } = content.site;
+  const { associationName, contact, logo } = content.site;
   const columns = content.nav.footerColumns;
 
   /* Two columns per row, in the bundle's own order: Main Pages ‖ Explore, then
@@ -86,11 +87,16 @@ export function SiteFooter(): React.ReactElement {
     <View style={{ backgroundColor: colour.white, paddingTop: layout.sectionPadV, paddingHorizontal: layout.gutter }}>
       {/* ── Wordmark, 129 × 32 ─────────────────────────────────────────── */}
       <Asset
-        image={{ src: logo.dark, width: 129, height: 32, alt: 'SXCCAA' }}
+        image={{ src: logo.dark, width: 129, height: 32, alt: associationName }}
         displayWidth={129}
         contentFit="contain"
         style={{ width: 129, height: 32 }}
       />
+
+      {/* ── The Association's full name, as on the website ─────────────── */}
+      <Text variant="small" style={{ marginTop: 14 }}>
+        {associationName}
+      </Text>
 
       {/* ── Association Office ─────────────────────────────────────────── */}
       <Text variant="label" style={{ marginTop: 14 }}>

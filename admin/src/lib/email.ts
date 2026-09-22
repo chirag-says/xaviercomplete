@@ -153,7 +153,7 @@ export function accessRejectedEmail(): Omit<Mail, 'to'> {
     `<h1 style="margin:0 0 16px;font-size:22px;font-weight:600">About your request</h1>
      <p style="margin:0 0 12px;color:#4a4a4a">Your request for alumni directory access could not be approved at this time.</p>
      <p style="margin:0;color:#4a4a4a">If you believe this is a mistake, you are welcome to apply again after 30 days.</p>`,
-    'St Xavier\'s College (Calcutta) Alumni Association',
+    'St Xavier\'s College Calcutta Alumni Association West Zone Chapter',
   );
 
   return { subject: 'Your SXCCAA alumni directory request', text, html };
@@ -239,7 +239,7 @@ export function broadcastEmail(content: BroadcastContent): Omit<Mail, 'to'> {
     ...(posterUrl ? ['', 'The poster is attached to this email.'] : []),
     '',
     '—',
-    'St Xavier\'s College (Calcutta) Alumni Association',
+    'St Xavier\'s College Calcutta Alumni Association West Zone Chapter',
     '',
     'To stop receiving these emails, open:',
     unsubscribeUrl,
