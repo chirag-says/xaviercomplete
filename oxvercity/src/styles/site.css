@@ -412,15 +412,18 @@
  * held to a measure rather than run to the full width of the window: a crest
  * scaled to 1885px reads as a second logo shouting; at this size it reads as a
  * sign-off. The space below it is the footer's, not the crop's. */
+.framer-kIeXk.framer-25f22s {
+  gap: 40px;
+}
 .framer-kIeXk .framer-1wha7z8 {
   height: auto;
-  padding-bottom: 64px;
+  padding-bottom: 20px;
 }
 .framer-kIeXk .framer-3xr0l9 {
   aspect-ratio: auto;
   height: auto;
-  width: 100%;
-  max-width: 1100px;
+  width: 50%;
+  max-width: none;
   margin-inline: auto;
 }
 .framer-kIeXk .framer-99r95a-container {
@@ -429,24 +432,29 @@
   left: auto;
   width: 100%;
   height: auto;
-  aspect-ratio: 1245 / 227;
+  aspect-ratio: auto;
   transform: none !important;
+}
+.framer-kIeXk .framer-99r95a-container img {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
 }
 
 @media (max-width: 1199.98px) {
   .framer-kIeXk .framer-1wha7z8 {
-    padding-bottom: 48px;
+    padding-bottom: 16px;
   }
   .framer-kIeXk .framer-3xr0l9 {
-    max-width: 760px;
+    width: 35%;
   }
 }
 @media (max-width: 809.98px) {
   .framer-kIeXk .framer-1wha7z8 {
-    padding-bottom: 36px;
+    padding-bottom: 12px;
   }
   .framer-kIeXk .framer-3xr0l9 {
-    max-width: none;
+    width: 35%;
   }
 }
 

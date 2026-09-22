@@ -122,16 +122,11 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                   </div>
                 </div>
               </div>
-              <div className={"framer-1wha7z8"} data-framer-name={"Footer Logo Wrap"} style={{ willChange: "transform", opacity: "0", transform: "translateY(40px)" } as React.CSSProperties}>
-                <div className={"framer-1029xla"} data-framer-name={"Gradient Layer"} style={{ background: "linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.55) 30%, rgb(255, 255, 255) 93%)" } as React.CSSProperties} />
+              <div className={"framer-1wha7z8"} data-framer-name={"Footer Logo Wrap"} style={{ willChange: "auto" } as React.CSSProperties}>
                 <div className={"framer-3xr0l9"}>
-                  <div className={"framer-99r95a-container"} style={{ transform: "translateX(-50%)" } as React.CSSProperties}>
-                    <a className={"framer-4X5ZN framer-10rs7as framer-v-1xpu774 framer-1jc5brm"} data-framer-name={"Logo Dark Large"} data-highlight={"true"} href={"/"} tabIndex={0} style={{ height: "100%", width: "100%" } as React.CSSProperties}>
-                      <div className={"framer-1jrltms"} data-framer-name={"Logo"}>
-                        <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                          <img decoding={"async"} loading={"lazy"} width={"1245"} height={"227"} src={siteLogo.watermark} alt={""} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
-                        </div>
-                      </div>
+                  <div className={"framer-99r95a-container"}>
+                    <a href={"/"} style={{ display: "block", width: "100%" } as React.CSSProperties}>
+                      <img decoding={"async"} loading={"lazy"} src={"/footer-logo.png"} alt={"St. Xavier's College Alumni Association"} style={{ display: "block", width: "100%", height: "auto" } as React.CSSProperties} />
                     </a>
                   </div>
                 </div>
@@ -231,16 +226,11 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                   </div>
                 </div>
               </div>
-              <div className={"framer-1wha7z8"} data-framer-name={"Footer Logo Wrap"} style={{ willChange: "transform", opacity: "0", transform: "translateY(40px)" } as React.CSSProperties}>
-                <div className={"framer-1029xla"} data-framer-name={"Gradient Layer"} style={{ background: "linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.55) 30%, rgb(255, 255, 255) 93%)" } as React.CSSProperties} />
+              <div className={"framer-1wha7z8"} data-framer-name={"Footer Logo Wrap"} style={{ willChange: "auto" } as React.CSSProperties}>
                 <div className={"framer-3xr0l9"}>
-                  <div className={"framer-99r95a-container"} style={{ transform: "translateX(-50%)" } as React.CSSProperties}>
-                    <a className={"framer-4X5ZN framer-10rs7as framer-v-1xpu774 framer-1jc5brm"} data-framer-name={"Logo Dark Large"} data-highlight={"true"} href={"/"} tabIndex={0} style={{ height: "100%", width: "100%" } as React.CSSProperties}>
-                      <div className={"framer-1jrltms"} data-framer-name={"Logo"}>
-                        <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                          <img decoding={"async"} loading={"lazy"} width={"1245"} height={"227"} src={siteLogo.watermark} alt={""} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
-                        </div>
-                      </div>
+                  <div className={"framer-99r95a-container"}>
+                    <a href={"/"} style={{ display: "block", width: "100%" } as React.CSSProperties}>
+                      <img decoding={"async"} loading={"lazy"} src={"/footer-logo.png"} alt={"St. Xavier's College Alumni Association"} style={{ display: "block", width: "100%", height: "auto" } as React.CSSProperties} />
                     </a>
                   </div>
                 </div>
@@ -343,16 +333,11 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                 </div>
               </div>
             </div>
-            <div className={"framer-1wha7z8"} data-framer-name={"Footer Logo Wrap"} style={{ willChange: "transform", opacity: "0", transform: "translateY(40px)" } as React.CSSProperties}>
-              <div className={"framer-1029xla"} data-framer-name={"Gradient Layer"} style={{ background: "linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.55) 30%, rgb(255, 255, 255) 93%)" } as React.CSSProperties} />
+            <div className={"framer-1wha7z8"} data-framer-name={"Footer Logo Wrap"} style={{ willChange: "auto" } as React.CSSProperties}>
               <div className={"framer-3xr0l9"}>
-                <div className={"framer-99r95a-container"} style={{ transform: "translateX(-50%)" } as React.CSSProperties}>
-                  <a className={"framer-4X5ZN framer-10rs7as framer-v-1xpu774 framer-1jc5brm"} data-framer-name={"Logo Dark Large"} data-highlight={"true"} href={"/"} tabIndex={0} style={{ height: "100%", width: "100%" } as React.CSSProperties}>
-                    <div className={"framer-1jrltms"} data-framer-name={"Logo"}>
-                      <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                        <img decoding={"async"} width={"1245"} height={"227"} src={siteLogo.watermark} alt={""} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
-                      </div>
-                    </div>
+                <div className={"framer-99r95a-container"}>
+                  <a href={"/"} style={{ display: "block", width: "100%" } as React.CSSProperties}>
+                    <img decoding={"async"} loading={"lazy"} src={"/footer-logo.png"} alt={"St. Xavier's College Alumni Association"} style={{ display: "block", width: "100%", height: "auto" } as React.CSSProperties} />
                   </a>
                 </div>
               </div>
