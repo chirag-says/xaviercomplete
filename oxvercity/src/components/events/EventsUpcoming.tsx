@@ -53,7 +53,14 @@ function Countdown({ days }: { days: number | null }) {
   );
 }
 
-export function EventsUpcoming() {
+/**
+ * The home page opens on this section too, so the heading level is the caller's
+ * to set: the page's own title there, a section heading under the page title
+ * here. `.ev-stage__title` carries every type property, so the two render
+ * identically.
+ */
+export function EventsUpcoming({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' } = {}) {
+  const Heading = headingLevel;
   const poster = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
   const [origin, setOrigin] = useState<DOMRect | null>(null);
@@ -81,10 +88,10 @@ export function EventsUpcoming() {
             Next event · {upcomingEvent.host}
           </p>
 
-          <h2 className="ev-stage__title" id="upcoming-heading">
+          <Heading className="ev-stage__title" id="upcoming-heading">
             <span className="ev-stage__line"><span className="ev-stage__rise">Nostalgia&nbsp;’26</span></span>
             <span className="ev-stage__line"><span className="ev-stage__rise" style={{ animationDelay: '0.09s' }}>cum Shakti</span></span>
-          </h2>
+          </Heading>
 
           <p className="ev-stage__sub">{upcomingEvent.subtitle}</p>
           <p className="ev-stage__lede">{upcomingEvent.lede}</p>
