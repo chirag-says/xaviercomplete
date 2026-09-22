@@ -1,0 +1,1427 @@
+/* =============================================================================
+ * The home page's opening run — Nostalgia '26 cum Shakti
+ *
+ * Four sections, and the page alternates ground between them so each one lands
+ * as a separate beat: the invitation on champagne, the awardee on the awardee
+ * poster's ivory, the booking ladder on ink, the close on white, which hands
+ * over to the College's sections below.
+ *
+ * COLOUR is taken from the artwork rather than chosen. The awardee poster
+ * gives ivory, a navy near #132f5f and a #98632a gold; the invitation poster
+ * gives the #140c27 plum the booking section is built from. Every value below
+ * is one of those or a step off one.
+ *
+ * The one deliberate inversion is the hero. Built on the invitation's own plum
+ * it was indistinguishable from the /events stage, which is built the same way
+ * — and a dark poster on a dark ground loses its edges. So the hero is
+ * champagne, and the dark is the poster itself: the same three colours, the
+ * light one in front.
+ *
+ * TYPE is the site's Instrument Sans at four steps, with one addition: a serif
+ * for the words the posters set in script — the second line of the title, the
+ * awardee's name, the pull-quote. `--nos-serif` names Instrument Serif, the
+ * direct companion to the site's sans, and falls back through Georgia, which
+ * every platform has. Nothing is downloaded for it; if the woff2 is added to
+ * /public/fonts later, the stack picks it up with no other change.
+ *
+ * MOTION: everything is transform and opacity, so every animation is a
+ * compositor job. The whole sheet is switched off under `prefers-reduced-
+ * motion` at the foot of the file — the run then renders as its resting state,
+ * which is the design, not a degraded copy of it.
+ * ========================================================================== */
+
+.nos-run {
+  --nos-ink: #140c27;
+  --nos-gold: #d8a94a;
+  --nos-gold-lit: #f6dfa6;
+  --nos-gold-deep: #98632a;
+  /* the gold that small type is allowed to be set in: #98632a is 3.4:1 on
+     champagne, which is fine for a 40px word and not for a 10px label */
+  --nos-gold-ink: #7d4f1e;
+  --nos-cream: #f0e3cd;
+  --nos-ivory: #faf6ee;
+  --nos-champagne: #f7edd9;
+  --nos-parchment: #fdfaf3;
+  --nos-navy: #16305e;
+  --nos-navy-deep: #0b1c3a;
+  --nos-line: rgba(240, 227, 205, 0.16);
+
+  --nos-sans: 'Instrument Sans', 'Instrument Sans Placeholder', sans-serif;
+  --nos-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+
+  --nos-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --nos-ease: cubic-bezier(0.44, 0, 0.56, 1);
+
+  font-family: var(--nos-sans);
+  width: 100%;
+}
+
+.nos-shell {
+  width: 100%;
+  max-width: 1336px;      /* the site's 1296 measure inside its 20px gutters */
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Two links in the hero jump down the page: the cue to the awardee and "Book
+ * your seat" to the ladder. The header is fixed and 104px tall, so without a
+ * scroll margin the browser parks the section's top edge underneath it. This
+ * is honoured by `scrollIntoView` as well, which is how the hero eases those
+ * two jumps — `scroll-behavior` would have to go on the scrolling element,
+ * and that is `html`, which belongs to every other page too. */
+#nos-awardee,
+#nos-passes { scroll-margin-top: 104px; }
+
+.nos-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- shared type --------------------------------------------------------- */
+
+.nos-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.nos-rule {
+  display: block;
+  width: 30px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+  flex: none;
+}
+.nos-rule--wide { width: min(220px, 40vw); margin: 0 auto; opacity: 0.32; }
+
+.nos-title {
+  margin: 0;
+  font-size: clamp(32px, 4.4vw, 58px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.032em;
+}
+
+/* Gold, as leaf reads: a band that is lighter through the middle than at the
+ * edges, sliding slowly across so the letters catch the light like foil. */
+.nos-gilt {
+  background: linear-gradient(100deg, var(--nos-gold-deep) 0%, var(--nos-gold) 22%, var(--nos-gold-lit) 42%, #fff6e2 50%, var(--nos-gold-lit) 58%, var(--nos-gold) 78%, var(--nos-gold-deep) 100%);
+  background-size: 260% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: nos-gilt 7s linear infinite;
+}
+@keyframes nos-gilt {
+  from { background-position: 130% 0; }
+  to   { background-position: -130% 0; }
+}
+/* ---- the shared call to action -------------------------------------------
+ * Two weights. The primary is solid navy — on a champagne ground that is the
+ * highest-contrast thing on the screen, which is what a single primary action
+ * should be. The secondary is a gold hairline, present but clearly second.
+ * Gold was the obvious choice for the primary and it is the wrong one: gold on
+ * champagne is a 2:1 button, legible only because it is large.
+ * ------------------------------------------------------------------------ */
+
+.nos-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 30px;
+  border: 0;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  background: var(--nos-navy-deep);
+  color: var(--nos-parchment);
+  box-shadow: 0 12px 30px rgba(11, 28, 58, 0.26);
+  transition: transform 0.45s var(--nos-out), box-shadow 0.45s var(--nos-out);
+}
+.nos-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 46px rgba(11, 28, 58, 0.32);
+}
+/* a band of gold wiped across the button on hover, clipped by the pill */
+.nos-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(216, 169, 74, 0.45) 50%, transparent 80%);
+  transform: translateX(-110%);
+  transition: transform 0.75s var(--nos-out);
+}
+.nos-cta:hover::after { transform: translateX(110%); }
+.nos-cta > * { position: relative; z-index: 1; }
+.nos-cta__arrow { transition: transform 0.45s var(--nos-out); }
+.nos-cta:hover .nos-cta__arrow { transform: translate(4px, -1px); }
+
+.nos-cta--quiet {
+  background: transparent;
+  color: var(--nos-navy);
+  border: 1px solid rgba(152, 99, 42, 0.42);
+  box-shadow: none;
+}
+.nos-cta--quiet:hover {
+  background: rgba(216, 169, 74, 0.12);
+  border-color: var(--nos-gold-deep);
+  box-shadow: none;
+}
+.nos-cta--quiet::after { display: none; }
+.nos-cta--quiet:hover .nos-cta__arrow { transform: translate(3px, -3px); }
+
+.nos-run :focus-visible {
+  outline: 2px solid var(--nos-gold-deep);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* =============================================================================
+ * 1 — the invitation
+ *
+ * This opened on the events page's ground — #140c27 plum with gold — and read
+ * as the same screen twice, which is the one thing it could not be. It is now
+ * the opposite: an engraved invitation card in champagne and navy, with the
+ * poster standing on it, unframed and the largest thing on the screen.
+ *
+ * The reasoning is the artwork's. The invitation poster is dark: deep plum,
+ * gold flare, a night crowd. Dark artwork on a dark ground has nowhere to go —
+ * the edges dissolve and the poster becomes wallpaper. On champagne it reads
+ * as an object, which is why it needs nothing around it: it arrived with its
+ * own border and its own ground, and a panel behind it only competed.
+ *
+ * Four things make that ground, and none of them is a photograph:
+ *   1. a champagne wash, warm at the top left and cooling to near-white;
+ *   2. an engraved hairline grid at 88px, the ruling on a stock certificate —
+ *      1px gold at 5% opacity, which you read as texture rather than lines,
+ *      and which fades out before it reaches the foot;
+ *   3. a wide gold bloom behind the poster, so the dark artwork arrives out of
+ *      light rather than being pasted on;
+ *   4. gold motes, slower and fewer than a dark ground can carry — on light,
+ *      anything faster reads as dust on the screen rather than in the room.
+ *
+ * The page is light, so `SiteShell` gets `lightPage` and the header opens with
+ * ink type instead of white. The 1px `#scroll-trigger` still flips it solid on
+ * the first scroll, exactly as before.
+ * ========================================================================== */
+
+.nos-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--nos-parchment);
+  color: var(--nos-navy);
+  padding: clamp(116px, 10vw, 160px) 0 clamp(84px, 8vw, 116px);
+  min-height: 100svh;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+}
+.nos-hero__trigger { position: absolute; top: 0; left: 0; width: 1px; height: 1px; }
+
+/* 1 — the champagne wash */
+.nos-hero__wash {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  background:
+    radial-gradient(90% 70% at 8% 0%, var(--nos-champagne) 0%, transparent 58%),
+    radial-gradient(70% 60% at 100% 86%, rgba(216, 169, 74, 0.13), transparent 62%),
+    linear-gradient(168deg, #fbf4e7 0%, var(--nos-parchment) 46%, #fffdf9 100%);
+}
+
+/* 2 — the engraving */
+.nos-hero__grid {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(to right, rgba(152, 99, 42, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(152, 99, 42, 0.07) 1px, transparent 1px);
+  background-size: 88px 88px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 42%, transparent 92%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 42%, transparent 92%);
+}
+
+/* 3 — the bloom: centered between the text and the poster so the warm light
+ * bridges the two halves into one composition rather than sitting behind
+ * only one of them. */
+.nos-hero__bloom {
+  position: absolute;
+  top: -8%;
+  right: -6%;
+  width: min(1100px, 88vw);
+  aspect-ratio: 1;
+  z-index: -2;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(216, 169, 74, 0.38) 0%, rgba(216, 169, 74, 0.16) 38%, transparent 64%);
+  filter: blur(18px);
+  animation: nos-bloom 22s ease-in-out infinite alternate;
+}
+@keyframes nos-bloom {
+  from { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
+  to   { transform: translate3d(-3%, 3%, 0) scale(1.1); opacity: 1; }
+}
+
+/* 4 — the motes */
+.nos-hero__dust {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.nos-hero__dust span {
+  position: absolute;
+  bottom: -12px;
+  border-radius: 50%;
+  background: var(--nos-gold-deep);
+  opacity: 0;
+  animation-name: nos-dust;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+@keyframes nos-dust {
+  0%   { opacity: 0; transform: translate3d(0, 0, 0); }
+  14%  { opacity: 0.4; }
+  76%  { opacity: 0.26; }
+  100% { opacity: 0; transform: translate3d(var(--drift, 0), -104vh, 0); }
+}
+
+/* The two halves — text and artwork — share one composition, not two columns
+ * placed next to each other. The poster column is set wider than the text, and
+ * a negative gap pulls the poster leftward so the gradient-masked edge bleeds
+ * behind the text column. The result is that the poster's glow and colour
+ * frame the words rather than sitting in a separate lane. */
+.nos-hero__shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: 0;
+}
+
+/* ---- the college name — full-width, centred, large ----------------------- */
+.nos-hero__college {
+  width: 100%;
+  padding: 0 clamp(20px, 4vw, 60px);
+  margin-bottom: clamp(28px, 3.4vw, 48px);
+  text-align: center;
+  opacity: 0;
+  animation: nos-in 1s var(--nos-out) 0.12s forwards;
+}
+.nos-hero__collegeName {
+  margin: 0;
+  font-family: 'Olde English', 'Old English Text MT', serif;
+  font-weight: 400;
+  font-size: clamp(32px, 5vw, 72px);
+  line-height: 1.12;
+  color: var(--nos-navy-deep);
+  letter-spacing: 0.01em;
+}
+.nos-hero__chapterName {
+  margin: 8px 0 0;
+  font-size: clamp(12px, 1.3vw, 17px);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--nos-gold-ink);
+}
+
+.nos-hero__words { min-width: 0; position: relative; z-index: 1; padding-left: clamp(20px, 3vw, 56px); padding-right: clamp(16px, 2vw, 32px); }
+
+/* One staircase for the left column; the delays live here so the order reads
+ * in one place rather than being scattered across seven inline styles. */
+.nos-hero__words > * {
+  opacity: 0;
+  animation: nos-in 0.9s var(--nos-out) forwards;
+}
+.nos-hero__title   { animation-delay: 0s; animation-name: none; opacity: 1; }
+.nos-hero__award   { animation-delay: 0.44s; }
+.nos-hero__lede    { animation-delay: 0.52s; }
+.nos-hero .nos-count { animation-delay: 0.6s; }
+.nos-hero__facts   { animation-delay: 0.68s; }
+.nos-hero__actions { animation-delay: 0.76s; }
+.nos-hero__price   { animation-delay: 0.84s; }
+@keyframes nos-in {
+  from { opacity: 0; transform: translate3d(0, 26px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---- the display ---------------------------------------------------------
+ * Set larger than the old one and in the serif throughout, because on a light
+ * ground the type is the artwork. The first line is navy, the second gilded:
+ * the poster sets the second in script and there is no script here worth
+ * loading, so the contrast comes from colour and slant instead.
+ * ------------------------------------------------------------------------ */
+
+.nos-hero__title {
+  margin: 0;
+  font-family: var(--nos-serif);
+  font-weight: 400;
+  font-size: clamp(52px, 8vw, 118px);
+  line-height: 0.92;
+  letter-spacing: -0.024em;
+  color: var(--nos-navy-deep);
+}
+/* each line is clipped to its own box, so the words rise out of nothing */
+.nos-hero__line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.04em;
+}
+.nos-hero__rise {
+  display: block;
+  animation: nos-rise 1.15s var(--nos-out) both;
+  animation-delay: 0.22s;
+}
+@keyframes nos-rise {
+  from { transform: translate3d(0, 106%, 0); }
+  to   { transform: none; }
+}
+.nos-hero__line--script {
+  font-style: italic;
+  font-size: 1.08em;
+  padding-left: 0.04em;
+}
+/* Gilt for a light ground, which is the opposite problem from gilt on a dark
+ * one. On ink the risk is the ramp going too dark; on champagne it is the
+ * highlight going too light — #e0b45e, the obvious choice for the glint, is
+ * 1.8:1 here, so for the second or so that the band crosses a letter that
+ * letter is gone. The ramp is compressed into the dark half instead: #5e3a11
+ * at the shoulders up to #ab7a2a at the peak, which is 3.5:1 at its very
+ * brightest. Foil on a pale card is a quieter thing than foil on black, so
+ * this is also what it actually looks like. */
+.nos-hero__line--script .nos-hero__rise {
+  background: linear-gradient(100deg, #5e3a11 0%, #7d4f1e 20%, #a06a2c 44%, #ab7a2a 50%, #a06a2c 56%, #7d4f1e 80%, #5e3a11 100%);
+  background-size: 260% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: nos-rise 1.15s var(--nos-out) 0.22s both, nos-gilt 7s linear 1.3s infinite;
+}
+
+/* the ruled award line, as an engraved invitation sets it */
+.nos-hero__award {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0 0;
+  font-size: clamp(12px, 1.25vw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--nos-gold-ink);
+}
+.nos-hero__award::before,
+.nos-hero__award::after {
+  content: '';
+  height: 1px;
+  background: rgba(152, 99, 42, 0.42);
+}
+.nos-hero__award::before { width: 34px; flex: none; }
+.nos-hero__award::after { flex: 1 1 auto; max-width: 180px; }
+
+.nos-hero__lede {
+  margin: 18px 0 0;
+  max-width: 36ch;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.58;
+  color: rgba(11, 28, 58, 0.72);
+}
+
+/* ---- the countdown -------------------------------------------------------
+ * The shape the reader liked, rebuilt for light: a white card with a gold
+ * hairline and a real shadow, navy numerals, and the unit in small tracked
+ * caps. Tabular figures so the seconds do not jog the row every tick.
+ * ------------------------------------------------------------------------ */
+
+.nos-count {
+  display: flex;
+  gap: 10px;
+  margin: 30px 0 0;
+}
+.nos-count__cell {
+  position: relative;
+  flex: 0 1 88px;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 8px 12px;
+  border: 1px solid rgba(152, 99, 42, 0.26);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff, #fdf8ef);
+  box-shadow: 0 10px 26px rgba(11, 28, 58, 0.08);
+  overflow: hidden;
+}
+/* a gold cap on each card, so the row reads as one ruled band */
+.nos-count__cell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--nos-gold), transparent);
+}
+.nos-count__num {
+  font-size: clamp(25px, 2.9vw, 37px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--nos-navy-deep);
+}
+.nos-count__word {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--nos-gold-ink);
+}
+
+/* ---- date, time, venue --------------------------------------------------- */
+
+.nos-hero__facts {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 14px 36px;
+  margin: 30px 0 0;
+  padding: 22px 0 0;
+  border-top: 1px solid rgba(152, 99, 42, 0.3);
+}
+.nos-hero__fact { display: flex; flex-flow: column; gap: 6px; min-width: 0; }
+.nos-hero__fact dt {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--nos-gold-ink);
+}
+.nos-hero__fact dd {
+  margin: 0;
+  font-size: clamp(14px, 1.4vw, 17px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--nos-navy-deep);
+}
+
+.nos-hero__actions {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 12px;
+  margin: 32px 0 0;
+}
+
+.nos-hero__price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 20px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(11, 28, 58, 0.68);
+}
+.nos-hero__price strong {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--nos-navy-deep);
+}
+.nos-hero__priceNote {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--nos-navy-deep);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #f3dda8;
+}
+
+/* ---- the poster ----------------------------------------------------------
+ * The artwork stands on the champagne with nothing behind it. It had a navy
+ * plinth, a gold hairline inset and a wax seal on the corner — a frame around
+ * a framed thing. The poster is already a designed object with its own border
+ * and its own deep ground; setting it on a second, darker panel made the page
+ * read as two rectangles, and the one that caught the eye first was the panel.
+ * It is the same treatment as the awardee poster below it now: the image, a
+ * soft navy shadow and a gold hairline ring, and that is all.
+ *
+ * THE ENTRANCE is a single sequence, and the poster leads it. All of it is
+ * transform, opacity or clip-path, so every beat is a compositor job:
+ *
+ *   0.08s  the poster rises and settles                          nos-poster-in
+ *   0.45s  a band of light wipes down it, and the artwork appears behind the
+ *          band — it is uncovered rather than faded in            nos-unveil
+ *   1.9s   it begins to breathe, and keeps doing it              nos-breathe
+ *   2.4s   foil light crosses it every eleven seconds               nos-foil
+ *
+ * The last two are the part that matters after the first look: the poster is
+ * never quite still, so the eye keeps returning to it, and the sheen is the
+ * one thing on a static page that behaves like a physical object catching the
+ * light. Both are slow enough to read as a room rather than as an animation.
+ * ------------------------------------------------------------------------ */
+
+.nos-hero__frame {
+  position: relative;
+  justify-self: end;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  width: 100%;
+  /* Pull the poster leftward so it overlaps the text column's right edge.
+   * The masked gradient on the poster (below) fades the overlap so the poster
+   * bleeds into the champagne rather than sitting in its own lane. */
+  margin-left: clamp(-48px, -3vw, -12px);
+  max-width: clamp(320px, calc(110vh - 480px), 420px);
+  opacity: 0;
+  animation:
+    nos-poster-in 1.1s var(--nos-out) 0.08s forwards,
+    nos-breathe 11s var(--nos-ease) 1.9s infinite;
+}
+@keyframes nos-poster-in {
+  from { opacity: 0; transform: translate3d(0, 34px, 0) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+/* 7px over eleven seconds: below the threshold at which it reads as movement,
+ * above the one at which the poster reads as printed onto the page */
+@keyframes nos-breathe {
+  0%, 100% { opacity: 1; transform: translate3d(0, 0, 0); }
+  50%      { opacity: 1; transform: translate3d(0, -7px, 0); }
+}
+
+/* The card. `--tilt-x/y` are written by `useTilt`; with no pointer they stay
+   at their declared 0deg and this is a plain framed image. */
+.nos-tilt {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --gloss-x: 50%;
+  --gloss-y: 0%;
+  width: 100%;
+  perspective: 1100px;
+}
+.nos-tilt__card {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  border-radius: 16px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.45),
+    0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: transform 0.7s var(--nos-out), box-shadow 0.7s var(--nos-out);
+}
+.nos-tilt[data-tilting] .nos-tilt__card {
+  transition: transform 0.18s linear, box-shadow 0.7s var(--nos-out);
+}
+.nos-tilt__card:hover {
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.5),
+    0 12px 32px rgba(0, 0, 0, 0.3),
+    0 0 60px rgba(216, 169, 74, 0.18);
+}
+.nos-tilt__card img { display: block; width: 100%; height: auto; border-radius: 16px; }
+
+/* ---- the hero poster's own animation -------------------------------------
+ * Everything below is scoped to `.nos-hero`, because `.nos-tilt` is shared
+ * with the awardee poster in the next section and that one has a different
+ * job: it is below the fold, it is revealed on scroll by `Reveal`, and it is
+ * light artwork, which `screen` does nothing for. This is the page's one
+ * centrepiece and only it gets the treatment.
+ *
+ * The unveil is a clip-path and not a transform, deliberately: `transform` on
+ * the card belongs to the tilt, and an entrance animation holding it would
+ * override the pointer for good. `backwards` keeps the artwork covered
+ * through the delay; when the animation ends the property goes back to
+ * `none`, and the tilt has had the transform to itself throughout.
+ * ------------------------------------------------------------------------ */
+
+.nos-hero .nos-tilt__card {
+  animation: nos-unveil 1.05s var(--nos-out) 0.45s backwards;
+}
+@keyframes nos-unveil {
+  from { clip-path: inset(0 0 100% 0 round 12px); }
+  to   { clip-path: inset(0 0 0 0 round 12px); }
+}
+
+/* The edge of the unveil: a band of gold light that travels down with the
+ * clip, so the poster looks uncovered by the light rather than faded up. It
+ * is clipped by the same `clip-path`, which is what keeps the two in step —
+ * the band sits at the bottom of a full-height gradient translated from
+ * -100% to 0, and the clip hides everything below it. */
+.nos-hero .nos-tilt__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(216, 169, 74, 0.1) 84%,
+    rgba(246, 223, 166, 0.55) 95%,
+    rgba(255, 252, 240, 0.95) 100%
+  );
+  animation: nos-unveil-edge 1.05s var(--nos-out) 0.45s backwards;
+}
+@keyframes nos-unveil-edge {
+  0%   { opacity: 1; transform: translate3d(0, -100%, 0); }
+  88%  { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(0, 0, 0); }
+}
+
+/* The foil. Every eleven seconds a narrow band of light crosses the artwork
+ * on the diagonal, the way light moves over a printed card when you turn it.
+ * `screen` is what makes it read as light rather than as a white overlay: on
+ * the poster's dark plum it brightens, and it leaves the pale areas alone. */
+.nos-hero .nos-tilt__card::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: -60%;
+  width: 55%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(216, 169, 74, 0.22) 38%,
+    rgba(255, 246, 226, 0.5) 50%,
+    rgba(216, 169, 74, 0.22) 62%,
+    transparent 100%
+  );
+  animation: nos-foil 11s var(--nos-ease) 2.4s infinite;
+}
+@keyframes nos-foil {
+  0%        { opacity: 0;    transform: translate3d(0, 0, 0) rotate(16deg); }
+  4%        { opacity: 0.95; }
+  20%       { opacity: 0.95; transform: translate3d(360%, 0, 0) rotate(16deg); }
+  24%, 100% { opacity: 0;    transform: translate3d(400%, 0, 0) rotate(16deg); }
+}
+
+/* the sheen follows the pointer across the artwork */
+.nos-tilt__gloss {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(38% 30% at var(--gloss-x) var(--gloss-y), rgba(255, 246, 226, 0.32), transparent 70%);
+  transition: opacity 0.5s var(--nos-out);
+}
+.nos-tilt[data-tilting] .nos-tilt__gloss { opacity: 1; }
+
+.nos-tilt__hint {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 16px;
+  transform: translate(-50%, 10px);
+  padding: 9px 17px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #1b1024;
+  background: rgba(246, 223, 166, 0.95);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.4s var(--nos-out), transform 0.4s var(--nos-out);
+}
+.nos-tilt__card:hover .nos-tilt__hint,
+.nos-tilt__card:focus-visible .nos-tilt__hint {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* (billing removed — the star-studded line is no longer shown below the poster) */
+
+/* ---- the scroll cue ------------------------------------------------------ */
+
+.nos-hero__cue {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  gap: 10px;
+  margin: clamp(38px, 5vw, 64px) auto 0;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--nos-gold-ink);
+  opacity: 0;
+  animation: nos-in 1s var(--nos-out) 1.05s forwards;
+  transition: color 0.4s var(--nos-out);
+}
+.nos-hero__cue:hover { color: var(--nos-navy-deep); }
+
+/* Champagne and the awardee section's ivory are two steps apart, which is not
+ * enough of a change to read as one section ending and another beginning. The
+ * gold hairline is the edge — the same device the invitation uses to rule off
+ * its own blocks. */
+.nos-hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(152, 99, 42, 0.5), transparent);
+}
+.nos-hero__cueLine {
+  display: block;
+  width: 1px;
+  height: 46px;
+  background: linear-gradient(180deg, var(--nos-gold-deep), transparent);
+  transform-origin: top;
+  animation: nos-cue 2.4s var(--nos-ease) infinite;
+}
+@keyframes nos-cue {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.4; }
+  45%      { transform: scaleY(1); opacity: 1; }
+}
+
+/* =============================================================================
+ * 2 — the awardee
+ * ========================================================================== */
+
+.nos-awardee {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--nos-ivory);
+  color: var(--nos-navy);
+  padding: clamp(78px, 9vw, 140px) 0;
+}
+.nos-awardee__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60% 52% at 18% 8%, rgba(216, 169, 74, 0.2), transparent 64%),
+    radial-gradient(54% 48% at 92% 92%, rgba(22, 48, 94, 0.09), transparent 62%);
+}
+.nos-awardee__shell {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: clamp(34px, 5vw, 72px);
+}
+.nos-awardee__frame { justify-self: start; width: 100%; max-width: 560px; }
+
+/* on ivory the card needs a softer shadow and a gold hairline, not a glow */
+.nos-tilt--light .nos-tilt__card {
+  box-shadow:
+    0 22px 60px rgba(22, 48, 94, 0.18),
+    0 0 0 1px rgba(216, 169, 74, 0.4);
+}
+.nos-tilt--light .nos-tilt__card:hover {
+  box-shadow:
+    0 32px 80px rgba(22, 48, 94, 0.24),
+    0 0 0 1px rgba(216, 169, 74, 0.8);
+}
+
+.nos-awardee__words { min-width: 0; }
+.nos-awardee__eyebrow { color: var(--nos-gold-deep); }
+
+.nos-awardee__name {
+  margin: 16px 0 0;
+  font-family: var(--nos-serif);
+  font-weight: 400;
+  font-size: clamp(46px, 6.4vw, 92px);
+  line-height: 0.98;
+  letter-spacing: -0.018em;
+  color: var(--nos-navy);
+}
+.nos-awardee__name span {
+  background: linear-gradient(96deg, var(--nos-gold-deep), #b9843a 30%, var(--nos-gold) 52%, #b9843a 74%, var(--nos-gold-deep));
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.nos-awardee__billing {
+  margin: 16px 0 0;
+  font-family: var(--nos-serif);
+  font-style: italic;
+  font-size: clamp(20px, 2.3vw, 30px);
+  line-height: 1.24;
+  color: var(--nos-navy);
+}
+.nos-awardee__line {
+  margin: 10px 0 0;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.55;
+  color: rgba(22, 48, 94, 0.74);
+}
+
+/* the SHAKTI plate, as the poster frames it */
+.nos-shakti {
+  margin: 30px 0 0;
+  padding: 26px 30px 28px;
+  border: 1px solid rgba(216, 169, 74, 0.5);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(250, 246, 238, 0.5));
+  text-align: center;
+  max-width: 430px;
+  box-shadow: 0 14px 40px rgba(22, 48, 94, 0.07);
+}
+.nos-shakti__name {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;      /* the tracking adds a gap after the last letter */
+  text-transform: uppercase;
+  line-height: 1.1;
+  color: var(--nos-navy);
+}
+.nos-shakti__title {
+  margin: 8px 0 0;
+  font-size: clamp(14px, 1.5vw, 18px);
+  font-weight: 500;
+  line-height: 1.35;
+  color: rgba(22, 48, 94, 0.82);
+}
+.nos-shakti__rule {
+  display: block;
+  width: 52px;
+  height: 1px;
+  margin: 16px auto;
+  background: var(--nos-gold);
+  opacity: 0.6;
+}
+.nos-shakti__line {
+  margin: 0;
+  font-family: var(--nos-serif);
+  font-style: italic;
+  font-size: clamp(15px, 1.5vw, 19px);
+  color: rgba(22, 48, 94, 0.72);
+}
+
+.nos-awardee__tagline {
+  margin: 26px 0 0;
+  font-family: var(--nos-serif);
+  font-style: italic;
+  font-size: clamp(20px, 2.2vw, 28px);
+  color: var(--nos-gold-deep);
+}
+
+/* =============================================================================
+ * 3 — the ladder and the account
+ * ========================================================================== */
+
+.nos-book {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--nos-ink);
+  color: var(--nos-cream);
+  padding: clamp(78px, 9vw, 136px) 0;
+}
+.nos-book__wash {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(70% 60% at 50% -10%, rgba(152, 99, 42, 0.3), transparent 62%),
+    radial-gradient(60% 55% at 88% 100%, rgba(86, 45, 82, 0.42), transparent 66%);
+}
+
+.nos-book__head { max-width: 42ch; }
+.nos-book__eyebrow { color: var(--nos-gold); }
+.nos-book__title { margin: 16px 0 0; }
+.nos-book__note {
+  margin: 14px 0 0;
+  font-size: clamp(14px, 1.4vw, 17px);
+  line-height: 1.55;
+  color: rgba(240, 227, 205, 0.64);
+}
+
+.nos-tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: clamp(34px, 4vw, 54px) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+.nos-tier { min-width: 0; }
+.nos-tier__inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  gap: 12px;
+  padding: 26px 26px 28px;
+  border: 1px solid var(--nos-line);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(240, 227, 205, 0.07), rgba(240, 227, 205, 0.015));
+  transition: transform 0.5s var(--nos-out), border-color 0.5s var(--nos-out), background 0.5s var(--nos-out);
+}
+.nos-tier__inner:hover { transform: translateY(-4px); border-color: rgba(216, 169, 74, 0.5); }
+
+/* the step today falls in, lifted out of the row */
+.nos-tier__inner[data-standing='open'] {
+  border-color: rgba(216, 169, 74, 0.72);
+  background: linear-gradient(180deg, rgba(216, 169, 74, 0.16), rgba(216, 169, 74, 0.03));
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.36), 0 0 44px rgba(216, 169, 74, 0.12);
+}
+.nos-tier__inner[data-standing='closed'] { opacity: 0.5; }
+
+.nos-tier__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.nos-tier__name {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--nos-gold-lit);
+}
+.nos-tier__standing {
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--nos-line);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(240, 227, 205, 0.62);
+}
+.nos-tier__inner[data-standing='open'] .nos-tier__standing {
+  border-color: transparent;
+  background: var(--nos-gold);
+  color: #1b1024;
+}
+.nos-tier__qualifier {
+  display: flex;
+  flex-flow: column;
+  gap: 2px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(240, 227, 205, 0.6);
+}
+.nos-tier__amount {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: auto 0 0;
+  padding: 14px 0 0;
+  font-size: clamp(34px, 4vw, 50px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: #fff;
+}
+.nos-tier__tax {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--nos-gold);
+}
+
+/* ---- the account --------------------------------------------------------- */
+
+.nos-bank {
+  margin: clamp(26px, 3vw, 40px) 0 0;
+  padding: clamp(26px, 3vw, 38px);
+  border: 1px solid rgba(216, 169, 74, 0.34);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(216, 169, 74, 0.1), rgba(240, 227, 205, 0.03) 42%, rgba(86, 45, 82, 0.16));
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+}
+.nos-bank__head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 0 22px;
+  border-bottom: 1px solid var(--nos-line);
+}
+.nos-bank__mark {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid rgba(216, 169, 74, 0.5);
+  color: var(--nos-gold-lit);
+  background: rgba(216, 169, 74, 0.12);
+}
+.nos-bank__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--nos-gold-lit);
+}
+.nos-bank__sub {
+  margin: 5px 0 0;
+  font-size: 14px;
+  color: rgba(240, 227, 205, 0.6);
+}
+
+.nos-bank__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  margin: 0;
+  padding: 22px 0 0;
+}
+.nos-bank__row {
+  display: flex;
+  flex-flow: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  transition: background 0.4s var(--nos-out);
+}
+.nos-bank__row:hover { background: rgba(240, 227, 205, 0.05); }
+.nos-bank__row dt {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--nos-gold);
+}
+.nos-bank__row dd {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+.nos-bank__value {
+  font-size: clamp(17px, 1.9vw, 22px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  user-select: all;
+}
+
+.nos-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border: 1px solid var(--nos-line);
+  border-radius: 999px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(240, 227, 205, 0.66);
+  cursor: pointer;
+  transition: border-color 0.35s var(--nos-out), color 0.35s var(--nos-out), background 0.35s var(--nos-out);
+}
+.nos-copy:hover { border-color: rgba(216, 169, 74, 0.6); color: var(--nos-gold-lit); }
+.nos-copy[data-state='copied'] {
+  border-color: transparent;
+  background: var(--nos-gold);
+  color: #1b1024;
+}
+/* the clipboard refused and the value has been selected instead: an outline,
+   not a filled chip, because the reader still has something to do */
+.nos-copy[data-state='manual'] {
+  border-color: var(--nos-gold);
+  color: var(--nos-gold-lit);
+  background: rgba(216, 169, 74, 0.14);
+}
+.nos-bank__value::selection { background: var(--nos-gold); color: #1b1024; }
+
+.nos-bank__foot {
+  margin: 20px 0 0;
+  padding: 14px 18px;
+  border-left: 2px solid rgba(216, 169, 74, 0.5);
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(240, 227, 205, 0.56);
+}
+
+/* =============================================================================
+ * 4 — the close
+ * ========================================================================== */
+
+.nos-close {
+  background: #fff;
+  color: var(--nos-navy);
+  padding: clamp(78px, 9vw, 136px) 0 clamp(64px, 7vw, 108px);
+  text-align: center;
+}
+
+.nos-quote {
+  margin: 0;
+  padding: 0;
+}
+.nos-quote__line {
+  margin: 0;
+  font-family: var(--nos-serif);
+  font-style: italic;
+  font-size: clamp(22px, 2.8vw, 38px);
+  line-height: 1.3;
+  color: rgba(22, 48, 94, 0.7);
+}
+.nos-quote__line--big {
+  font-family: var(--nos-sans);
+  font-style: normal;
+  font-weight: 700;
+  font-size: clamp(30px, 5.2vw, 72px);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  color: var(--nos-navy);
+  margin: 6px 0;
+}
+
+.nos-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 44px);
+  margin: clamp(46px, 6vw, 84px) 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.nos-pillar {
+  position: relative;
+  padding: 26px 0 0;
+  border-top: 1px solid rgba(22, 48, 94, 0.14);
+  min-width: 0;
+}
+.nos-pillar__index {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--nos-gold-deep);
+}
+.nos-pillar__title {
+  margin: 12px 0 0;
+  font-family: var(--nos-serif);
+  font-weight: 400;
+  font-size: clamp(28px, 3.4vw, 46px);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--nos-navy);
+}
+.nos-pillar__body {
+  display: flex;
+  flex-flow: column;
+  gap: 2px;
+  margin: 12px 0 0;
+  font-size: clamp(14px, 1.4vw, 17px);
+  line-height: 1.5;
+  color: rgba(22, 48, 94, 0.72);
+}
+
+.nos-creed {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  gap: 14px;
+  margin: clamp(50px, 6vw, 88px) 0 0;
+}
+.nos-creed__call {
+  margin: 0;
+  font-size: clamp(16px, 1.9vw, 22px);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--nos-navy);
+}
+.nos-creed__line {
+  margin: 0;
+  font-size: clamp(13px, 1.4vw, 16px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(22, 48, 94, 0.7);
+}
+.nos-creed__motto {
+  margin: 4px 0;
+  font-family: var(--nos-serif);
+  font-style: italic;
+  font-size: clamp(20px, 2.4vw, 30px);
+  color: var(--nos-gold-deep);
+}
+
+/* =============================================================================
+ * Narrower screens
+ *
+ * The two-column sections stack, the poster leads the awardee section rather
+ * than sitting beside it, and the ladder and the account become one column.
+ * ========================================================================== */
+
+@media (max-width: 1099.98px) {
+  .nos-hero__shell { gap: 0; }
+  .nos-bank__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---- short screens --------------------------------------------------------
+ * A laptop is wide and short: 1280×720 and 1440×900 are the two commonest
+ * shapes, and at the rhythm above the countdown and the buttons both fell
+ * below the fold on the first of them. The type scale on a wide screen is set
+ * from the width, which says nothing about how much height there is to spend.
+ *
+ * So on a wide-but-short viewport the hero tightens: a smaller display size,
+ * less air between the blocks, and a shallower top margin. Nothing is removed
+ * and nothing moves — the same seven things in the same order, set closer.
+ * ------------------------------------------------------------------------ */
+@media (min-width: 900px) and (max-height: 940px) {
+  .nos-hero { padding-top: clamp(88px, 7vw, 104px); padding-bottom: clamp(56px, 6vw, 84px); }
+  .nos-hero__title { font-size: clamp(40px, 5.8vw, 82px); }
+  .nos-hero__award { margin-top: 15px; }
+  .nos-hero__lede { margin-top: 13px; font-size: clamp(14px, 1.2vw, 16px); }
+  .nos-hero .nos-count { margin-top: 21px; }
+  .nos-count__cell { padding: 10px 8px 9px; }
+  .nos-count__num { font-size: clamp(21px, 2.3vw, 29px); }
+  .nos-hero__facts { margin-top: 21px; padding-top: 16px; }
+  .nos-hero__actions { margin-top: 21px; }
+  .nos-hero__price { margin-top: 15px; }
+  .nos-hero__cue { margin-top: clamp(26px, 3vw, 40px); }
+}
+
+@media (max-width: 899.98px) {
+  .nos-hero {
+    min-height: 0;
+    padding: clamp(88px, 14vw, 108px) 0 clamp(56px, 10vw, 84px);
+  }
+  .nos-hero__shell,
+  .nos-awardee__shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* On one column the poster cannot simply go first or last: first, it fills
+   * the phone and the title starts 850px down; last, the artwork sits below
+   * eight blocks of text. It belongs directly under the title, which means
+   * breaking between two children of `.nos-hero__words`.
+   *
+   * `display: contents` drops that wrapper out of the box tree so its seven
+   * children become grid items of the shell alongside the poster, and `order`
+   * then puts the poster fifth. The wrapper carries no styling of its own, so
+   * nothing is lost with it, and `.nos-hero__words > *` still matches — the
+   * selector reads the DOM, which has not changed.
+   *
+   * Only the poster moves out of source order. It is a button whose accessible
+   * name is the poster's full alt text, so a reader who tabs to it last still
+   * gets the whole thing; nothing above it depends on having read it. */
+  .nos-hero__words { display: contents; }
+  .nos-hero__college { margin-bottom: 16px; }
+  .nos-hero__title   { order: 1; }
+  .nos-hero__award   { order: 2; }
+  .nos-hero__frame   { order: 3; }
+  .nos-hero__lede    { order: 4; }
+  .nos-hero .nos-count      { order: 5; }
+  .nos-hero__facts   { order: 6; }
+  .nos-hero__actions { order: 7; }
+  .nos-hero__price   { order: 8; }
+
+  .nos-hero__shell { gap: 0; }
+  .nos-hero__frame {
+    justify-self: center;
+    max-width: 360px;
+    margin: 26px 0 4px;
+    margin-left: 0;
+  }
+  .nos-awardee__frame { justify-self: center; max-width: 460px; }
+  .nos-awardee__words { text-align: center; }
+  .nos-awardee__eyebrow { justify-content: center; }
+  .nos-shakti { margin-inline: auto; }
+  .nos-tiers { grid-template-columns: minmax(0, 1fr); }
+  .nos-close { display: none; }
+  .nos-hero__cue { display: none; }
+}
+
+@media (max-width: 599.98px) {
+  .nos-count { gap: 7px; }
+  .nos-count__cell { flex: 1 1 0; padding: 11px 4px 9px; border-radius: 11px; }
+  .nos-count__word { font-size: 9px; letter-spacing: 0.1em; }
+  .nos-hero__actions { flex-flow: column; align-items: stretch; }
+  .nos-cta { justify-content: center; }
+  .nos-bank__row dd { gap: 10px; }
+}
+
+/* =============================================================================
+ * Reduced motion
+ *
+ * Every entrance here is an opacity and a transform, so removing them leaves
+ * the finished state — which is the design. The bloom, the motes and the gilt
+ * sweep stop outright; the tilt never starts, because the hook checks the same
+ * query before it writes anything, and the hero's two in-page jumps fall back
+ * to the browser's instant scroll for the same reason.
+ * ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .nos-run *,
+  .nos-run *::before,
+  .nos-run *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+  .nos-hero__words > *,
+  .nos-hero__college,
+  .nos-hero__frame,
+  .nos-hero__cue {
+    opacity: 1;
+    transform: none;
+  }
+  .nos-hero__dust { display: none; }
+  /* the gilt sweep is an animation; without it the gradient must still paint */
+  .nos-hero__line--script .nos-hero__rise,
+  .nos-gilt { background-position: 50% 0; }
+}

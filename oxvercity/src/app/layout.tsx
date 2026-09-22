@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
  *   breakpoints  which breakpoint copy of a component is visible
  *   site         the few hand-written rules the rebuild adds
  *   voices       the home page's animated community voices section
+ *   nostalgia    the home page's opening run, built from the two event posters
  *   auth         the sign-in page, built from the same tokens as the rest
  *   account      the profile icon in the header, for signed-in alumni
  */
@@ -17,6 +18,7 @@ import '@/styles/framer-runtime.css';
 import '@/styles/breakpoints.css';
 import '@/styles/site.css';
 import '@/styles/voices.css';
+import '@/styles/nostalgia.css';
 import '@/styles/events.css';
 import '@/styles/chapters.css';
 import '@/styles/alumni.css';
