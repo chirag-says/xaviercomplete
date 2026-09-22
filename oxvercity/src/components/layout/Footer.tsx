@@ -8,7 +8,7 @@
 
 import { FooterLink } from './FooterLink';
 import { LAYOUT_HASHES, type BreakpointHashes } from '@/lib/breakpoints';
-import { contact, footerColumns, siteLogo } from '@/data/site';
+import { associationName, contact, footerColumns, siteLogo } from '@/data/site';
 
 /** Framer's layout slot for each link, per column. */
 const LINK_CONTAINERS = [
@@ -33,10 +33,15 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                       <a className={"framer-4X5ZN framer-10rs7as framer-v-f1vhqz framer-1jc5brm"} data-framer-name={"Logo Dark"} data-highlight={"true"} href={"/"} tabIndex={0} style={{ height: "100%", width: "100%" } as React.CSSProperties}>
                         <div className={"framer-1jrltms"} data-framer-name={"Logo"}>
                           <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                            <img decoding={"async"} width={"153"} height={"29"} src={siteLogo.dark} alt={""} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
+                            <img decoding={"async"} width={"153"} height={"29"} src={siteLogo.dark} alt={associationName} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
                           </div>
                         </div>
                       </a>
+                    </div>
+                    <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ width: "100%", transform: "none" } as React.CSSProperties}>
+                      <p className={"framer-text framer-styles-preset-1dfqlr0"} data-styles-preset={"r3nvaFHNq"}>
+                        {associationName}
+                      </p>
                     </div>
                     <div className={"framer-75f6l"} data-framer-name={"Text Block"}>
                       <div className={"framer-k9231b"} data-framer-name={"Title"} data-framer-component-type={"RichTextContainer"} style={{ '--framer-link-text-color': "rgb(0, 153, 255)", '--framer-link-text-decoration': "underline", transform: "none" } as React.CSSProperties}>
@@ -137,10 +142,15 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                       <a className={"framer-4X5ZN framer-10rs7as framer-v-f1vhqz framer-1jc5brm"} data-framer-name={"Logo Dark"} data-highlight={"true"} href={"/"} tabIndex={0} style={{ height: "100%", width: "100%" } as React.CSSProperties}>
                         <div className={"framer-1jrltms"} data-framer-name={"Logo"}>
                           <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                            <img decoding={"async"} width={"153"} height={"29"} src={siteLogo.dark} alt={""} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
+                            <img decoding={"async"} width={"153"} height={"29"} src={siteLogo.dark} alt={associationName} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
                           </div>
                         </div>
                       </a>
+                    </div>
+                    <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ width: "100%", transform: "none" } as React.CSSProperties}>
+                      <p className={"framer-text framer-styles-preset-1dfqlr0"} data-styles-preset={"r3nvaFHNq"}>
+                        {associationName}
+                      </p>
                     </div>
                     <div className={"framer-75f6l"} data-framer-name={"Text Block"}>
                       <div className={"framer-k9231b"} data-framer-name={"Title"} data-framer-component-type={"RichTextContainer"} style={{ '--framer-link-text-color': "rgb(0, 153, 255)", '--framer-link-text-decoration': "underline", transform: "none" } as React.CSSProperties}>
@@ -244,10 +254,15 @@ export function Footer({ hashes = LAYOUT_HASHES.main, containerClass = 'framer-1
                     <a className={"framer-4X5ZN framer-10rs7as framer-v-f1vhqz framer-1jc5brm"} data-framer-name={"Logo Dark"} data-highlight={"true"} href={"/"} tabIndex={0} style={{ height: "100%", width: "100%" } as React.CSSProperties}>
                       <div className={"framer-1jrltms"} data-framer-name={"Logo"}>
                         <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                          <img decoding={"async"} width={"153"} height={"29"} src={siteLogo.dark} alt={""} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
+                          <img decoding={"async"} width={"153"} height={"29"} src={siteLogo.dark} alt={associationName} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "contain" } as React.CSSProperties} />
                         </div>
                       </div>
                     </a>
+                  </div>
+                  <div data-framer-name={"Association Name"} data-framer-component-type={"RichTextContainer"} style={{ width: "100%", transform: "none" } as React.CSSProperties}>
+                    <p className={"framer-text framer-styles-preset-1dfqlr0"} data-styles-preset={"r3nvaFHNq"}>
+                      {associationName}
+                    </p>
                   </div>
                   <div className={"framer-75f6l"} data-framer-name={"Text Block"}>
                     <div className={"framer-k9231b"} data-framer-name={"Title"} data-framer-component-type={"RichTextContainer"} style={{ '--framer-link-text-color': "rgb(0, 153, 255)", '--framer-link-text-decoration': "underline", transform: "none" } as React.CSSProperties}>

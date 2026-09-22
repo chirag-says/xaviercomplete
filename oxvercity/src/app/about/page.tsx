@@ -6,7 +6,7 @@ import { PillarsSection } from '@/components/about/PillarsSection';
 import { HistorySection } from '@/components/about/HistorySection';
 import { CollegeSection } from '@/components/about/CollegeSection';
 
-export const metadata: Metadata = { title: 'About SXCCAA West Zone — St. Xavier\u2019s College Alumni Association' };
+export const metadata: Metadata = { title: 'About SXCCAA — St. Xavier\u2019s College Calcutta Alumni Association West Zone Chapter' };
 
 /**
  * The page opens with the Association, turns to the College it came out of —

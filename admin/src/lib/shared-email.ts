@@ -89,7 +89,7 @@ export async function send(mail: Mail, config: MailConfig = mailConfig()): Promi
 const WRAP = (body: string, footer: string) => `<!doctype html>
 <html lang="en"><body style="margin:0;padding:32px 16px;background:#f6f5f3;font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1a1a1a">
 <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;padding:36px 32px">
-<p style="margin:0 0 24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a">St Xavier's College Calcutta Alumni Association West Zone</p>
+<p style="margin:0 0 24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a">St Xavier's College Calcutta Alumni Association West Zone Chapter</p>
 ${body}
 <hr style="border:0;border-top:1px solid #eae8e4;margin:32px 0 20px">
 <p style="margin:0;font-size:13px;color:#8a8a8a">${footer}</p>
@@ -112,7 +112,7 @@ export function invitationEmail(
   const text = [
     `You've been invited to Nostalgia '26!`,
     '',
-    `The St. Xavier\u2019s College Calcutta Alumni Association West Zone has added you to the alumni directory.`,
+    `The St. Xavier\u2019s College Calcutta Alumni Association West Zone Chapter has added you to the alumni directory.`,
     '',
     `You can sign in anytime using your email address: ${alumniEmail}`,
     '',
@@ -128,7 +128,7 @@ export function invitationEmail(
 
   const html = WRAP(
     `<h1 style="margin:0 0 8px;font-size:22px;font-weight:600">You\u2019re invited to Nostalgia \u201926</h1>
-<p style="margin:0 0 20px;color:#555">The St. Xavier\u2019s College Calcutta Alumni Association West Zone has added you to the alumni directory.</p>
+<p style="margin:0 0 20px;color:#555">The St. Xavier\u2019s College Calcutta Alumni Association West Zone Chapter has added you to the alumni directory.</p>
 <p style="margin:0 0 8px;font-size:14px;color:#8a8a8a">Your sign-in email</p>
 <p style="margin:0 0 24px;font-size:18px;font-weight:600;font-family:monospace;background:#f6f5f3;padding:12px 16px;border-radius:8px;word-break:break-all">${alumniEmail}</p>
 <p style="margin:0 0 24px;color:#555">No password needed \u2014 we\u2019ll email you a one-time code each time you sign in.</p>

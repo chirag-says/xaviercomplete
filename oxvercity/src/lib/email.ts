@@ -100,7 +100,7 @@ export async function send(mail: Mail, config: MailConfig = mailConfig()): Promi
 const WRAP = (body: string, footer: string) => `<!doctype html>
 <html lang="en"><body style="margin:0;padding:32px 16px;background:#f6f5f3;font:16px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1a1a1a">
 <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:14px;padding:36px 32px">
-<p style="margin:0 0 24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a">St Xavier's College Calcutta Alumni Association West Zone</p>
+<p style="margin:0 0 24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8a8a8a">St Xavier's College Calcutta Alumni Association West Zone Chapter</p>
 ${body}
 <hr style="border:0;border-top:1px solid #eae8e4;margin:32px 0 20px">
 <p style="margin:0;font-size:13px;color:#8a8a8a">${footer}</p>

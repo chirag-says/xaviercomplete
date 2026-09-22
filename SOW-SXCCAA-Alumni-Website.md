@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | **Document** | Statement of Work (SOW) |
-| **Project** | St. Xavier's College Alumni Association — Alumni Directory & Connection Platform |
-| **Client** | St. Xavier's College Alumni Association (SXCCAA) |
+| **Project** | St. Xavier's College Calcutta Alumni Association West Zone Chapter — Alumni Directory & Connection Platform |
+| **Client** | St. Xavier's College Calcutta Alumni Association West Zone Chapter (SXCCAA) |
 | **Prepared by** | [Your name / Team name] |
 | **Prepared for** | [Client / Sponsor name] |
 | **Version** | 0.1 — Draft for review |

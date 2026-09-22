@@ -21,7 +21,7 @@ Any future audit must do the same or it will measure the desktop layout.
 
 | Family | Where |
 |---|---|
-| **Olde English** | The hero: "St. Xaviers College (Calcutta)" and "Alumni Association" |
+| **Olde English** | The hero: "St. Xaviers College (Calcutta)" and "Alumni Association West Zone Chapter" |
 | Instrument Sans | Headings, ledes, card titles |
 | Roboto | Body copy |
 | Inter | Navigation, buttons, labels |
