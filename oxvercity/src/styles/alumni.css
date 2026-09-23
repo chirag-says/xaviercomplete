@@ -421,6 +421,41 @@
   color: var(--al-white);
 }
 
+/* Sort toggle — "Recently Active" */
+.al-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  border: 1.5px solid var(--al-faint);
+  border-radius: 10px;
+  background: var(--al-white);
+  color: var(--al-muted);
+  cursor: pointer;
+  transition: all 0.3s var(--al-out);
+  white-space: nowrap;
+}
+.al-sort-btn:hover {
+  border-color: var(--al-green);
+  color: var(--al-ink);
+}
+.al-sort-btn--active {
+  background: var(--al-green);
+  border-color: var(--al-green);
+  color: var(--al-white);
+}
+.al-sort-btn--active:hover {
+  background: #0f345a;
+  border-color: #0f345a;
+  color: var(--al-white);
+}
+.al-sort-btn svg {
+  flex-shrink: 0;
+}
+
 .al-reset {
   appearance: none;
   border: none;

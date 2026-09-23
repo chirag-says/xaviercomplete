@@ -48,6 +48,7 @@ function record(overrides: Partial<AlumniRecord> = {}): AlumniRecord {
     showGmail: true,
     photoAudience: 'public',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
     ...overrides,
   };
 }

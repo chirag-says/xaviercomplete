@@ -84,6 +84,7 @@ function toOwnRecord(row: OwnDbRow): OwnAlumnus {
     otherInfo: safeDecrypt(row.other_info_enc, row.id, 'otherInfo'),
     showContact: row.show_contact,
     showGmail: row.show_gmail,
+    ownerUpdatedAt: null,
     isVisible: row.is_visible,
   });
 }
@@ -395,6 +396,7 @@ export async function readPhotoBytes(
         designation: null,
         photoAudience: row.photo_audience as PhotoAudience,
         photoStatus: row.photo_status as OwnAlumnus['photoStatus'],
+        ownerUpdatedAt: null,
       },
       viewer,
     );

@@ -82,6 +82,7 @@ interface PublicDbRow {
   designation: string | null;
   photo_audience: string;
   photo_status: string;
+  owner_updated_at: Date | null;
 }
 
 function toPublicRow(row: PublicDbRow): PublicRow {
@@ -94,6 +95,7 @@ function toPublicRow(row: PublicDbRow): PublicRow {
     designation: row.designation,
     photoAudience: row.photo_audience as PublicRow['photoAudience'],
     photoStatus: row.photo_status as PublicRow['photoStatus'],
+    ownerUpdatedAt: row.owner_updated_at?.toISOString() ?? null,
   };
 }
 
@@ -122,7 +124,7 @@ export async function listPublicAlumni(
     : (
         await sql<PublicDbRow[]>`
           select id, full_name, batch_year, stream, current_org, designation,
-                 photo_audience, photo_status
+                 photo_audience, photo_status, owner_updated_at
             from alumni
            where is_visible
            order by batch_year desc nulls last, full_name nulls last

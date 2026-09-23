@@ -49,6 +49,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: true,
     photoAudience: 'public',
     photoStatus: 'none',
+    ownerUpdatedAt: '2026-09-20T14:30:00.000Z',
   },
   {
     id: 'b7n4t8v2yz6h',
@@ -67,6 +68,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: true,
     photoAudience: 'public',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
   },
   {
     id: 'r5w9q3j7dk2m',
@@ -84,6 +86,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: false,
     photoAudience: 'alumni',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
   },
   {
     id: 'h2p6s4c8nx3v',
@@ -100,6 +103,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: true,
     photoAudience: 'public',
     photoStatus: 'none',
+    ownerUpdatedAt: '2026-09-22T09:15:00.000Z',
   },
   {
     id: 'm8z3g7k2ft5q',
@@ -116,6 +120,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: false,
     photoAudience: 'alumni',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
   },
   {
     id: 'd4v7b9n3xw6r',
@@ -132,6 +137,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: true,
     photoAudience: 'public',
     photoStatus: 'none',
+    ownerUpdatedAt: '2026-09-18T11:00:00.000Z',
   },
   {
     id: 'q9j2m5t8hz4c',
@@ -148,6 +154,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: false,
     photoAudience: 'alumni',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
   },
   {
     id: 'w6k4r7p2vn9s',
@@ -166,6 +173,7 @@ export const demoAlumni: AlumniRecord[] = [
     // An administrator took this one down; the object was deleted and the card
     // fell back to the avatar. Exercises the "no object behind it" branch.
     photoStatus: 'removed',
+    ownerUpdatedAt: '2026-09-21T16:45:00.000Z',
   },
   {
     id: 'z3t8n5x2qm7f',
@@ -182,6 +190,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: true,
     photoAudience: 'alumni',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
   },
   {
     id: 'c7h3v9k4sw2p',
@@ -198,6 +207,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: true,
     photoAudience: 'public',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
   },
   {
     id: 'n5q2w8f3jt6k',
@@ -214,6 +224,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: true,
     photoAudience: 'public',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
   },
   {
     id: 'v4m7c2z9pk3h',
@@ -232,6 +243,7 @@ export const demoAlumni: AlumniRecord[] = [
     showGmail: false,
     photoAudience: 'public',
     photoStatus: 'none',
+    ownerUpdatedAt: null,
   },
 ];
 
