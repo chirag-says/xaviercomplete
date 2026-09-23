@@ -21,6 +21,8 @@ import { AlumniCard } from './AlumniCard';
 import { directoryCopy, filterLabels, type FilterKey } from '@/data/alumni';
 import type { PublicAlumnus } from '@/lib/visibility';
 
+type SortMode = 'batch' | 'active';
+
 const EMPTY: Record<FilterKey, string> = { batchYear: '', stream: '' };
 
 /*
@@ -60,6 +62,7 @@ export function AlumniDiscover({
 }) {
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState(EMPTY);
+  const [sort, setSort] = useState<SortMode>('batch');
 
   // Derived from the records on screen, so a filter never offers a value that
   // would return nothing — and never names a batch or stream that is not in the
@@ -74,18 +77,32 @@ export function AlumniDiscover({
 
   const results = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return people.filter((person) => {
+    const filtered = people.filter((person) => {
       if (needle && !haystack(person).includes(needle)) return false;
       return (Object.keys(filters) as FilterKey[]).every(
         (key) => !filters[key] || valueOf(person, key) === filters[key],
       );
     });
-  }, [people, query, filters]);
+
+    if (sort === 'active') {
+      return [...filtered].sort((a, b) => {
+        // Alumni with lastActive come first, sorted most recent first.
+        // Alumni without lastActive go to the end.
+        if (a.lastActive && b.lastActive) return b.lastActive.localeCompare(a.lastActive);
+        if (a.lastActive) return -1;
+        if (b.lastActive) return 1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [people, query, filters, sort]);
 
   const dirty = query !== '' || Object.values(filters).some(Boolean);
   const reset = () => {
     setQuery('');
     setFilters(EMPTY);
+    setSort('batch');
   };
 
   return (
@@ -128,7 +145,19 @@ export function AlumniDiscover({
             </select>
           ))}
 
-          {dirty && (
+          <button
+            type="button"
+            className={`al-sort-btn${sort === 'active' ? ' al-sort-btn--active' : ''}`}
+            onClick={() => setSort(sort === 'active' ? 'batch' : 'active')}
+            aria-pressed={sort === 'active'}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83" />
+            </svg>
+            Recently Active
+          </button>
+
+          {(dirty || sort !== 'batch') && (
             <button type="button" className="al-reset" onClick={reset}>{directoryCopy.clearLabel}</button>
           )}
         </div>

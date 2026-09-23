@@ -66,6 +66,8 @@ export interface PublicRow {
   designation: string | null;
   photoAudience: PhotoAudience;
   photoStatus: PhotoStatus;
+  /** ISO string of when the alumnus last edited their own record, or null. */
+  ownerUpdatedAt: string | null;
 }
 
 /**
@@ -100,6 +102,8 @@ export interface PublicAlumnus {
   designation: string | null;
   /** Null means "show the fallback avatar" — either no photo, or not for this viewer. */
   photoUrl: string | null;
+  /** ISO string of when the alumnus last edited their own record, or null. */
+  lastActive: string | null;
 }
 
 /**
@@ -217,6 +221,7 @@ export function toPublic(row: PublicRow, viewer: ViewerTier): PublicAlumnus {
     currentOrg: row.currentOrg,
     designation: row.designation,
     photoUrl: photoUrlFor(row, viewer),
+    lastActive: row.ownerUpdatedAt,
   };
 }
 
