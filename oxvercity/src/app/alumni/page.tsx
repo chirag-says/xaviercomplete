@@ -17,11 +17,9 @@ import type { Metadata } from 'next';
 
 import { SiteShell } from '@/components/layout/SiteShell';
 import { AlumniHero } from '@/components/alumni/AlumniHero';
-import { AlumniFeatured } from '@/components/alumni/AlumniFeatured';
 import { AlumniDiscover } from '@/components/alumni/AlumniDiscover';
 import { SignInPrompt } from '@/components/alumni/SignInPrompt';
-import { featuredIds } from '@/data/alumni';
-import { listFeatured, listPublicAlumni, tierOf, servingDemoRecords } from '@/lib/directory';
+import { listPublicAlumni, tierOf, servingDemoRecords } from '@/lib/directory';
 import { currentSession } from '@/lib/session-cookie';
 
 export const runtime = 'nodejs';
@@ -39,7 +37,6 @@ export default async function AlumniPage() {
   const isDemo = servingDemoRecords();
 
   const people = await listPublicAlumni(viewer);
-  const featured = await listFeatured(viewer, featuredIds);
 
   // Counted from what is on the page, so the figures can never overstate the
   // directory — see the note in AlumniHero.
@@ -56,7 +53,6 @@ export default async function AlumniPage() {
     <SiteShell lightPage={true}>
       <div className="al-page">
         <AlumniHero stats={stats} />
-        <AlumniFeatured people={featured} isDemo={isDemo} />
         {!isVerified && <SignInPrompt />}
         <AlumniDiscover people={people} isVerified={isVerified} isDemo={isDemo} />
       </div>
