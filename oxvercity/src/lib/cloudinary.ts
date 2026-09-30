@@ -28,10 +28,10 @@ export function cloudinaryUrl(localPath: string, opts?: { width?: number }): str
   const filename = parts.pop()!;
   const subfolders = parts; // e.g. ['events'] or ['home'] or []
   const folder = ['oxvercity', ...subfolders].join('/');       // oxvercity/events
-  const basename = filename.replace(/\.[^.]+$/, '');           // nostalgia-26
+  const [, basename, ext] = filename.match(/^(.*)(\.[^.]+)$/) || [, filename, ''];
   // The upload stored at folder + "/" + folder + "/" + basename
   // because both `folder` and `public_id` (which included folder) were sent.
-  const fullPath = `${folder}/${folder}/${basename}`;
+  const fullPath = `${folder}/${folder}/${basename}${ext}`;
 
   const transforms = ['f_auto', 'q_auto'];
   if (opts?.width) transforms.push(`w_${opts.width}`);
