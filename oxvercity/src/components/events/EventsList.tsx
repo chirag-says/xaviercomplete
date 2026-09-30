@@ -14,7 +14,7 @@
  */
 
 import { Reveal } from '@/components/motion/Reveal';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { alumniEvents, featuredEvent, eventsPage } from '@/data/pages/events';
 
 const POSTER_SIZES = '(max-width: 809.98px) min(calc(100vw - 40px), 414px), (max-width: 1199.98px) 340px, 414px';
@@ -35,7 +35,7 @@ export function EventsList() {
                   height={featuredEvent.poster.height}
                   sizes={POSTER_SIZES}
                   srcSet={imageSrcSet(featuredEvent.poster)}
-                  src={featuredEvent.poster.src}
+                  src={imageUrl(featuredEvent.poster)}
                   alt={featuredEvent.poster.alt}
                 />
               </div>
@@ -104,7 +104,7 @@ export function EventsList() {
                             height={image.height}
                             sizes={PHOTO_SIZES}
                             srcSet={imageSrcSet(image)}
-                            src={image.src}
+                            src={imageUrl(image)}
                             alt={image.alt}
                           />
                         </figure>

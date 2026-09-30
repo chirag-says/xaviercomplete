@@ -17,6 +17,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { imageUrl } from '@/lib/images';
 import type { SiteImage } from '@/lib/images';
 
 export interface LightboxItem {
@@ -119,7 +120,7 @@ export function Lightbox({
 
       <div className="ev-lightbox__frame" ref={frame}>
         <img
-          src={item.image.src}
+          src={imageUrl(item.image)}
           width={item.image.width}
           height={item.image.height}
           alt={item.image.alt}

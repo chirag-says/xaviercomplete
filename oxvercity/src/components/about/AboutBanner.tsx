@@ -1,3 +1,4 @@
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { SplitDisplay } from '@/components/shared/SplitDisplay';
 
 /**
@@ -26,8 +27,8 @@ export function AboutBanner() {
               <div className={"framer-1kv7kk8"} data-framer-appear-id={"1kv7kk8"} data-framer-name={"BG Image"} style={{ willChange: "transform", opacity: "0.001", transform: "scale(1.03)" } as React.CSSProperties}>
                 <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
                   <picture>
-                    <source media="(max-width: 809.98px)" srcSet="/images/home/campus-gate-mobile.png" />
-                    <img decoding={"async"} width={"1600"} height={"900"} sizes={"(min-width: 1200px) max(100vw, 1px), (min-width: 810px) and (max-width: 1199.98px) max(100vw, 1px), (max-width: 809.98px) max(100vw, 1px)"} srcSet={"/images/home/voices-bg-512.jpg 512w, /images/home/voices-bg-1024.jpg 1024w, /images/home/voices-bg.jpg 1600w"} src={"/images/home/voices-bg.jpg"} alt={"Xaverian community"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "50% 50%", objectFit: "cover" } as React.CSSProperties} />
+                    <source media="(max-width: 809.98px)" srcSet={cloudinaryUrl('/images/home/campus-gate-mobile.png')} />
+                    <img decoding={"async"} width={"1600"} height={"900"} sizes={"(min-width: 1200px) max(100vw, 1px), (min-width: 810px) and (max-width: 1199.98px) max(100vw, 1px), (max-width: 809.98px) max(100vw, 1px)"} srcSet={`${cloudinaryUrl('/images/home/voices-bg.jpg', { width: 512 })} 512w, ${cloudinaryUrl('/images/home/voices-bg.jpg', { width: 1024 })} 1024w, ${cloudinaryUrl('/images/home/voices-bg.jpg')} 1600w`} src={cloudinaryUrl('/images/home/voices-bg.jpg')} alt={"Xaverian community"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "50% 50%", objectFit: "cover" } as React.CSSProperties} />
                   </picture>
                 </div>
               </div>

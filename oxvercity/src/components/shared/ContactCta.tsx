@@ -17,6 +17,7 @@ export const ABOUT_HASHES: BreakpointHashes = { desktop: 'r0yflc', tablet: '4h95
 /** Each page template wraps the CTA in its own container class, which carries the width rule. */
 export const CTA_CONTAINERS = { home: 'framer-o4lape-container', about: 'framer-1j8g7ei-container' } as const;
 
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { SiteForm, SubmitButton } from '@/components/ui/SiteForm';
 import { contactCta } from '@/data/site';
 
@@ -28,7 +29,7 @@ export function ContactCta({ hashes = HOME_HASHES, containerClass = CTA_CONTAINE
           <section className={"framer-JP73w framer-r4qqQ framer-ShxJM framer-8jqacb framer-v-8jqacb"} data-framer-name={"Desktop"} style={{ width: "100%" } as React.CSSProperties}>
             <div className={"framer-easkis"} data-framer-name={"BG Image"} style={{ willChange: "transform", opacity: "1", transform: "scale(1.1)" } as React.CSSProperties}>
               <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                <img decoding={"async"} width={"900"} height={"611"} sizes={"(min-width: 1200px) 100vw, (max-width: 809.98px) 100vw, (min-width: 810px) and (max-width: 1199.98px) 100vw"} srcSet={"/images/shared/contact-cta-bg-512.jpg 512w, /images/shared/contact-cta-bg.jpg 900w"} src={"/images/shared/contact-cta-bg.jpg"} alt={"Cta Image"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "cover" } as React.CSSProperties} />
+                <img decoding={"async"} width={"900"} height={"611"} sizes={"(min-width: 1200px) 100vw, (max-width: 809.98px) 100vw, (min-width: 810px) and (max-width: 1199.98px) 100vw"} srcSet={`${cloudinaryUrl('/images/shared/contact-cta-bg.jpg', { width: 512 })} 512w, ${cloudinaryUrl('/images/shared/contact-cta-bg.jpg')} 900w`} src={cloudinaryUrl('/images/shared/contact-cta-bg.jpg')} alt={"Cta Image"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "cover" } as React.CSSProperties} />
               </div>
             </div>
             <div className={"framer-1wdx7i7"} data-framer-name={"Container"}>
@@ -105,7 +106,7 @@ export function ContactCta({ hashes = HOME_HASHES, containerClass = CTA_CONTAINE
           <section className={"framer-JP73w framer-r4qqQ framer-ShxJM framer-8jqacb framer-v-1wtl4qm"} data-framer-name={"Phone"} style={{ width: "100%" } as React.CSSProperties}>
             <div className={"framer-easkis"} data-framer-name={"BG Image"} style={{ willChange: "transform", opacity: "1", transform: "scale(1.1)" } as React.CSSProperties}>
               <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                <img decoding={"async"} width={"900"} height={"611"} sizes={"(min-width: 1200px) 100vw, (max-width: 809.98px) 100vw, (min-width: 810px) and (max-width: 1199.98px) 100vw"} srcSet={"/images/shared/contact-cta-bg-512.jpg 512w, /images/shared/contact-cta-bg.jpg 900w"} src={"/images/shared/contact-cta-bg.jpg"} alt={"Cta Image"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "cover" } as React.CSSProperties} />
+                <img decoding={"async"} width={"900"} height={"611"} sizes={"(min-width: 1200px) 100vw, (max-width: 809.98px) 100vw, (min-width: 810px) and (max-width: 1199.98px) 100vw"} srcSet={`${cloudinaryUrl('/images/shared/contact-cta-bg.jpg', { width: 512 })} 512w, ${cloudinaryUrl('/images/shared/contact-cta-bg.jpg')} 900w`} src={cloudinaryUrl('/images/shared/contact-cta-bg.jpg')} alt={"Cta Image"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "cover" } as React.CSSProperties} />
               </div>
             </div>
             <div className={"framer-1wdx7i7"} data-framer-name={"Container"}>
@@ -182,7 +183,7 @@ export function ContactCta({ hashes = HOME_HASHES, containerClass = CTA_CONTAINE
           <section className={"framer-JP73w framer-r4qqQ framer-ShxJM framer-8jqacb framer-v-1n4499d"} data-framer-name={"Tablet"} style={{ width: "100%" } as React.CSSProperties}>
             <div className={"framer-easkis"} data-framer-name={"BG Image"} style={{ willChange: "transform", opacity: "1", transform: "scale(1.1)" } as React.CSSProperties}>
               <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
-                <img decoding={"async"} width={"900"} height={"611"} sizes={"(min-width: 1200px) 100vw, (max-width: 809.98px) 100vw, (min-width: 810px) and (max-width: 1199.98px) 100vw"} srcSet={"/images/shared/contact-cta-bg-512.jpg 512w, /images/shared/contact-cta-bg.jpg 900w"} src={"/images/shared/contact-cta-bg.jpg"} alt={"Cta Image"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "cover" } as React.CSSProperties} />
+                <img decoding={"async"} width={"900"} height={"611"} sizes={"(min-width: 1200px) 100vw, (max-width: 809.98px) 100vw, (min-width: 810px) and (max-width: 1199.98px) 100vw"} srcSet={`${cloudinaryUrl('/images/shared/contact-cta-bg.jpg', { width: 512 })} 512w, ${cloudinaryUrl('/images/shared/contact-cta-bg.jpg')} 900w`} src={cloudinaryUrl('/images/shared/contact-cta-bg.jpg')} alt={"Cta Image"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "cover" } as React.CSSProperties} />
               </div>
             </div>
             <div className={"framer-1wdx7i7"} data-framer-name={"Container"}>

@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { tokens } from '@/lib/tokens';
 import type { NewsCard as Card } from '@/data/pages/about';
 
@@ -58,7 +58,7 @@ export function NewsCard({ item, variant }: { item: Card; variant: keyof typeof 
           <div className="framer-sugu5n" data-framer-name="Image Wrapper" style={radius}>
             <div className="framer-1s1s5wx" data-framer-name="Image" style={{ transform: 'none' }}>
               <div style={FILL} data-framer-background-image-wrapper="true">
-                <img decoding="async" width={item.image.width} height={item.image.height} sizes={SIZES} srcSet={imageSrcSet(item.image)} src={item.image.src} alt={item.image.alt} style={IMG} />
+                <img decoding="async" width={item.image.width} height={item.image.height} sizes={SIZES} srcSet={imageSrcSet(item.image)} src={imageUrl(item.image)} alt={item.image.alt} style={IMG} />
               </div>
             </div>
           </div>

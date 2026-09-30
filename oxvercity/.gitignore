@@ -19,3 +19,9 @@ private-data/
 # Ingest dry-run output: counts and error reasons only, but there is no reason
 # for it to be in version control.
 tools/ingest/reports/
+
+# Images are served from Cloudinary. The local copies under public/images/ are
+# kept for reference but must not be committed — they are what bloated the repo
+# past the deployment runner's clone limit.
+public/images/
+tools/cloudinary/manifest.json

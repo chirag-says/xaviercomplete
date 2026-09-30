@@ -18,7 +18,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import Image from 'next/image';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { animate } from 'motion';
 import { prefersReducedMotion } from '@/lib/motion';
 import { useInView } from '@/lib/useInView';
@@ -67,25 +67,27 @@ export function ChapterJoin() {
           <div className="cx-join__cards">
             <figure className="cx-join__card" data-card="">
               <figcaption className="cx-join__label">Session pricing</figcaption>
-              <Image
-                src="/images/chapter-pricing.png"
+              <img
+                src={cloudinaryUrl('/images/chapter-pricing.png')}
                 alt="Session pricing table — Full Day: Xaverian ₹5000, Spouse ₹3000; Day Session: Xaverian ₹2500, Spouse ₹2000; Awards & Dinner: Xaverian ₹3500, Spouse ₹2000; Non Xaverian ₹7500"
                 width={470}
                 height={220}
                 className="cx-join__img"
                 sizes="(max-width: 809.98px) calc(100vw - 96px), 420px"
+                decoding="async"
               />
             </figure>
 
             <figure className="cx-join__card cx-join__card--qr" data-card="">
               <figcaption className="cx-join__label">Scan to pay</figcaption>
-              <Image
-                src="/images/chapter-qr.png"
+              <img
+                src={cloudinaryUrl('/images/chapter-qr.png')}
                 alt="SXC Cal Alumni Association — UPI QR code for payment"
                 width={340}
                 height={360}
                 className="cx-join__img cx-join__img--qr"
                 sizes="(max-width: 809.98px) 220px, 240px"
+                decoding="async"
               />
             </figure>
           </div>

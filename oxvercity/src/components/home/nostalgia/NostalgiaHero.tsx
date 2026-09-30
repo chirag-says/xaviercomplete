@@ -40,7 +40,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { prefersReducedMotion } from '@/lib/motion';
 import { Lightbox } from '@/components/events/Lightbox';
 import { invitePoster, nostalgia, registration } from '@/data/pages/nostalgia';
@@ -192,7 +192,7 @@ export function NostalgiaHero() {
           <div className="nos-tilt nos-tilt--light" ref={tilt.ref} onPointerMove={tilt.onPointerMove} onPointerLeave={tilt.onPointerLeave}>
             <button type="button" className="nos-tilt__card" ref={poster} onClick={openPoster}>
               <img
-                src={invitePoster.src}
+                src={imageUrl(invitePoster)}
                 srcSet={imageSrcSet(invitePoster)}
                 width={invitePoster.width}
                 height={invitePoster.height}

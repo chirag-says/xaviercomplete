@@ -14,7 +14,7 @@
 
 import { useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { Button } from '@/components/ui/Button';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { animateHeight, prefersReducedMotion } from '@/lib/motion';
 import { tokens } from '@/lib/tokens';
 import type { Breakpoint } from '@/lib/breakpoints';
@@ -123,7 +123,7 @@ function Item({ item, index, open, spec, detailsLabel, onOpen }: { item: Explore
             <div className="framer-1571v0n" data-framer-name="Image Wrap">
               <div className="framer-kstmv" data-framer-name="Image" style={{ filter: 'blur(0px)', WebkitFilter: 'blur(0px)', ...RADIUS_10, transform: open ? 'none' : 'translate(-50%, -50%) scale(0)' }}>
                 <div style={FILL} data-framer-background-image-wrapper="true">
-                  <img decoding="async" width={item.image.width} height={item.image.height} sizes={IMAGE_SIZES} srcSet={imageSrcSet(item.image)} src={item.image.src} alt={item.image.alt} style={IMG} />
+                  <img decoding="async" width={item.image.width} height={item.image.height} sizes={IMAGE_SIZES} srcSet={imageSrcSet(item.image)} src={imageUrl(item.image)} alt={item.image.alt} style={IMG} />
                 </div>
               </div>
             </div>

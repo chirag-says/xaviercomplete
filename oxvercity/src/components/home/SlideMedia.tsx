@@ -14,7 +14,7 @@
  * stylesheet lifts a standing-in slot out of the row.
  */
 
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import type { SiteImage } from '@/lib/images';
 
 const SIZES =
@@ -33,7 +33,7 @@ export function SlideMedia({ image }: { image?: SiteImage }) {
             height={image.height}
             sizes={SIZES}
             srcSet={imageSrcSet(image)}
-            src={image.src}
+            src={imageUrl(image)}
             alt={image.alt}
             style={{ display: 'block', width: '100%', height: '100%', borderRadius: 'inherit', objectPosition: image.position ?? 'center', objectFit: 'cover' }}
           />

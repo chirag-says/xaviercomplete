@@ -16,7 +16,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { Reveal } from '@/components/motion/Reveal';
 import { Lightbox } from '@/components/events/Lightbox';
 import { schedule, specialInvitee, schedulePoster } from '@/data/pages/schedule';
@@ -45,7 +45,7 @@ export function ScheduleSection() {
           <div className="nos-tilt nos-tilt--light" ref={tilt.ref} onPointerMove={tilt.onPointerMove} onPointerLeave={tilt.onPointerLeave}>
             <button type="button" className="nos-tilt__card" ref={poster} onClick={openPoster}>
               <img
-                src={schedulePoster.src}
+                src={imageUrl(schedulePoster)}
                 srcSet={imageSrcSet(schedulePoster)}
                 width={schedulePoster.width}
                 height={schedulePoster.height}

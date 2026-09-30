@@ -18,6 +18,7 @@
  */
 
 import { SplitDisplay } from '@/components/shared/SplitDisplay';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { hero } from '@/data/pages/home';
 
 export function Hero() {
@@ -40,8 +41,8 @@ export function Hero() {
               <div className={"framer-1kv7kk8"} data-framer-appear-id={"1kv7kk8"} data-framer-name={"BG Image"} style={{ willChange: "transform", opacity: "0.001", transform: "scale(1.03)" } as React.CSSProperties}>
                 <div style={{ position: "absolute", borderRadius: "inherit", cornerShape: "inherit", top: "0", right: "0", bottom: "0", left: "0" } as React.CSSProperties} data-framer-background-image-wrapper={"true"}>
                   <picture>
-                    <source media="(max-width: 809.98px)" srcSet="/images/home/hero-bg-mobile.png" />
-                    <img decoding={"async"} width={"1672"} height={"941"} sizes={"(min-width: 1200px) max(100vw, 1px), (min-width: 810px) and (max-width: 1199.98px) max(100vw, 1px), (max-width: 809.98px) max(100vw, 1px)"} srcSet={"/images/home/hero-bg-512.jpg 512w, /images/home/hero-bg-1024.jpg 1024w, /images/home/hero-bg.jpg 1672w"} src={"/images/home/hero-bg.jpg"} alt={"St. Xaviers College (Calcutta), seen across the college grounds"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "cover" } as React.CSSProperties} />
+                    <source media="(max-width: 809.98px)" srcSet={cloudinaryUrl('/images/home/hero-bg-mobile.png')} />
+                    <img decoding={"async"} width={"1672"} height={"941"} sizes={"(min-width: 1200px) max(100vw, 1px), (min-width: 810px) and (max-width: 1199.98px) max(100vw, 1px), (max-width: 809.98px) max(100vw, 1px)"} srcSet={`${cloudinaryUrl('/images/home/hero-bg.jpg', { width: 512 })} 512w, ${cloudinaryUrl('/images/home/hero-bg.jpg', { width: 1024 })} 1024w, ${cloudinaryUrl('/images/home/hero-bg.jpg')} 1672w`} src={cloudinaryUrl('/images/home/hero-bg.jpg')} alt={"St. Xaviers College (Calcutta), seen across the college grounds"} style={{ display: "block", width: "100%", height: "100%", borderRadius: "inherit", cornerShape: "inherit", objectPosition: "center", objectFit: "cover" } as React.CSSProperties} />
                   </picture>
                 </div>
               </div>

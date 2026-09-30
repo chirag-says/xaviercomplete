@@ -35,6 +35,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { voices } from '@/data/voices';
 
 /**
@@ -132,7 +133,7 @@ export function VoicesSection() {
         <div className="sx-voices__bg">
           <picture>
             <img
-              src="/images/home/voices-bg.png"
+              src={cloudinaryUrl('/images/home/voices-bg.png')}
               sizes="100vw"
               width={1666}
               height={944}

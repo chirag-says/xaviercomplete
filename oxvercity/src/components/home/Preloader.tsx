@@ -28,6 +28,7 @@
 
 import { useEffect, useRef } from 'react';
 import { animate } from 'motion';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 
 /** The crest's entrance: Framer's default spring, as the hero titles use. */
 const RISE = { type: 'spring' as const, stiffness: 400, damping: 100, mass: 1 };
@@ -100,7 +101,7 @@ export function Preloader() {
       </noscript>
       <div className="site-preloader__panel" data-preloader-panel="">
         <div className="site-preloader__mark" data-preloader-mark="">
-          <img src="/images/brand/crest-420.png" width={352} height={420} alt="" decoding="async" />
+          <img src={cloudinaryUrl('/images/brand/crest-420.png')} width={352} height={420} alt="" decoding="async" />
         </div>
       </div>
     </div>

@@ -24,6 +24,7 @@
  */
 
 import { useRef, useState } from 'react';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { crossing, useScrollLink } from '@/lib/useScrollLink';
 import { gallery } from '@/data/pages/events';
 import { Lightbox } from './Lightbox';
@@ -33,8 +34,6 @@ const ROWS = [
   [
     '/images/events/ripples-of-hope.png',
     '/images/events/womens-day.png',
-    /* the one upright picture in the set: it sizes itself narrow beside the two
-       landscape frames, which is what gives the row its rhythm */
     '/images/events/international-yoga-day.jpg',
   ],
   [
@@ -45,14 +44,13 @@ const ROWS = [
   ],
 ];
 
-/** Parallax per row, in px across the section's pass. The row moves as one. */
 const DRIFT = [-30, 22];
 
 const rows = ROWS.map((srcs) =>
   srcs.map((src) => {
     const entry = gallery.find((g) => g.image.src === src);
     if (!entry) throw new Error(`gallery: no photograph for ${src}`);
-    return { ...entry, index: gallery.indexOf(entry) };
+    return { ...entry, src: cloudinaryUrl(src), index: gallery.indexOf(entry) };
   }),
 );
 
@@ -119,7 +117,7 @@ export function EventsGallery() {
                     >
                       <span className="ev-gallery__frame">
                         <img
-                          src={entry.image.src}
+                          src={entry.src}
                           width={entry.image.width}
                           height={entry.image.height}
                           alt={entry.image.alt}

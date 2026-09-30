@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { tokens } from '@/lib/tokens';
 import type { CampusCard as Card } from '@/data/pages/home';
 
@@ -36,7 +36,7 @@ export function CampusCard({ card, variant, containerClass, reveal }: { card: Ca
                 height={card.image.height}
                 sizes={SIZES}
                 srcSet={imageSrcSet(card.image)}
-                src={card.image.src}
+                src={imageUrl(card.image)}
                 alt={card.image.alt}
                 style={{ display: 'block', width: '100%', height: '100%', borderRadius: 'inherit', objectPosition: card.image.position ?? 'center', objectFit: 'cover' }}
               />

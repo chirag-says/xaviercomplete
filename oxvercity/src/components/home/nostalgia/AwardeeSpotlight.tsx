@@ -16,7 +16,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { Reveal } from '@/components/motion/Reveal';
 import { Lightbox } from '@/components/events/Lightbox';
 import { awardee, awardeePoster, nostalgia } from '@/data/pages/nostalgia';
@@ -43,7 +43,7 @@ export function AwardeeSpotlight() {
           <div className="nos-tilt nos-tilt--light" ref={tilt.ref} onPointerMove={tilt.onPointerMove} onPointerLeave={tilt.onPointerLeave}>
             <button type="button" className="nos-tilt__card" ref={poster} onClick={openPoster}>
               <img
-                src={awardeePoster.src}
+                src={imageUrl(awardeePoster)}
                 srcSet={imageSrcSet(awardeePoster)}
                 width={awardeePoster.width}
                 height={awardeePoster.height}

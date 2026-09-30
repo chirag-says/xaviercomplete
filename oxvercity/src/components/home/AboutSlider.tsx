@@ -43,6 +43,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { prefersReducedMotion } from '@/lib/motion';
 import { tokens } from '@/lib/tokens';
 
@@ -193,8 +194,8 @@ export function AboutSlider() {
                 width={1144}
                 height={1364}
                 sizes="(max-width: 809.98px) 20vw, min(25vw, 330px)"
-                srcSet="/images/home/about-crest-512.png 512w, /images/home/about-crest-1024.png 1024w, /images/home/about-crest.png 1144w"
-                src="/images/home/about-crest-512.png"
+                srcSet={`${cloudinaryUrl('/images/home/about-crest.png', { width: 512 })} 512w, ${cloudinaryUrl('/images/home/about-crest.png', { width: 1024 })} 1024w, ${cloudinaryUrl('/images/home/about-crest.png')} 1144w`}
+                src={cloudinaryUrl('/images/home/about-crest.png', { width: 512 })}
                 alt="The crest of St. Xaviers College (Calcutta)"
                 style={CONTAIN}
               />
@@ -215,8 +216,8 @@ export function AboutSlider() {
                 sizes="(max-width: 809.98px) 56vw, min(45vw, 588px)"
                 /* the file is 1447px wide, so the srcset stops there: a 2048
                    variant would only be this one upscaled */
-                srcSet="/images/home/about-slide-1-512.jpg 512w, /images/home/about-slide-1-1024.jpg 1024w, /images/home/about-slide-1.jpg 1447w"
-                src="/images/home/about-slide-1-1024.jpg"
+                srcSet={`${cloudinaryUrl('/images/home/about-slide-1.jpg', { width: 512 })} 512w, ${cloudinaryUrl('/images/home/about-slide-1.jpg', { width: 1024 })} 1024w, ${cloudinaryUrl('/images/home/about-slide-1.jpg')} 1447w`}
+                src={cloudinaryUrl('/images/home/about-slide-1.jpg', { width: 1024 })}
                 alt="A Xaverian raising her diploma on the College grounds on graduation day"
                 style={{ ...COVER, objectPosition: 'center' }}
               />
@@ -235,8 +236,8 @@ export function AboutSlider() {
                 width={1733}
                 height={849}
                 sizes="(max-width: 809.98px) 20vw, min(25vw, 330px)"
-                srcSet="/images/home/about-emrc-512.png 512w, /images/home/about-emrc-1024.png 1024w, /images/home/about-emrc.png 1733w"
-                src="/images/home/about-emrc-512.png"
+                srcSet={`${cloudinaryUrl('/images/home/about-emrc.png', { width: 512 })} 512w, ${cloudinaryUrl('/images/home/about-emrc.png', { width: 1024 })} 1024w, ${cloudinaryUrl('/images/home/about-emrc.png')} 1733w`}
+                src={cloudinaryUrl('/images/home/about-emrc.png', { width: 512 })}
                 alt="EMRC Kolkata, a UGC Media Centre, with the College crest"
                 style={CONTAIN}
               />

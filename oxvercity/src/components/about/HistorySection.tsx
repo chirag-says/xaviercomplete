@@ -7,7 +7,7 @@
  */
 
 import { history } from '@/data/pages/about';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { Reveal } from '@/components/motion/Reveal';
 import { SectionHeading } from './SectionHeading';
 
@@ -32,7 +32,7 @@ export function HistorySection() {
                 height={history.image.height}
                 sizes={IMAGE_SIZES}
                 srcSet={imageSrcSet(history.image)}
-                src={history.image.src}
+                src={imageUrl(history.image)}
                 alt={history.image.alt}
               />
             </Reveal>

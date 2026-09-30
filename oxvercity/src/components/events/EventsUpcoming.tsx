@@ -26,7 +26,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { eventsPage, upcomingEvent } from '@/data/pages/events';
 import { Lightbox } from './Lightbox';
 
@@ -139,7 +139,7 @@ export function EventsUpcoming({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 
             }}
           >
             <img
-              src={upcomingEvent.poster.src}
+              src={imageUrl(upcomingEvent.poster)}
               srcSet={imageSrcSet(upcomingEvent.poster)}
               width={upcomingEvent.poster.width}
               height={upcomingEvent.poster.height}

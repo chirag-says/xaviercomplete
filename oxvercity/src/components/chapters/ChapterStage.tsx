@@ -36,7 +36,7 @@
  */
 
 import { useRef, useState } from 'react';
-import { imageSrcSet } from '@/lib/images';
+import { imageSrcSet, imageUrl } from '@/lib/images';
 import { useSmoothScrollLink } from '@/lib/useSmoothScrollLink';
 import { Lightbox } from '@/components/events/Lightbox';
 import { chaptersPage, westZone } from '@/data/pages/chapters';
@@ -82,7 +82,7 @@ export function ChapterStage() {
       <div className="cx-stage__ground" aria-hidden="true">
         <img
           className="cx-stage__crest"
-          src="/images/brand/crest.png"
+          src={imageUrl('/images/brand/crest.png')}
           alt=""
           width={755}
           height={900}
@@ -136,7 +136,7 @@ export function ChapterStage() {
           <span className="cx-stage__pan">
             <img
               className="cx-stage__poster"
-              src={westZone.poster.src}
+              src={imageUrl(westZone.poster)}
               srcSet={imageSrcSet(westZone.poster)}
               sizes={SIZES}
               width={westZone.poster.width}
