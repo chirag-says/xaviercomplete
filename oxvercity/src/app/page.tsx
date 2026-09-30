@@ -2,6 +2,7 @@ import { SiteShell, PAGE_ROOT_STYLE } from '@/components/layout/SiteShell';
 import { Preloader } from '@/components/home/Preloader';
 import { NostalgiaHero } from '@/components/home/nostalgia/NostalgiaHero';
 import { AwardeeSpotlight } from '@/components/home/nostalgia/AwardeeSpotlight';
+import { ScheduleSection } from '@/components/home/nostalgia/ScheduleSection';
 import { BookingSection } from '@/components/home/nostalgia/BookingSection';
 import { Pillars } from '@/components/home/nostalgia/Pillars';
 import { AboutSection } from '@/components/home/AboutSection';
@@ -28,6 +29,8 @@ import { ProgramSection } from '@/components/home/ProgramSection';
  *                     flips it solid on the first scroll.
  *   AwardeeSpotlight  the awardee poster on its ivory: Monali Thakur, and the
  *                     SHAKTI block printed beside her.
+ *   ScheduleSection   the day's programme as a compact vertical timeline on
+ *                     ivory, with the schedule poster below it.
  *   BookingSection    the booking ladder and the bank account, back on ink.
  *   Pillars           the invitation's pull-quote and triptych, on white.
  *
@@ -45,6 +48,7 @@ export default function HomePage() {
         <div className="nos-run">
           <NostalgiaHero />
           <AwardeeSpotlight />
+          <ScheduleSection />
           <BookingSection />
           <Pillars />
         </div>

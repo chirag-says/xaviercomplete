@@ -1302,6 +1302,208 @@
 }
 
 /* =============================================================================
+ * 5 — the programme schedule
+ *
+ * A compact vertical timeline — each event is a slim card with the time
+ * prominent on the left and the programme on the right. The ground is ivory,
+ * continuing from the awardee section so the page does not switch again before
+ * the dark booking section below.
+ *
+ * The poster is centred below the timeline for readers who want the original.
+ * ========================================================================== */
+
+#nos-schedule { scroll-margin-top: 104px; }
+
+.nos-sched {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--nos-ivory);
+  color: var(--nos-navy);
+  padding: clamp(64px, 8vw, 116px) 0;
+}
+.nos-sched__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60% 52% at 82% 12%, rgba(216, 169, 74, 0.14), transparent 64%),
+    radial-gradient(54% 48% at 12% 88%, rgba(22, 48, 94, 0.06), transparent 62%);
+}
+
+/* a gold hairline separating from the section above */
+.nos-sched::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(152, 99, 42, 0.42), transparent);
+}
+
+.nos-sched__head { max-width: 42ch; margin-bottom: clamp(32px, 4vw, 52px); }
+.nos-sched__eyebrow { color: var(--nos-gold-deep); }
+.nos-sched__title { margin: 14px 0 0; }
+.nos-sched__sub {
+  margin: 12px 0 0;
+  font-size: clamp(13px, 1.35vw, 16px);
+  line-height: 1.5;
+  color: rgba(22, 48, 94, 0.62);
+}
+.nos-sched__sub sup { font-size: 0.65em; }
+
+/* ---- the timeline -------------------------------------------------------- */
+
+.nos-timeline {
+  display: flex;
+  flex-flow: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: relative;
+}
+/* the vertical line down the left */
+.nos-timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 62px;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(152, 99, 42, 0.38), rgba(152, 99, 42, 0.1));
+}
+
+.nos-evt {
+  display: grid;
+  grid-template-columns: 62px 1fr;
+  gap: 0 20px;
+  align-items: start;
+  min-width: 0;
+}
+
+.nos-evt__time {
+  position: relative;
+  font-size: clamp(16px, 1.6vw, 20px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--nos-navy-deep);
+  text-align: right;
+  padding: 16px 0 16px 0;
+  z-index: 1;
+}
+/* the dot on the timeline */
+.nos-evt__time::after {
+  content: '';
+  position: absolute;
+  right: -24px;
+  top: 18px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--nos-gold);
+  box-shadow: 0 0 0 3px var(--nos-ivory);
+}
+
+.nos-evt__card {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(22, 48, 94, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(250, 246, 238, 0.4));
+  margin: 6px 0;
+  transition: border-color 0.4s var(--nos-out), box-shadow 0.4s var(--nos-out), transform 0.4s var(--nos-out);
+}
+.nos-evt__card:hover {
+  border-color: rgba(216, 169, 74, 0.45);
+  box-shadow: 0 8px 28px rgba(22, 48, 94, 0.06);
+  transform: translateY(-1px);
+}
+
+.nos-evt__title {
+  margin: 0;
+  font-size: clamp(13px, 1.3vw, 15px);
+  line-height: 1.48;
+  color: rgba(22, 48, 94, 0.78);
+}
+.nos-evt__speaker {
+  font-weight: 700;
+  color: var(--nos-navy);
+}
+.nos-evt__detail {
+  margin: 3px 0 0;
+  font-size: clamp(12px, 1.15vw, 13.5px);
+  line-height: 1.45;
+  color: rgba(22, 48, 94, 0.55);
+}
+
+/* the SHAKTI SAMMAN highlight */
+.nos-evt--highlight .nos-evt__card {
+  border-color: rgba(216, 169, 74, 0.55);
+  background: linear-gradient(135deg, rgba(216, 169, 74, 0.12), rgba(255, 255, 255, 0.7) 40%, rgba(216, 169, 74, 0.08));
+  box-shadow: 0 10px 30px rgba(152, 99, 42, 0.08);
+}
+.nos-evt--highlight .nos-evt__title {
+  font-size: clamp(15px, 1.5vw, 18px);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--nos-navy);
+}
+.nos-evt--highlight .nos-evt__detail {
+  font-family: var(--nos-serif);
+  font-style: italic;
+  font-size: clamp(13px, 1.25vw, 15px);
+  color: var(--nos-gold-deep);
+}
+
+/* ---- special invitee ----------------------------------------------------- */
+
+.nos-invitee {
+  margin: clamp(30px, 3.5vw, 46px) 0 0;
+  padding: 22px 26px;
+  border: 1px solid rgba(216, 169, 74, 0.42);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(250, 246, 238, 0.5));
+  box-shadow: 0 12px 36px rgba(22, 48, 94, 0.05);
+  text-align: center;
+  max-width: 620px;
+  margin-inline: auto;
+}
+.nos-invitee__label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--nos-gold-deep);
+  margin-bottom: 8px;
+}
+.nos-invitee__name {
+  margin: 0;
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--nos-navy);
+}
+.nos-invitee__detail {
+  margin: 6px 0 0;
+  font-size: clamp(13px, 1.3vw, 15px);
+  line-height: 1.45;
+  color: rgba(22, 48, 94, 0.62);
+}
+
+/* ---- the poster (right below the heading, above the timeline) ------------ */
+
+.nos-sched__poster {
+  margin: 0 auto clamp(36px, 4.5vw, 56px);
+  max-width: 540px;
+  width: 100%;
+}
+
+/* =============================================================================
  * Narrower screens
  *
  * The two-column sections stack, the poster leads the awardee section rather
@@ -1386,6 +1588,14 @@
   .nos-tiers { grid-template-columns: minmax(0, 1fr); }
   .nos-close { display: none; }
   .nos-hero__cue { display: none; }
+
+  /* schedule */
+  .nos-sched__head { text-align: center; }
+  .nos-sched__eyebrow { justify-content: center; }
+  .nos-timeline::before { left: 52px; }
+  .nos-evt { grid-template-columns: 52px 1fr; gap: 0 16px; }
+  .nos-evt__time::after { right: -20px; }
+  .nos-sched__poster { max-width: 380px; }
 }
 
 @media (max-width: 599.98px) {
@@ -1395,6 +1605,13 @@
   .nos-hero__actions { flex-flow: column; align-items: stretch; }
   .nos-cta { justify-content: center; }
   .nos-bank__row dd { gap: 10px; }
+
+  /* schedule — phone */
+  .nos-timeline::before { left: 42px; }
+  .nos-evt { grid-template-columns: 42px 1fr; gap: 0 14px; }
+  .nos-evt__time { font-size: 14px; padding: 14px 0; }
+  .nos-evt__time::after { right: -18px; width: 6px; height: 6px; top: 16px; }
+  .nos-evt__card { padding: 10px 14px; }
 }
 
 /* =============================================================================
