@@ -22,14 +22,21 @@ const CLOUD_NAME = 'l7gcfbfi';
  * @returns          A full `https://res.cloudinary.com/…` URL.
  */
 export function cloudinaryUrl(localPath: string, opts?: { width?: number }): string {
-  // Strip leading `/images/` and the file extension to get the public_id
+  // Strip leading `/images/` to get the relative subpath
   const stripped = localPath.replace(/^\/images\//, '');
-  const publicId = `oxvercity/${stripped.replace(/\.[^.]+$/, '')}`;
+  const parts = stripped.split('/');
+  const filename = parts.pop()!;
+  const subfolders = parts; // e.g. ['events'] or ['home'] or []
+  const folder = ['oxvercity', ...subfolders].join('/');       // oxvercity/events
+  const basename = filename.replace(/\.[^.]+$/, '');           // nostalgia-26
+  // The upload stored at folder + "/" + folder + "/" + basename
+  // because both `folder` and `public_id` (which included folder) were sent.
+  const fullPath = `${folder}/${folder}/${basename}`;
 
   const transforms = ['f_auto', 'q_auto'];
   if (opts?.width) transforms.push(`w_${opts.width}`);
 
-  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${transforms.join(',')}/${publicId}`;
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${transforms.join(',')}/${fullPath}`;
 }
 
 /**
