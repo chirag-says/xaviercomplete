@@ -103,12 +103,9 @@ export function AboutSlider() {
     // and does not assume how any of them are positioned.
     let leftSpan = 0;
     let rightSpan = 0;
-    // The sticky panel is held `top` from the viewport top and travels the
-    // difference between the block and itself, so progress starts when the
-    // block's top reaches that line and ends when the block runs out.
-    let start = 0;
-    let travel = 1;
-    const measure = () => {
+
+    /** Measure the side-panel spans (only changes on resize). */
+    const measureSpans = () => {
       const held = [leftEl.style.transform, rightEl.style.transform];
       leftEl.style.transform = 'none';
       rightEl.style.transform = 'none';
@@ -116,10 +113,19 @@ export function AboutSlider() {
       leftSpan = centreBox.left - leftEl.getBoundingClientRect().left;
       rightSpan = rightEl.getBoundingClientRect().right - centreBox.right;
       [leftEl.style.transform, rightEl.style.transform] = held;
+    };
 
+    /**
+     * Compute the scroll start and travel on every frame. Content above the
+     * block (the Nostalgia sections, lazily-loaded images, Reveal animations)
+     * can change height after mount, which shifts the block's document-top.
+     * Measuring live keeps the progress accurate regardless.
+     */
+    const scrollProgress = (): number => {
       const top = parseFloat(getComputedStyle(pinEl).top) || 0;
-      start = blockEl.getBoundingClientRect().top + window.scrollY - top;
-      travel = Math.max(blockEl.offsetHeight - pinEl.offsetHeight, 1);
+      const start = blockEl.getBoundingClientRect().top + window.scrollY - top;
+      const travel = Math.max(blockEl.offsetHeight - pinEl.offsetHeight, 1);
+      return Math.min(Math.max((window.scrollY - start) / travel, 0), 1);
     };
 
     const apply = (progress: number) => {
@@ -132,7 +138,7 @@ export function AboutSlider() {
     };
 
     if (prefersReducedMotion()) {
-      measure();
+      measureSpans();
       apply(1);
       return;
     }
@@ -140,17 +146,17 @@ export function AboutSlider() {
     let frame = 0;
     const update = () => {
       frame = 0;
-      apply(Math.min(Math.max((window.scrollY - start) / travel, 0), 1));
+      apply(scrollProgress());
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
     const onResize = () => {
-      measure();
+      measureSpans();
       update();
     };
 
-    measure();
+    measureSpans();
     update();
     window.addEventListener('scroll', onScroll, { passive: true });
     // The observer covers a width change; the listener covers a height-only one,
