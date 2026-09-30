@@ -1317,7 +1317,6 @@
 .nos-sched {
   position: relative;
   isolation: isolate;
-  overflow: clip;
   background: var(--nos-ivory);
   color: var(--nos-navy);
   padding: clamp(64px, 8vw, 116px) 0;
@@ -1352,6 +1351,26 @@
   color: rgba(22, 48, 94, 0.62);
 }
 .nos-sched__sub sup { font-size: 0.65em; }
+
+/* ---- two-column grid: poster left, programme right ---------------------- */
+
+.nos-sched__shell {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  align-items: start;
+  gap: clamp(34px, 5vw, 72px);
+}
+.nos-sched__poster {
+  position: sticky;
+  top: 124px;          /* 104px header + 20px breathing room */
+  justify-self: start;
+  width: 100%;
+  max-width: 560px;
+  margin: 0;
+}
+.nos-sched__body {
+  min-width: 0;
+}
 
 /* ---- the timeline -------------------------------------------------------- */
 
@@ -1495,13 +1514,7 @@
   color: rgba(22, 48, 94, 0.62);
 }
 
-/* ---- the poster (right below the heading, above the timeline) ------------ */
-
-.nos-sched__poster {
-  margin: 0 auto clamp(36px, 4.5vw, 56px);
-  max-width: 540px;
-  width: 100%;
-}
+/* (poster styles are now above with the two-column grid) */
 
 /* =============================================================================
  * Narrower screens
@@ -1590,12 +1603,13 @@
   .nos-hero__cue { display: none; }
 
   /* schedule */
+  .nos-sched__shell { grid-template-columns: minmax(0, 1fr); }
+  .nos-sched__poster { position: static; justify-self: center; max-width: 380px; margin-bottom: clamp(28px, 4vw, 44px); }
   .nos-sched__head { text-align: center; }
   .nos-sched__eyebrow { justify-content: center; }
   .nos-timeline::before { left: 52px; }
   .nos-evt { grid-template-columns: 52px 1fr; gap: 0 16px; }
   .nos-evt__time::after { right: -20px; }
-  .nos-sched__poster { max-width: 380px; }
 }
 
 @media (max-width: 599.98px) {

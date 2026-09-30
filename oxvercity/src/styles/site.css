@@ -1598,3 +1598,16 @@
   background: rgba(163, 36, 31, 0.08);
   color: #a3241f;
 }
+
+/* =============================================================================
+ * About section — blue text
+ *
+ * The Framer preset text-color token defaults to #111. This override scopes
+ * the heading and paragraph text in the About section to the site's navy blue,
+ * keeping every other section unchanged.
+ * ========================================================================== */
+
+.framer-1r6v9gw {
+  --token-1c49fc01-5a06-4e84-9621-823d64297d7d: #16305e;
+  color: #16305e;
+}
