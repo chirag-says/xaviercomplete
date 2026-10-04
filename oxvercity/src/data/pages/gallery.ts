@@ -34,5 +34,5 @@ export const photos: GalleryPhoto[] = galleryPhotos.map(([file, width, height], 
   id: `oxvercity/gallery/${file}`,
   width,
   height,
-  alt: `${galleryEvent.title}, ${galleryEvent.date} — photograph ${i + 1} of ${galleryPhotos.length}`,
+  alt: `${galleryEvent.title}, ${galleryEvent.date} — photograph ${i + 1}`,
 }));

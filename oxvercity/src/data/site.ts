@@ -103,15 +103,10 @@ export const pagesMenu: { title: string; links: NavLink[] }[] = [
 export const mobileMenu: NavLink[] = [
   { label: 'Home', href: '/' },
   { label: 'About SXCCAA', href: '/about' },
-  { label: 'Alumni Directory', href: '/alumni' },
-  { label: 'Xaverians Making a Difference', href: '/alumni#featured' },
-  { label: 'Explore the Network', href: '/explore' },
   { label: 'Chapters', href: '/chapters' },
-  { label: 'Alumni Events & Activities', href: '/events' },
+  { label: 'Events', href: '/events' },
   { label: 'Gallery', href: '/gallery' },
   { label: 'Contact', href: '/contact' },
-  { label: 'Privacy Policy', href: '/privacy-policy' },
-  { label: 'Terms of Use', href: '/terms-of-use' },
 ];
 
 export const headerCta: NavLink = { label: 'Explore Alumni', href: '/alumni' };

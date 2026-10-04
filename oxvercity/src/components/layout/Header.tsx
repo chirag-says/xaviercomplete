@@ -217,7 +217,7 @@ function Hamburger({ open, tone, onClick }: { open: boolean; tone: Tone; onClick
   );
 }
 
-const MOBILE_ITEM_CLASSES = ['framer-y6kjx2-container', 'framer-hq3sy-container', 'framer-15fi588-container', 'framer-1h5vixz-container', 'framer-ovfw0e-container', 'framer-16oc9qw-container', 'framer-bx7fei-container', 'framer-zzq1f6-container', 'framer-da32w6-container', 'framer-qs9dgh-container', 'framer-1kgfhw1-container', 'framer-1gksxsm-container'];
+const MOBILE_ITEM_CLASSES = ['framer-y6kjx2-container', 'framer-hq3sy-container', 'framer-15fi588-container', 'framer-ovfw0e-container', 'framer-1h5vixz-container', 'framer-16oc9qw-container', 'framer-bx7fei-container', 'framer-zzq1f6-container', 'framer-da32w6-container', 'framer-qs9dgh-container', 'framer-1kgfhw1-container', 'framer-1gksxsm-container'];
 
 function MobileMenu({ open, pathname, onNavigate }: { open: boolean; pathname: string; onNavigate: () => void }) {
   return (

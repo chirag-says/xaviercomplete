@@ -35,6 +35,7 @@ export function Lightbox({
   origin,
   onClose,
   onStep,
+  showCount = true,
 }: {
   items: LightboxItem[];
   index: number;
@@ -42,6 +43,8 @@ export function Lightbox({
   origin: DOMRect | null;
   onClose: () => void;
   onStep: (next: number) => void;
+  /** Show "03 / 12" and say "image 3 of 12"; off where the total isn't for display. */
+  showCount?: boolean;
 }) {
   const dialog = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLDivElement>(null);
@@ -115,7 +118,7 @@ export function Lightbox({
       ref={dialog}
       role="dialog"
       aria-modal="true"
-      aria-label={items.length > 1 ? `${item.title} — image ${index + 1} of ${items.length}` : item.title}
+      aria-label={items.length > 1 && showCount ? `${item.title} — image ${index + 1} of ${items.length}` : item.title}
       data-flown={flown ? 'yes' : 'no'}
     >
       <button type="button" className="ev-lightbox__scrim" onClick={onClose} aria-label="Close the viewer" />
@@ -139,7 +142,7 @@ export function Lightbox({
             {item.date}
           </span>
         </p>
-        {items.length > 1 ? (
+        {items.length > 1 && showCount ? (
           <p className="ev-lightbox__count" aria-hidden="true">
             {String(index + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
           </p>

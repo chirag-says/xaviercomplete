@@ -85,8 +85,6 @@ function useLayout(): Layout {
   return layout;
 }
 
-const count = new Intl.NumberFormat('en-IN');
-
 export function PhotoGallery() {
   const layout = useLayout();
   const rows = useMemo(() => pack(layout), [layout]);
@@ -139,7 +137,7 @@ export function PhotoGallery() {
           <div className="gl-meta">
             <p className="ev-eyebrow">{galleryEvent.title}</p>
             <p className="ev-gallery__note">
-              {galleryEvent.place} · {galleryEvent.date} · {count.format(photos.length)} photographs
+              {galleryEvent.place} · {galleryEvent.date}
             </p>
           </div>
         </div>
@@ -194,11 +192,8 @@ export function PhotoGallery() {
 
         {lastShown < photos.length ? (
           <div className="gl-more">
-            <p className="gl-more__count" aria-live="polite">
-              {count.format(lastShown)} of {count.format(photos.length)}
-            </p>
             <button type="button" className="gl-more__button" onClick={() => setShown(lastShown + BATCH)}>
-              Show more photographs
+              Show more photos
             </button>
           </div>
         ) : null}
@@ -211,6 +206,7 @@ export function PhotoGallery() {
           origin={origin}
           onClose={close}
           onStep={(next) => { setOrigin(null); setOpen(next); }}
+          showCount={false}
         />
       ) : null}
     </section>
