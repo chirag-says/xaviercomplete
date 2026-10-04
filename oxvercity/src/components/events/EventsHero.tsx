@@ -24,6 +24,7 @@
 import { useRef } from 'react';
 import { crossing, useScrollLink } from '@/lib/useScrollLink';
 import { alumniEvents, eventsPage, leadEventId } from '@/data/pages/events';
+import { imageUrl } from '@/lib/images';
 
 const lead = alumniEvents.find((event) => event.id === leadEventId)!;
 const plate = lead.images[0];
@@ -64,7 +65,7 @@ export function EventsHero() {
         <figure className="ev-hero__band" ref={band}>
           <div className="ev-hero__mask">
             <img
-              src={plate.src}
+              src={imageUrl(plate)}
               width={plate.width}
               height={plate.height}
               alt={plate.alt}

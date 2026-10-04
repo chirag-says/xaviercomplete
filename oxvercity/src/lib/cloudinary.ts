@@ -67,3 +67,16 @@ export function cloudinarySrcSet(
   entries.push(`${cloudinaryUrl(localPath)} ${intrinsicWidth}w`);
   return entries.join(', ');
 }
+
+/**
+ * Build a Cloudinary delivery URL straight from a public_id.
+ *
+ * For assets uploaded with an explicit public_id and no extension — the
+ * gallery's photographs live at `oxvercity/gallery/SHUB4102` — so none of the
+ * doubled-folder path rewriting `cloudinaryUrl` does applies to them.
+ */
+export function cloudinaryIdUrl(publicId: string, opts?: { width?: number }): string {
+  const transforms = ['f_auto', 'q_auto'];
+  if (opts?.width) transforms.push(`w_${opts.width}`);
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${transforms.join(',')}/${publicId}`;
+}

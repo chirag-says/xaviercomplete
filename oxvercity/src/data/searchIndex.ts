@@ -12,6 +12,7 @@ import { alumniEvents, featuredEvent, eventsPage } from '@/data/pages/events';
 import { pillars, pillarsHeading, history, why, college } from '@/data/pages/about';
 import { exploreItems } from '@/data/explore';
 import { faq } from '@/data/pages/contact';
+import { galleryEvent, galleryPage } from '@/data/pages/gallery';
 import { contact, footerColumns, mobileMenu } from '@/data/site';
 
 const NAV = mobileMenu.map((link) => link.label);
@@ -81,6 +82,18 @@ export const searchIndex: SearchEntry[] = [
       ...alumniEvents.map((event) => event.description),
       ...FOOTER,
     ],
+  },
+  {
+    url: '/gallery',
+    title: 'Gallery',
+    description: galleryPage.intro,
+    h1: [galleryPage.title],
+    h2: [],
+    h3: [],
+    h4: [],
+    h5: [],
+    h6: [],
+    p: [...NAV, galleryEvent.title, `${galleryEvent.place} ${galleryEvent.date}`, galleryPage.intro, ...FOOTER],
   },
   {
     url: '/about',

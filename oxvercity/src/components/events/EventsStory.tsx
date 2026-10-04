@@ -20,6 +20,7 @@
 import { useRef } from 'react';
 import { pinned, useScrollLink } from '@/lib/useScrollLink';
 import { alumniEvents, storyEventIds, strands as allStrands } from '@/data/pages/events';
+import { imageUrl } from '@/lib/images';
 
 const chapters = storyEventIds
   .map((id) => alumniEvents.find((event) => event.id === id))
@@ -101,7 +102,7 @@ export function EventsStory() {
                 </div>
                 <figure className="ev-story__plate">
                   <img
-                    src={chapter.images[0].src}
+                    src={imageUrl(chapter.images[0])}
                     width={chapter.images[0].width}
                     height={chapter.images[0].height}
                     alt={chapter.images[0].alt}

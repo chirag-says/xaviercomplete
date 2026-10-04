@@ -1,0 +1,71 @@
+/* =============================================================================
+ * /gallery — every photograph, set as the /events gallery is set.
+ *
+ * The rows, frames, hover and lightbox are the /events rules (events.css) used
+ * as they are; this file only covers what a page of a thousand photographs
+ * needs on top: room under the fixed header, tighter rows, a phone that keeps
+ * pictures side by side, and the "show more" control.
+ * ========================================================================== */
+
+.gl-page { position: relative; }
+
+/* the header's scroll variant keys off this strip leaving the viewport */
+.gl-trigger {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.gl-gallery { padding-top: clamp(140px, 14vw, 200px); }
+.gl-title { font-size: clamp(48px, 6.4vw, 88px); }
+.gl-meta { display: flex; flex-flow: column; gap: 10px; }
+
+/* The rows are packed rather than hand-composed, so there are many of them;
+ * the /events gap between its two rows would make this a ladder of gaps. */
+.gl-gallery .ev-gallery__rows { gap: clamp(14px, 1.6vw, 24px); }
+.gl-gallery .ev-gallery__row > ul { gap: clamp(14px, 1.6vw, 24px); }
+.gl-row { will-change: auto; }
+
+/* /events stacks its pictures on a phone; here the rows are already packed for
+ * the phone's measure, so they stay rows. */
+@media (max-width: 809.98px) {
+  .gl-gallery .ev-gallery__row > ul { flex-flow: row; gap: 10px; }
+  .gl-gallery .ev-gallery__rows { gap: 10px; }
+}
+
+.gl-more {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: clamp(50px, 6vw, 90px);
+}
+.gl-more__count {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ev-muted);
+}
+.gl-more__button {
+  appearance: none;
+  border: 1px solid var(--ev-ink);
+  border-radius: 40px;
+  padding: 15px 28px;
+  background: transparent;
+  color: var(--ev-ink);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.35s var(--ev-out), color 0.35s var(--ev-out);
+}
+.gl-more__button:hover,
+.gl-more__button:focus-visible { background: var(--ev-ink); color: #fff; }

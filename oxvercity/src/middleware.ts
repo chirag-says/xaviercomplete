@@ -45,10 +45,9 @@ function contentSecurityPolicy(nonce: string): string {
     // Framer's export positions everything with inline style attributes.
     "style-src 'self' 'unsafe-inline'",
     // `data:` covers the inline SVG fallbacks in the export. Photographs are
-    // served from this origin by /api/photo, so 'self' already allows them —
-    // and an explicit list is what stops injected markup beaconing an image
-    // request out to an attacker's server.
-    "img-src 'self' data:",
+    // served from this origin by /api/photo, so 'self' already allows them.
+    // Cloudinary hosts all site imagery (migrated from /public/images/).
+    "img-src 'self' data: https://res.cloudinary.com",
     "font-src 'self'",
     "connect-src 'self'",
     `frame-src ${TURNSTILE}`,

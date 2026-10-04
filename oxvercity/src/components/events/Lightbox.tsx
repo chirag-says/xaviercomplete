@@ -25,6 +25,8 @@ export interface LightboxItem {
   title: string;
   date: string;
   place: string;
+  /** Full-size URL, for images that don't live at a `/images/…` path. */
+  full?: string;
 }
 
 export function Lightbox({
@@ -120,7 +122,7 @@ export function Lightbox({
 
       <div className="ev-lightbox__frame" ref={frame}>
         <img
-          src={imageUrl(item.image)}
+          src={item.full ?? imageUrl(item.image)}
           width={item.image.width}
           height={item.image.height}
           alt={item.image.alt}

@@ -10,6 +10,7 @@
 
 import { Reveal } from '@/components/motion/Reveal';
 import { alumniEvents, eventsPage, featuredEvent, strands } from '@/data/pages/events';
+import { imageUrl } from '@/lib/images';
 
 const counted = strands
   .filter((strand) => strand.id !== 'all')
@@ -46,7 +47,7 @@ export function EventsIndex() {
           <p className="ev-eyebrow">Supplied artwork</p>
           <figure>
             <img
-              src={featuredEvent.poster.src}
+              src={imageUrl(featuredEvent.poster)}
               width={featuredEvent.poster.width}
               height={featuredEvent.poster.height}
               alt={featuredEvent.poster.alt}

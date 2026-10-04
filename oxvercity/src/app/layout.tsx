@@ -20,6 +20,7 @@ import '@/styles/site.css';
 import '@/styles/voices.css';
 import '@/styles/nostalgia.css';
 import '@/styles/events.css';
+import '@/styles/gallery.css';
 import '@/styles/chapters.css';
 import '@/styles/alumni.css';
 import '@/styles/auth.css';

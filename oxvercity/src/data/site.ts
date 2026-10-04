@@ -55,13 +55,14 @@ export interface NavLink {
 /**
  * The pills in the desktop bar, in reading order. The "Explore" dropdown is
  * rendered between the second and third, so the bar reads
- * Home · About SXCCAA · Explore · Chapters · Events · Contact.
+ * Home · About SXCCAA · Explore · Chapters · Events · Gallery · Contact.
  */
 export const mainNav: NavLink[] = [
   { label: 'Home', href: '/' },
   { label: 'About SXCCAA', href: '/about' },
   { label: 'Chapters', href: '/chapters' },
   { label: 'Events', href: '/events' },
+  { label: 'Gallery', href: '/gallery' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -84,6 +85,7 @@ export const pagesMenu: { title: string; links: NavLink[] }[] = [
       { label: 'About SXCCAA', href: '/about' },
       { label: 'Chapters', href: '/chapters' },
       { label: 'Alumni Events & Activities', href: '/events' },
+      { label: 'Gallery', href: '/gallery' },
       { label: 'Contact SXCCAA', href: '/contact' },
     ],
   },
@@ -106,6 +108,7 @@ export const mobileMenu: NavLink[] = [
   { label: 'Explore the Network', href: '/explore' },
   { label: 'Chapters', href: '/chapters' },
   { label: 'Alumni Events & Activities', href: '/events' },
+  { label: 'Gallery', href: '/gallery' },
   { label: 'Contact', href: '/contact' },
   { label: 'Privacy Policy', href: '/privacy-policy' },
   { label: 'Terms of Use', href: '/terms-of-use' },
@@ -154,6 +157,7 @@ export const footerColumns: { title: string; links: NavLink[] }[] = [
       { label: 'Alumni', href: '/alumni' },
       { label: 'Chapters', href: '/chapters' },
       { label: 'Events & Activities', href: '/events' },
+      { label: 'Gallery', href: '/gallery' },
       { label: 'Stories', href: '/alumni#featured' },
     ],
   },

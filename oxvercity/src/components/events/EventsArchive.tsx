@@ -21,6 +21,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { alumniEvents, strands, type DateStamp, type Strand } from '@/data/pages/events';
+import { imageUrl } from '@/lib/images';
 
 /**
  * Whatever SXCCAA gave, the largest part of it is set large: the day where
@@ -168,7 +169,7 @@ export function EventsArchive() {
 
           <div className="ev-archive__plate" ref={plate} aria-hidden="true" data-on={active ? 'yes' : 'no'}>
             {active ? (
-              <img src={active.images[0].src} width={active.images[0].width} height={active.images[0].height} alt="" loading="lazy" decoding="async" sizes="260px" />
+              <img src={imageUrl(active.images[0])} width={active.images[0].width} height={active.images[0].height} alt="" loading="lazy" decoding="async" sizes="260px" />
             ) : null}
           </div>
         </div>
