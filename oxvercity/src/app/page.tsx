@@ -2,7 +2,6 @@ import { SiteShell, PAGE_ROOT_STYLE } from '@/components/layout/SiteShell';
 import { Preloader } from '@/components/home/Preloader';
 import { NostalgiaHero } from '@/components/home/nostalgia/NostalgiaHero';
 import { AwardeeSpotlight } from '@/components/home/nostalgia/AwardeeSpotlight';
-import { BookingSection } from '@/components/home/nostalgia/BookingSection';
 import { Pillars } from '@/components/home/nostalgia/Pillars';
 import { AboutSection } from '@/components/home/AboutSection';
 import { FacultySection } from '@/components/home/FacultySection';
@@ -14,7 +13,7 @@ import { ProgramSection } from '@/components/home/ProgramSection';
  * stage /events opens on. The two pages were showing the same first screen;
  * /events keeps that stage untouched, and this is the home page's own.
  *
- * The run is four beats, alternating ground so each one lands separately. The
+ * The run is three beats, alternating ground so each one lands separately. The
  * hero deliberately does not use the invitation poster's own plum: the /events
  * stage is built from exactly that, and the two pages were opening on the same
  * screen. See the note at the top of `NostalgiaHero`.
@@ -28,7 +27,6 @@ import { ProgramSection } from '@/components/home/ProgramSection';
  *                     flips it solid on the first scroll.
  *   AwardeeSpotlight  the awardee poster on its ivory: Monali Thakur, and the
  *                     SHAKTI block printed beside her.
- *   BookingSection    the booking ladder and the bank account, back on ink.
  *   Pillars           the invitation's pull-quote and triptych, on white.
  *
  * Below them the College's own sections continue unchanged. A reader who came
@@ -45,7 +43,6 @@ export default function HomePage() {
         <div className="nos-run">
           <NostalgiaHero />
           <AwardeeSpotlight />
-          <BookingSection />
           <Pillars />
         </div>
         <div className="framer-18qsyp8" data-framer-name="Section Wrapper">

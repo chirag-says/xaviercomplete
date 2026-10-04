@@ -26,7 +26,7 @@
  *
  * The poster takes the wider of the two columns and is sized off the viewport
  * HEIGHT rather than its width, so it is as large as each screen can hold
- * without pushing "Book your seat" under the fold. It is uncovered on load by
+ * without pushing its call to action under the fold. It is uncovered on load by
  * a band of gold light, breathes on an eleven-second cycle, catches a sweep of
  * foil on the same cycle, and rotates a few degrees toward the pointer with a
  * sheen that tracks it. Nothing about the content depends on any of that: it
@@ -43,7 +43,7 @@ import { useRef, useState } from 'react';
 import { imageSrcSet, imageUrl } from '@/lib/images';
 import { prefersReducedMotion } from '@/lib/motion';
 import { Lightbox } from '@/components/events/Lightbox';
-import { invitePoster, nostalgia, registration } from '@/data/pages/nostalgia';
+import { invitePoster, nostalgia } from '@/data/pages/nostalgia';
 import { useCountdown, useTilt } from './hooks';
 
 /** The dust. Each speck gets a lane, a size, a delay and a duration. */
@@ -97,7 +97,7 @@ export function NostalgiaHero() {
   };
 
   /**
-   * Eases the two in-page jumps instead of cutting to them, and leaves the URL
+   * Eases the in-page jump instead of cutting to it, and leaves the URL
    * hash in place so the link is still a link — copyable, openable in a new
    * tab, and working with the script off.
    *
@@ -172,20 +172,11 @@ export function NostalgiaHero() {
           </dl>
 
           <div className="nos-hero__actions">
-            <a className="nos-cta" href="#nos-passes" onClick={jump}>
-              <span>Book your seat</span>
-              <span aria-hidden="true" className="nos-cta__arrow">→</span>
-            </a>
             <button type="button" className="nos-cta nos-cta--quiet" onClick={openPoster}>
               <span>View the invitation</span>
               <span aria-hidden="true" className="nos-cta__arrow">↗</span>
             </button>
           </div>
-
-          <p className="nos-hero__price">
-            {registration.label} <strong>{registration.amount}</strong> <span>{registration.tax}</span>
-            <span className="nos-hero__priceNote">{registration.note}</span>
-          </p>
         </div>
 
         <div className="nos-hero__frame">
