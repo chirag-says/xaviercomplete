@@ -389,6 +389,78 @@
   }
 }
 
+/* ---- podium photograph -------------------------------------------------------
+ * The one photograph between the hero and the About section: the Secretary at
+ * the podium at Nostalgia '26, on the section wrapper's white, at the 1296px
+ * measure the rebuilt pages share (`.ev-shell`), with the template's 15px
+ * radius on the frame. The note under it is set in the About section's own
+ * paragraph preset, one step down, so it reads as a caption and not as copy.
+ * (The preset's selector is three classes deep, so the overrides carry the
+ * section class as well to outrank it.)
+ * Only the top is padded: the About section's own padding makes the gap
+ * below. Everything is under `.sx-podium`. */
+.sx-podium {
+  position: relative;
+  flex: none;
+  width: 100%;
+  padding: 80px 0 0;
+}
+.sx-podium__shell {
+  width: 100%;
+  max-width: 1336px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.sx-podium__figure {
+  margin: 0;
+}
+.sx-podium__frame {
+  display: block;
+  overflow: hidden;
+  border-radius: 15px;
+  background-color: rgba(19, 62, 109, 0.06);
+}
+.sx-podium__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2560 / 1707;
+  object-fit: cover;
+}
+.sx-podium__caption {
+  padding-top: 18px;
+}
+.sx-podium .sx-podium__caption p.framer-text {
+  --framer-font-size: 16px;
+  --framer-line-height: 1.5em;
+  --framer-text-color: var(--token-1c49fc01-5a06-4e84-9621-823d64297d7d, rgb(17, 17, 17));
+}
+.sx-podium .sx-podium__caption strong {
+  font-weight: 600;
+  color: rgb(19, 62, 109);
+}
+.sx-podium__sep {
+  margin: 0 0.5em;
+  opacity: 0.45;
+}
+.sx-podium .sx-podium__caption p.sx-podium__line {
+  margin-top: 4px;
+  --framer-font-size: 14px;
+  opacity: 0.7;
+}
+@media (max-width: 1199.98px) {
+  .sx-podium { padding-top: 60px; }
+}
+@media (max-width: 809.98px) {
+  .sx-podium { padding-top: 48px; }
+  .sx-podium__frame { border-radius: 12px; }
+  .sx-podium__caption { padding-top: 14px; }
+  .sx-podium .sx-podium__caption p.framer-text { --framer-font-size: 15px; }
+  .sx-podium .sx-podium__caption p.sx-podium__line { --framer-font-size: 13px; }
+  /* the name and the role stack on a phone */
+  .sx-podium__sep { display: block; height: 0; overflow: hidden; margin: 0; }
+}
+
 /* ---- About section: the home page's two calls to action ---------------------
  * The template gives the About section one pill. The Association's home page
  * puts both of the hero's buttons here instead, so the first thing a visitor

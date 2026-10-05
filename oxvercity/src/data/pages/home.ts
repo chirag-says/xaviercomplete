@@ -6,8 +6,10 @@ import { eventsCta } from '@/data/site';
  * components; change text and images here.
  *
  * Nothing in this file asserts a fact about the alumni body — no counts, no
- * names, no achievements — because the Association has not supplied the
- * alumni dataset yet. Statements about the College come from sxccal.edu.
+ * achievements — because the Association has not supplied the alumni dataset
+ * yet. The one name here, the Secretary's under the podium photograph, is as
+ * printed in the Nostalgia '26 programme (`schedule.ts`) and confirmed by
+ * SXCCAA on 5 October 2026. Statements about the College come from sxccal.edu.
  */
 
 /**
@@ -30,6 +32,25 @@ export const hero = {
    */
   primaryCta: { label: 'Explore Alumni', href: '/alumni' },
   secondaryCta: eventsCta,
+};
+
+/**
+ * The photograph under the hero and the note under it: the Secretary at the
+ * podium at Nostalgia '26. The frame is the gallery upload `SHUB4128`
+ * (`galleryPhotos.ts` lists the same id). The role is the one the programme
+ * prints against his welcome message (`schedule.ts`); the event line is the
+ * gallery's.
+ */
+export const podium = {
+  photo: {
+    id: 'oxvercity/gallery/SHUB4128',
+    width: 2560,
+    height: 1707,
+    alt: 'Dr. Sanjay Goel speaking from the podium at Nostalgia ’26 cum Shakti, 3 October 2026',
+  },
+  name: 'Dr. Sanjay Goel',
+  role: 'Secretary, SXCCAA West Zone Chapter',
+  line: 'Welcoming the gathering at Nostalgia ’26 cum Shakti, 3 October 2026',
 };
 
 export interface FacultySlide {
